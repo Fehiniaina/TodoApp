@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "TodoApp",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/TodoApp"],
+      "port": 5200,
+      "url": "http://localhost:5200"
+    }
+  ]
+}
