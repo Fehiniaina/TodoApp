@@ -34,18 +34,46 @@ else
             PageSizeChanged="OnPageSizeChangedAsync">
         <ChildContentHeader>
             <tr>
-                <th scope="col" class="px-6 py-3 font-medium">Titre</th>
-                <th scope="col" class="px-6 py-3 font-medium">Description</th>
-                <th scope="col" class="px-6 py-3 font-medium">Priorité</th>
-                <th scope="col" class="px-6 py-3 font-medium">Créée le</th>
+                <th scope="col">Titre</th>
+                <th scope="col">Description</th>
+                <th scope="col">Priorité</th>
+                <th scope="col">Créée le</th>
+                <th scope="col" class="text-end">Actions</th>
             </tr>
         </ChildContentHeader>
         <ChildContentRow Context="task">
-            <tr class="bg-neutral-primary-soft border-b border-default">
-                <th class="bg-neutral-primary-soft border-b border-default">@task.Title</th>
-                <th class="bg-neutral-primary-soft border-b border-default">@task.Description</th>
-                <th class="bg-neutral-primary-soft border-b border-default">@task.Priority</th>
-                <th class="bg-neutral-primary-soft border-b border-default">@task.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</th>
+            <tr class="bg-neutral-primary-soft border-b border-default" @key="task.Id">
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Title</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Description</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Priority</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td class="text-end text-nowrap">
+                    @if (_pendingDeleteId == task.Id)
+                    {
+                        <span class="me-2">Supprimer ?</span>
+                        <button class="btn btn-sm btn-danger" disabled="@_isDeleting"
+                                @onclick="() => ConfirmDeleteAsync(task.Id)" @(_isDeleting ? "Suppression…" : "Oui" )>
+                            Oui
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" disabled="@_isDeleting"
+                                @onclick="CancelDelete">
+                            Non
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-outline-primary me-1"
+                                aria-label="@($"Modifier {task.Title}")"
+                                @onclick="() => OnEdit.InvokeAsync(task)">
+                            Modifier
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                aria-label="@($"Supprimer {task.Title}")"
+                                @onclick="() => RequestDelete(task.Id)">
+                            Supprimer
+                        </button>
+                    }
+                </td>
             </tr>
         </ChildContentRow>
     </PaginationComponent>

@@ -3,13 +3,24 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using TodoApp.Common;
 using TodoApp.Features.Shared;
+using TodoApp.Features.Tasks.DeleteTasks;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
 public partial class TaskList : IDisposable
 {
+    [Parameter] public EventCallback<TaskSummary> OnEdit { get; set; }
+
+    private Guid? _pendingDeleteId;
+    private bool _isDeleting;
+    private string? _actionError;
+
+    private void RequestDelete(Guid id) => _pendingDeleteId = id;
+    private void CancelDelete() => _pendingDeleteId = null;
+
     [Inject] private ListTasksHandler Handler { get; set; } = null!;
     [Inject] private TaskChangeNotifier Notifier { get; set; } = null!;
+    [Inject] private DeleteTasksHandler DeleteTasksHandler { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -80,6 +91,37 @@ public partial class TaskList : IDisposable
             await LoadTasksAsync(); // recharge la page courante, sans revenir à la première
             StateHasChanged();
         });
+
+    public async Task ConfirmDeleteAsync(Guid id)
+    {
+        var auth = await AuthenticationState;
+        _ownerId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(_ownerId))
+        {
+            return;
+        }
+
+        _isDeleting = true;
+        _actionError = null;
+
+        try
+        {
+            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(id, _ownerId));
+
+            if (result.IsFailure)
+            {
+                _actionError = result.Error.Message;
+            }
+        }
+        finally
+        {
+            _isDeleting = false;
+            _pendingDeleteId = null;
+        }
+
+    }
+
 
     public void Dispose() => Notifier.Changed -= OnTasksChanged;
 }

@@ -1,6 +1,6 @@
 namespace TodoApp.Domain.Tasks;
 
-internal enum TaskPriority
+public enum TaskPriority
 {
     Low,
     Medium,

@@ -33,7 +33,7 @@ internal sealed class CreateTaskHandler(
         if (!validation.IsValid)
         {
             var first = validation.Errors[0];
-            return Error.Validation(first.ErrorCode, first.ErrorMessage);
+            return Error.Validation("Task.IsInvalid", first.ErrorMessage);
         }
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);

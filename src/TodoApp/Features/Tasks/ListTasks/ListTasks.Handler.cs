@@ -11,7 +11,7 @@ internal sealed record ListTasksQuery(
     int Page = 1,
     int PageSize = 10);
 
-internal sealed record TaskSummary(
+public sealed record TaskSummary(
     Guid Id,
     string Title,
     string? Description,
