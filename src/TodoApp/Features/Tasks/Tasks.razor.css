@@ -1,0 +1,18 @@
+﻿body {
+    .tasks-page {
+        width: 100%;
+        max-width: none;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+
+    .tasks-page-body {
+        width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .tasks-page {
+            padding: 1.5rem 2rem;
+        }
+    }
+}

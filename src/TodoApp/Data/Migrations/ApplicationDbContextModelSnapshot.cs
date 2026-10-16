@@ -336,8 +336,12 @@ namespace TodoApp.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_tasks");
 
-                    b.HasIndex("OwnerId")
-                        .HasDatabaseName("ix_tasks_owner_id");
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tasks_id");
+
+                    b.HasIndex("OwnerId", "Priority")
+                        .HasDatabaseName("ix_tasks_owner_id_priority");
 
                     b.ToTable("tasks", (string)null);
                 });

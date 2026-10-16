@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
 using TodoApp.Components;
 using TodoApp.Components.Account;
@@ -34,9 +35,17 @@ builder.Services.AddAuthentication(options =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options => {
     options.UseNpgsql(connectionString)
-        .UseSnakeCaseNamingConvention());
+    .UseSnakeCaseNamingConvention();
+
+    if (builder.Environment.IsDevelopment())
+    {
+        options.LogTo(Console.WriteLine, LogLevel.Information)
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors();
+    }
+});
 // Identity stores require a scoped DbContext; bridge it to the singleton
 // factory so handlers still get a short-lived context per call.
 builder.Services.AddScoped<ApplicationDbContext>(sp =>

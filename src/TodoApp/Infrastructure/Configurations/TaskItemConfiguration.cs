@@ -28,6 +28,8 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(task => task.CreatedAtUtc)
             .IsRequired();
 
-        builder.HasIndex(task => task.OwnerId);
+        builder.HasIndex(task => task.Id)
+            .IsUnique();
+        builder.HasIndex(task => new { task.OwnerId , task.Priority}); // composite index
     }
 }
