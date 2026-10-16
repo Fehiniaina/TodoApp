@@ -34,9 +34,25 @@ builder.Services.AddAuthentication(options =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString)
-        .UseSnakeCaseNamingConvention());
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options => {
+    options.UseNpgsql(
+        connectionString,
+        npgsqlOptions => npgsqlOptions
+        .EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorCodesToAdd: null
+        ))
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+        .UseSnakeCaseNamingConvention();
+
+    if (builder.Environment.IsDevelopment())
+    {
+        options.LogTo(Console.WriteLine, LogLevel.Information)
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors();
+    }
+});
 // Identity stores require a scoped DbContext; bridge it to the singleton
 // factory so handlers still get a short-lived context per call.
 builder.Services.AddScoped<ApplicationDbContext>(sp =>

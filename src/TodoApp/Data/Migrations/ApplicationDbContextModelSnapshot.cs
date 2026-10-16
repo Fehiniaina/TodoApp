@@ -235,6 +235,14 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("email_confirmed");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean")
                         .HasColumnName("lockout_enabled");
@@ -328,8 +336,12 @@ namespace TodoApp.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_tasks");
 
-                    b.HasIndex("OwnerId")
-                        .HasDatabaseName("ix_tasks_owner_id");
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tasks_id");
+
+                    b.HasIndex("OwnerId", "Priority")
+                        .HasDatabaseName("ix_tasks_owner_id_priority");
 
                     b.ToTable("tasks", (string)null);
                 });

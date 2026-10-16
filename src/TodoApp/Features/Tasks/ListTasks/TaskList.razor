@@ -1,0 +1,80 @@
+@using TodoApp.Components.Shared
+
+@if (_isLoading)
+{
+    <div class="task-list-empty">
+        <p class="text-secondary">Loading tasks…</p>
+    </div>
+}
+else if (_errorMessage is not null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_result is null || _result.TotalCount == 0)
+{
+    <div class="task-list-empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+             class="task-list-empty-icon" aria-hidden="true">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <p class="task-list-empty-text">No tasks yet.<br />Create your first one above.</p>
+    </div>
+}
+else
+{
+    <PaginationComponent 
+            TItem="TaskSummary" 
+            Items="_result.Items"
+            TotalCount="_result.TotalCount"
+            CurrentPage="_currentPage"
+            PageSize="_pageSize"
+            PageChanged="OnPageChangedAsync"
+            PageSizeChanged="OnPageSizeChangedAsync">
+        <ChildContentHeader>
+            <tr>
+                <th scope="col">Titre</th>
+                <th scope="col">Description</th>
+                <th scope="col">Priorité</th>
+                <th scope="col">Créée le</th>
+                <th scope="col" class="text-end">Actions</th>
+            </tr>
+        </ChildContentHeader>
+        <ChildContentRow Context="task">
+            <tr class="bg-neutral-primary-soft border-b border-default" @key="task.Id">
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Title</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Description</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Priority</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td class="text-end text-nowrap">
+                    @if (_pendingDeleteId == task.Id)
+                    {
+                        <span class="me-2">Supprimer ?</span>
+                        <button class="btn btn-sm btn-danger" disabled="@_isDeleting"
+                                @onclick="() => ConfirmDeleteAsync(task.Id)" @(_isDeleting ? "Suppression…" : "Oui" )>
+                            Oui
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" disabled="@_isDeleting"
+                                @onclick="CancelDelete">
+                            Non
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-outline-primary me-1"
+                                aria-label="@($"Modifier {task.Title}")"
+                                @onclick="() => OnEdit.InvokeAsync(task)">
+                            Modifier
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                aria-label="@($"Supprimer {task.Title}")"
+                                @onclick="() => RequestDelete(task.Id)">
+                            Supprimer
+                        </button>
+                    }
+                </td>
+            </tr>
+        </ChildContentRow>
+    </PaginationComponent>
+}

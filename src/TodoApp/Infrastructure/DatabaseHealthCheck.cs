@@ -10,6 +10,7 @@ internal sealed class DatabaseHealthCheck(IDbContextFactory<ApplicationDbContext
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
+        Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>");
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         return await dbContext.Database.CanConnectAsync(cancellationToken)
