@@ -29,11 +29,27 @@ internal sealed class TaskItem
     public static TaskItem Create(string ownerId, string title, string? description, TaskPriority priority) =>
         new()
         {
-            Id = Guid.CreateVersion7(), 
-            OwnerId = ownerId, 
-            Title = title.Trim(), 
-            Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim(), 
+            Id = Guid.CreateVersion7(),
+            OwnerId = ownerId,
+            Title = title.Trim(),
+            Description = NormalizeDescription(description),
             Priority = priority,
             CreatedAtUtc = DateTime.UtcNow
         };
+
+    public void Update(string title, string? description, TaskPriority priority)
+    {
+        Title = NormalizeTitle(title);
+        Description = NormalizeDescription(description);
+        Priority = priority;
+    }
+
+    private static string NormalizeTitle(string title)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        return title.Trim();
+    }
+
+    private static string? NormalizeDescription(string? description) =>
+        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
 }

@@ -71,7 +71,7 @@ else
                     {
                         <button class="btn btn-sm btn-outline-primary me-1"
                                 aria-label="@($"Modifier {task.Title}")"
-                                @onclick="() => OnEdit.InvokeAsync(task)">
+                                @onclick="() => OpenEditModal(task)">
                             Modifier
                         </button>
                         <button class="btn btn-sm btn-outline-danger"
@@ -88,20 +88,17 @@ else
 
 @if (_showCreateModal)
 {
-    <div class="modal fade show d-block" tabindex="-1" role="dialog"
-         aria-modal="true" aria-labelledby="create-task-title">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="create-task-title">Nouvelle tâche</h2>
-                    <button type="button" class="btn-close" aria-label="Fermer"
-                            @onclick="CloseCreateModal"></button>
-                </div>
-                <div class="modal-body">
-                    <CreateTaskForm OnCreated="OnTaskCreatedAsync" OnCancel="CloseCreateModal" />
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
+    <Modal Title="Nouvelle tâche" OnClose="CloseCreateModal">
+        <CreateTaskForm OnCreated="OnTaskCreatedAsync" OnCancel="CloseCreateModal" />
+    </Modal>
+}
+
+@if (_editingTask is not null)
+{
+    <Modal Title="Modifier la tâche" OnClose="CloseEditModal">
+        <EditTaskForm @key="_editingTask.Id"
+                      TaskToEdit="_editingTask"
+                      OnSaved="CloseEditModal"
+                      OnCancel="CloseEditModal" />
+    </Modal>
 }

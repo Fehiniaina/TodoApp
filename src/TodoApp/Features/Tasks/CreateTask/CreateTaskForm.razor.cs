@@ -1,14 +1,15 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Tasks.CreateTask;
+using TodoApp.Features.Tasks.Shared;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TodoApp.Features.Tasks.CreateTask;
@@ -27,7 +28,7 @@ public partial class CreateTaskForm
 
     // Cascading auth state is provided by AddCascadingAuthenticationState() in Program.cs.
 
-    private FormModel Model { get; set; } = new();
+    private TaskFormModel Model { get; set; } = new();
     private bool IsSubmitting { get; set; }
     private string? ErrorMessage { get; set; }
     private string? SuccessMessage { get; set; }
@@ -73,12 +74,5 @@ public partial class CreateTaskForm
         {
             IsSubmitting = false;
         }   
-    }
-
-    internal sealed class FormModel
-    {
-        public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public TaskPriority Priority { get; set; } = TaskPriority.Medium;
     }
 }

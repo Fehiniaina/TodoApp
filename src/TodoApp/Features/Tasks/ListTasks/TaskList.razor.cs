@@ -12,8 +12,6 @@ namespace TodoApp.Features.Tasks.ListTasks;
 
 public partial class TaskList : IDisposable
 {
-    [Parameter] public EventCallback<TaskSummary> OnEdit { get; set; }
-
     private Guid? _pendingDeleteId;
     private bool _isDeleting;
 
@@ -39,6 +37,11 @@ public partial class TaskList : IDisposable
     private bool _isLoading = true;
     private string? _errorMessage;
     private string? _ownerId;
+
+    private TaskSummary? _editingTask;
+
+    private void OpenEditModal(TaskSummary task) => _editingTask = task;
+    private void CloseEditModal() => _editingTask = null;
 
     protected override async Task OnInitializedAsync()
     {
