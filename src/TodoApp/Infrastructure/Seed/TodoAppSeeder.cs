@@ -33,7 +33,7 @@ public static class TodoAppSeeder
                 priority: f.PickRandom<TaskPriority>()
             ));
 
-        var tasks = taskFaker.Generate(10000);
+        var tasks = taskFaker.Generate(10);
 
         context.Tasks.AddRange(tasks);
         await context.SaveChangesAsync();

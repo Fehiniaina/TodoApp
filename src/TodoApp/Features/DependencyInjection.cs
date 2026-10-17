@@ -19,7 +19,7 @@ internal static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 
         // Register database seeder as hosted service (runs once at startup in Development only)
-        services.AddHostedService<DatabaseSeederHostedService>();
+        // services.AddHostedService<DatabaseSeederHostedService>();
 
         return services;
     }

@@ -1,5 +1,12 @@
 @using TodoApp.Components.Shared
 
+<div class="task-list-toolbar d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary" @onclick="OpenCreateModal">
+        <span class="bi bi-plus-lg me-1" aria-hidden="true"></span>
+        Nouvelle tâche
+    </button>
+</div>
+
 @if (_isLoading)
 {
     <div class="task-list-empty">
@@ -77,4 +84,24 @@ else
             </tr>
         </ChildContentRow>
     </PaginationComponent>
+}
+
+@if (_showCreateModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog"
+         aria-modal="true" aria-labelledby="create-task-title">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="create-task-title">Nouvelle tâche</h2>
+                    <button type="button" class="btn-close" aria-label="Fermer"
+                            @onclick="CloseCreateModal"></button>
+                </div>
+                <div class="modal-body">
+                    <CreateTaskForm OnCreated="OnTaskCreatedAsync" OnCancel="CloseCreateModal" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
 }

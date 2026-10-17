@@ -8,6 +8,7 @@ using TodoApp.Components.Account;
 using TodoApp.Data;
 using TodoApp.Features;
 using TodoApp.Features.Shared;
+using TodoApp.Features.Shared.Notifications;
 using TodoApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -78,6 +79,8 @@ builder.Services.AddScoped<CurrentUser>();
 
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
+
+builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 

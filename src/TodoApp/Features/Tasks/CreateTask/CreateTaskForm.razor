@@ -1,18 +1,8 @@
-@page "/tasks/new"
-@rendermode InteractiveServer
-@attribute [Authorize]
-
-@using Microsoft.AspNetCore.Authorization
 @using TodoApp.Domain.Tasks
 
-@inject NavigationManager Navigation
-
-<PageTitle>Nouvelle tâche</PageTitle>
-<h1>Nouvelle tâche</h1>
-
-<EditForm Model="Model" OnValidSubmit="SubmitAsync" FormName="create-task">
+<EditForm Model="Model" OnValidSubmit="SubmitAsync">
     <div class="mb-3">
-        <label class="form-label" for="task-title">Title <span aria-hidden="true">*</span></label>
+        <label class="form-label" for="task-title">Titre <span aria-hidden="true">*</span></label>
         <InputText id="task-title" class="form-control" @bind-Value="Model.Title" />
     </div>
 
@@ -22,7 +12,7 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label" for="task-priority">Priority</label>
+        <label class="form-label" for="task-priority">Priorité</label>
         <InputSelect id="task-priority" class="form-select" @bind-Value="Model.Priority">
             @foreach (var priority in Enum.GetValues<TaskPriority>())
             {
@@ -31,16 +21,18 @@
         </InputSelect>
     </div>
 
-    <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
-        @(IsSubmitting ? "Enregistrement…" : "Créer la tâche")
-    </button>
-</EditForm>
+    @if (ErrorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@ErrorMessage</div>
+    }
 
-@if (ErrorMessage is not null)
-{
-    <div class="alert alert-danger mt-3" role="alert">@ErrorMessage</div>
-}
-@if (SuccessMessage is not null)
-{
-    <div class="alert alert-success mt-3" role="alert">@SuccessMessage</div>
-}
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" disabled="@IsSubmitting"
+                @onclick="OnCancel">
+            Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+            @(IsSubmitting ? "Enregistrement…" : "Créer la tâche")
+        </button>
+    </div>
+</EditForm>
