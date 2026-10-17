@@ -16,7 +16,9 @@ public sealed record TaskSummary(
     string Title,
     string? Description,
     TaskPriority Priority,
-    DateTime CreatedAtUtc);
+    DateTime CreatedAtUtc,
+    bool IsCompleted,
+    DateTime? CompletedAt);
 
 internal sealed class ListTasksHandler(
     IDbContextFactory<ApplicationDbContext> factory) : IHandler
@@ -42,7 +44,7 @@ internal sealed class ListTasksHandler(
             .ThenBy(t => t.Id)
             .Skip((page -1) * pageSize)
             .Take(pageSize)
-            .Select(t => new TaskSummary(t.Id, t.Title, t.Description, t.Priority, t.CreatedAtUtc))
+            .Select(t => new TaskSummary(t.Id, t.Title, t.Description, t.Priority, t.CreatedAtUtc, t.IsCompleted, t.CompletedAt))
             .ToListAsync(cancellationToken);
 
         return new PagedResult<TaskSummary>(items, totalCount, pageSize);

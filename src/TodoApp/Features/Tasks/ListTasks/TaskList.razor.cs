@@ -7,6 +7,7 @@ using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
+using TodoApp.Features.Tasks.ToggleTaskCompletion;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
@@ -42,6 +43,10 @@ public partial class TaskList : IDisposable
 
     private void OpenEditModal(TaskSummary task) => _editingTask = task;
     private void CloseEditModal() => _editingTask = null;
+
+    [Inject] private ToggleTaskCompletionHandler ToggleHandler { get; set; } = null!;
+
+    private readonly HashSet<Guid> _togglingIds = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,6 +114,60 @@ public partial class TaskList : IDisposable
             await LoadTasksAsync(); // recharge la page courante, sans revenir à la première
             StateHasChanged();
         });
+
+    private async Task ToggleCompletionAsync(TaskSummary original, bool isCompleted)
+    {
+        if (!_togglingIds.Add(original.Id)) return; // déjà en cours pour cette ligne
+
+        // 1. Mise à jour optimiste : la ligne change tout de suite.
+        ReplaceItem(original with
+        {
+            IsCompleted = isCompleted,
+            CompletedAt = isCompleted ? DateTime.UtcNow : null,
+        });
+
+        try
+        {
+            var result = await ToggleHandler.HandleAsync(new ToggleTaskCompletionCommand(original.Id, isCompleted));
+
+            if (result.IsFailure)
+            {
+                ReplaceItem(original); // 2a. Rollback
+                Logger.OperationFailed(OperationsTask.ToggleTaskCompletion, result.Error.Code, result.Error.Message);
+                Notification.Warning(result.Error.Message, "Mise à jour impossible");
+                return;
+            }
+
+            // 2b. Confirmation : on garde la date réellement enregistrée par le serveur.
+            ReplaceItem(original with
+            {
+                IsCompleted = result.Value.IsCompleted,
+                CompletedAt = result.Value.CompletedAt,
+            });
+            Notification.Success(message: "Tache mise a jour avec success");
+        }
+        catch (Exception ex)
+        {
+            ReplaceItem(original);
+            Logger.UnexpectedError(OperationsTask.ToggleTaskCompletion, ex);
+            Notification.Error("Une erreur inattendue est survenue. Réessayez plus tard.", "Erreur");
+        }
+        finally
+        {
+            _togglingIds.Remove(original.Id);
+        }
+    }
+
+    /// <summary>Remplace une seule ligne sans recharger la page.</summary>
+    private void ReplaceItem(TaskSummary updated)
+    {
+        if (_result is null) return;
+
+        _result = _result with
+        {
+            Items = _result.Items.Select(t => t.Id == updated.Id ? updated : t).ToList(),
+        };
+    }
 
     public async Task ConfirmDeleteAsync(Guid id)
     {

@@ -41,6 +41,7 @@ else
             PageSizeChanged="OnPageSizeChangedAsync">
         <ChildContentHeader>
             <tr>
+                <th scope="col" class="text-center">Terminée</th>
                 <th scope="col">Titre</th>
                 <th scope="col">Description</th>
                 <th scope="col">Priorité</th>
@@ -49,7 +50,20 @@ else
             </tr>
         </ChildContentHeader>
         <ChildContentRow Context="task">
-            <tr class="bg-neutral-primary-soft border-b border-default" @key="task.Id">
+            <tr class="bg-neutral-primary-soft border-b border-default @(task.IsCompleted ? "task-completed" : null)" @key="task.Id">
+                <td class="text-center">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           checked="@task.IsCompleted"
+                           disabled="@_togglingIds.Contains(task.Id)"
+                           aria-label="@($"Marquer « {task.Title} » comme {(task.IsCompleted ? "non terminée" : "terminée")}")"
+                           @onchange="e => ToggleCompletionAsync(task, (bool)e.Value!)" />
+                    <span class="@(task.IsCompleted ? "text-decoration-line-through text-secondary" : null)">@task.Title</span>
+                    @if (task.CompletedAt is { } completedAt)
+                    {
+                        <small class="d-block text-secondary">Terminée le @completedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                    }
+                </td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.Title</td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.Description</td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.Priority</td>

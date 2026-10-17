@@ -81,6 +81,7 @@ builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 

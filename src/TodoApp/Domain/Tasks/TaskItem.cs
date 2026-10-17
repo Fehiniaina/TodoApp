@@ -44,6 +44,28 @@ internal sealed class TaskItem
         Priority = priority;
     }
 
+    public void Complete(DateTime completedAtUtc)
+    {
+        if (IsCompleted)
+        {
+            return; // idempotent : on garde la date d'origine
+        }
+
+        IsCompleted = true;
+        CompletedAt = completedAtUtc;
+    }
+
+    public void Reopen()
+    {
+        if (!IsCompleted)
+        {
+            return;
+        }
+
+        IsCompleted = false;
+        CompletedAt = null;
+    }
+
     private static string NormalizeTitle(string title)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
