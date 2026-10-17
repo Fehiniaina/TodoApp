@@ -585,6 +585,14 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
+            "Microsoft.Extensions.Configuration.EnvironmentVariables": {
+              "target": "Package",
+              "version": "[10.0.13, )"
+            },
+            "Microsoft.Extensions.Configuration.UserSecrets": {
+              "target": "Package",
+              "version": "[10.0.13, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[17.14.1, )"
@@ -592,10 +600,6 @@
             "Respawn": {
               "target": "Package",
               "version": "[7.0.0, )"
-            },
-            "Testcontainers.PostgreSql": {
-              "target": "Package",
-              "version": "[4.16.0, )"
             },
             "coverlet.collector": {
               "target": "Package",

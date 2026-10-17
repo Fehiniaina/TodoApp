@@ -1,4 +1,14 @@
+@page "/tasks/new"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
 @using TodoApp.Domain.Tasks
+
+@inject NavigationManager Navigation
+
+<PageTitle>Nouvelle tâche</PageTitle>
+<h1>Nouvelle tâche</h1>
 
 <EditForm Model="Model" OnValidSubmit="SubmitAsync" FormName="create-task">
     <div class="mb-3">
@@ -22,7 +32,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
-        @(IsSubmitting ? "Saving…" : "Create task")
+        @(IsSubmitting ? "Enregistrement…" : "Créer la tâche")
     </button>
 </EditForm>
 

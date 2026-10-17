@@ -11,7 +11,7 @@ public class CreateTaskCommandValidatorTests
         string title = "Buy groceries",
         string? description = null,
         TaskPriority priority = TaskPriority.Medium) =>
-        new("owner-1", title, description, priority);
+        new(title, description, priority);
 
     [Fact]
     public void Validate_EmptyTitle_ReturnsInvalid()

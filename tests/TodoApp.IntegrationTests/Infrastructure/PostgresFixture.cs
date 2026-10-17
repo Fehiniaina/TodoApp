@@ -1,31 +1,58 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Respawn;
 using Respawn.Graph;
-using Testcontainers.PostgreSql;
 using TodoApp.Data;
 using TodoApp.Infrastructure.Configurations;
 
 namespace TodoApp.IntegrationTests.Infrastructure;
 
 /// <summary>
-/// Starts a PostgreSQL container once per test collection, applies migrations,
-/// and exposes <see cref="ResetAsync"/> so each test starts with a clean slate.
+/// Uses a local PostgreSQL instance and a dedicated "<c>*_tests</c>" database.
+/// Applies migrations once per test collection and exposes <see cref="ResetAsync"/>
+/// so each test starts with a clean slate.
 /// </summary>
 public sealed class PostgresFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine")
-        .Build();
+    private const string TestDatabaseSuffix = "_tests";
 
     private Respawner _respawner = null!;
 
-    public string ConnectionString => _container.GetConnectionString();
+    public string ConnectionString { get; }
+
+    public PostgresFixture()
+    {
+        // Reads the app's user secrets (same UserSecretsId as the TodoApp assembly),
+        // then environment variables (e.g. ConnectionStrings__TestConnection in CI).
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets<ApplicationDbContext>(optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var baseConnectionString =
+            configuration.GetConnectionString("TestConnection")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException(
+                "No connection string found. Set ConnectionStrings:DefaultConnection in user secrets " +
+                "or ConnectionStrings__TestConnection as an environment variable.");
+
+        var builder = new NpgsqlConnectionStringBuilder(baseConnectionString);
+        var database = builder.Database ?? "todoapp";
+
+        // Safety net: Respawn wipes every table — never run against the dev database.
+        if (!database.EndsWith(TestDatabaseSuffix, StringComparison.OrdinalIgnoreCase))
+        {
+            database += TestDatabaseSuffix;
+        }
+
+        builder.Database = database;
+        ConnectionString = builder.ConnectionString;
+    }
 
     public async Task InitializeAsync()
     {
-        await _container.StartAsync();
-
         await using (var db = CreateDbContext())
         {
             await db.Database.MigrateAsync();
@@ -40,6 +67,8 @@ public sealed class PostgresFixture : IAsyncLifetime
             SchemasToInclude = ["public"],
             TablesToIgnore = [new Table("__EFMigrationsHistory")],
         });
+
+        await _respawner.ResetAsync(connection); // start from an empty DB even after an aborted run
     }
 
     public ApplicationDbContext CreateDbContext()
@@ -63,7 +92,7 @@ public sealed class PostgresFixture : IAsyncLifetime
         await _respawner.ResetAsync(connection);
     }
 
-    public async Task DisposeAsync() => await _container.DisposeAsync();
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 
 /// <summary>xUnit collection that shares one <see cref="PostgresFixture"/> across all integration tests.</summary>

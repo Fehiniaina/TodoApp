@@ -14,7 +14,6 @@ public partial class CreateTaskForm
     [Inject] private CreateTaskHandler Handler { get; set; } = null!;
 
     // Cascading auth state is provided by AddCascadingAuthenticationState() in Program.cs.
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
     private FormModel Model { get; set; } = new();
     private bool IsSubmitting { get; set; }
@@ -23,39 +22,30 @@ public partial class CreateTaskForm
 
     private async Task SubmitAsync()
     {
+        if (IsSubmitting) return;
+
         IsSubmitting = true;
         ErrorMessage = null;
         SuccessMessage = null;
 
-        var authState = await AuthenticationState;
-        var ownerId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrEmpty(ownerId))
+        try
         {
-            ErrorMessage = "You must be signed in to create a task.";
-            IsSubmitting = false;
-            return;
-        }
+            var result = await Handler.HandleAsync(
+                new CreateTaskCommand(Model.Title, string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description, Model.Priority));
 
-        var command = new CreateTaskCommand(
-            ownerId,
-            Model.Title,
-            string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description,
-            Model.Priority);
+            if (result.IsFailure)
+            {
+                ErrorMessage = result.Error.Message;
+                return;
+            }
 
-        var result = await Handler.HandleAsync(command);
-
-        if (result.IsSuccess)
-        {
             SuccessMessage = $"\"{result.Value.Title}\" created successfully.";
             Model = new FormModel();
         }
-        else
+        finally
         {
-            ErrorMessage = result.Error.Message;
-        }
-
-        IsSubmitting = false;
+            IsSubmitting = false;
+        }   
     }
 
     internal sealed class FormModel

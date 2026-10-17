@@ -10,12 +10,16 @@ namespace TodoApp.IntegrationTests.Features.Tasks.CreateTask;
 [Collection("Postgres")]
 public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 {
+    private const string OwnerA = "owner-A";
+    private const string OwnerB = "owner-B";
+
     public Task InitializeAsync() => fixture.ResetAsync();
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private CreateTaskHandler CreateHandler() => new(
+    private CreateTaskHandler CreateHandler(string ownerId = OwnerA) => new(
         new TestDbContextFactory(fixture),
         new CreateTaskCommandValidator(),
+        new FakeCurrentUser(ownerId),
         new TaskChangeNotifier());
 
     // ── success path ────────────────────────────────────────────────────────
@@ -23,7 +27,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task HandleAsync_ValidCommand_ReturnsSuccess()
     {
-        var command = new CreateTaskCommand("owner-1", "Buy milk", null, TaskPriority.Low);
+        var command = new CreateTaskCommand("Buy milk", null, TaskPriority.Low);
 
         var result = await CreateHandler().HandleAsync(command);
 
@@ -37,7 +41,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task HandleAsync_ValidCommand_PersistsTaskToDatabase()
     {
-        var command = new CreateTaskCommand("owner-2", "Write tests", "Important!", TaskPriority.High);
+        var command = new CreateTaskCommand("Write tests", "Important!", TaskPriority.High);
 
         var result = await CreateHandler().HandleAsync(command);
 
@@ -49,7 +53,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal("Write tests", persisted.Title);
         Assert.Equal("Important!", persisted.Description);
         Assert.Equal(TaskPriority.High, persisted.Priority);
-        Assert.Equal("owner-2", persisted.OwnerId);
+        Assert.Equal(OwnerA, persisted.OwnerId);
     }
 
     // ── validation failure ───────────────────────────────────────────────────
@@ -57,7 +61,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task HandleAsync_EmptyTitle_ReturnsValidationFailure()
     {
-        var command = new CreateTaskCommand("owner-1", "", null, TaskPriority.Medium);
+        var command = new CreateTaskCommand("", null, TaskPriority.Medium);
 
         var result = await CreateHandler().HandleAsync(command);
 
@@ -68,7 +72,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task HandleAsync_InvalidPriority_ReturnsValidationFailure()
     {
-        var command = new CreateTaskCommand("owner-1", "Valid title", null, (TaskPriority)999);
+        var command = new CreateTaskCommand("Valid title", null, (TaskPriority)999);
 
         var result = await CreateHandler().HandleAsync(command);
 
@@ -82,7 +86,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     public async Task HandleAsync_TasksAreScopedByOwner_OtherOwnerSeesNoTasks()
     {
         // Arrange: create a task for ownerA
-        var commandA = new CreateTaskCommand("owner-A", "Secret task", null, TaskPriority.Medium);
+        var commandA = new CreateTaskCommand("Secret task", null, TaskPriority.Medium);
         await CreateHandler().HandleAsync(commandA);
 
         // Act: query database as ownerB
@@ -93,5 +97,45 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 
         // Assert: ownerB has no tasks
         Assert.Empty(ownerBTasks);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ValidCommand_PersistsTaskWithCurrentUserAsOwner()
+    {
+        var command = new CreateTaskCommand("Write tests", "Important!", TaskPriority.High);
+
+        var result = await CreateHandler().HandleAsync(command);
+
+        Assert.True(result.IsSuccess);
+
+        await using var db = fixture.CreateDbContext();
+        var persisted = await db.Tasks.AsNoTracking()
+           .SingleOrDefaultAsync(t => t.Id == result.Value.Id);
+
+        Assert.NotNull(persisted);
+        Assert.Equal("Write tests", persisted.Title);
+        Assert.Equal("Important!", persisted.Description);
+        Assert.Equal(TaskPriority.High, persisted.Priority);
+        Assert.Equal(OwnerA, persisted.OwnerId);
+    }
+
+    [Fact]
+    public async Task HandleAsync_TaskCreatedByOwnerA_IsNotVisibleToOwnerB()
+    {
+        // Arrange
+        var result = await CreateHandler(OwnerB)
+            .HandleAsync(new CreateTaskCommand("Write tests", "Important!", TaskPriority.High));
+
+        Assert.True(result.IsSuccess);
+
+        // Act
+        await using var db = fixture.CreateDbContext();
+        var ownerATasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerA).ToListAsync();
+        var ownerBTasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerB).ToListAsync();
+
+        // Assert
+        var task = Assert.Single(ownerBTasks);
+        Assert.Equal(result.Value.Id, task.Id);
+        Assert.Empty(ownerATasks);
     }
 }
