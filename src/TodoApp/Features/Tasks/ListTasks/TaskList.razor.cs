@@ -2,10 +2,12 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using TodoApp.Common;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
+using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
 using TodoApp.Features.Tasks.ToggleTaskCompletion;
@@ -25,6 +27,10 @@ public partial class TaskList : IDisposable
     [Inject] private DeleteTasksHandler DeleteTasksHandler { get; set; } = null!;
     [Inject] private NotificationService Notification { get; set; } = null!;
     [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
+    [Inject] private ToggleTaskCompletionHandler ToggleHandler { get; set; } = null!;
+    [Inject] private IUserClock Clock { get; set; } = null!;
+    [Inject] private UserTimeZone UserTimeZone { get; set; } = null!;
+    [Inject] private IJSRuntime JS { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -45,9 +51,9 @@ public partial class TaskList : IDisposable
     private void OpenEditModal(TaskSummary task) => _editingTask = task;
     private void CloseEditModal() => _editingTask = null;
 
-    [Inject] private ToggleTaskCompletionHandler ToggleHandler { get; set; } = null!;
-
     private readonly HashSet<Guid> _togglingIds = [];
+    private DateOnly _today;
+    protected override void OnParametersSet() => _today = Clock.Today;
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,6 +63,20 @@ public partial class TaskList : IDisposable
         Notifier.Changed += OnTasksChanged;
 
         await LoadTasksAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Le fuseau du navigateur n'est accessible qu'une fois le circuit interactif établi.
+        if (firstRender && !UserTimeZone.IsDetected)
+        {
+            var ianaId = await JS.InvokeAsync<string>("todoApp.getTimeZone");
+            if (UserTimeZone.TrySet(ianaId))
+            {
+                _today = Clock.Today;
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task LoadTasksAsync()
@@ -209,11 +229,8 @@ public partial class TaskList : IDisposable
 
     private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
 
-    private static string FormatDate(DateTime utc) =>
-        utc.ToLocalTime().ToString("d MMM yyyy", French);
-
-    private static string FormatDateTime(DateTime utc) =>
-        utc.ToLocalTime().ToString("d MMM yyyy 'à' HH:mm", French);
-
     public void Dispose() => Notifier.Changed -= OnTasksChanged;
+
+    private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
+    private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
 }

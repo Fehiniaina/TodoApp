@@ -49,8 +49,10 @@ else
                 <tr>
                     <th scope="col" class="col-check"><span class="visually-hidden">Terminée</span></th>
                     <th scope="col" class="col-summary">Résumé</th>
+                    <th scope="col" class="col-description">Description</th>
                     <th scope="col" class="col-priority">Priorité</th>
                     <th scope="col" class="col-status">Statut</th>
+                    <th scope="col" class="col-due">Échéance</th>
                     <th scope="col" class="col-date">Créée le</th>
                     <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
                 </tr>
@@ -77,6 +79,8 @@ else
                         }
                     </td>
 
+                    <td class="col-description">@task.Description</td>
+
                     <td class="col-priority">
                         <PriorityIcon Priority="task.Priority" />
                     </td>
@@ -92,6 +96,7 @@ else
                         }
                     </td>
 
+                    <td class="col-date"><DueDateBadge DueDate="task.DueDate" IsCompleted="task.IsCompleted" Today="_today" /></td>
                     <td class="col-date">@FormatDate(task.CreatedAtUtc)</td>
 
                     <td class="col-actions">

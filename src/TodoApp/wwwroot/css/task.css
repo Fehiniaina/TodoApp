@@ -88,23 +88,25 @@
         color: var(--issue-text);
     }
 
-    .issue-table th {
-        padding: 0.5rem 0.625rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--issue-muted);
-        text-align: left;
-        border-bottom: 2px solid var(--issue-border);
-    }
+        .issue-table th {
+            padding: 0.5rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--issue-muted);
+            text-align: left;
+            border-bottom: 2px solid var(--issue-border);
+        }
 
-    .issue-table td {
-        height: 44px;
-        padding: 0.25rem 0.625rem;
-        vertical-align: middle;
-        border-bottom: 1px solid var(--issue-border);
-    }
+        .issue-table td {
+            height: 44px;
+            padding: 0.25rem 0.625rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--issue-border);
+        }
 
-    .issue-table .issue-row:hover td { background: var(--issue-hover); }
+        .issue-table .issue-row:hover td {
+            background: var(--issue-hover);
+        }
 
     .col-check {
         width: 44px;
@@ -376,35 +378,35 @@
         cursor: pointer;
     }
 
-        .pager-btn svg {
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.75;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+    .pager-btn svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
 
-        .pager-btn:hover:not(:disabled):not(.is-current) {
-            background: var(--issue-hover);
-        }
+    .pager-btn:hover:not(:disabled):not(.is-current) {
+        background: var(--issue-hover);
+    }
 
-        .pager-btn.is-current {
-            font-weight: 600;
-            color: var(--issue-primary);
-            background: #e9f2ff;
-            cursor: default;
-        }
+    .pager-btn.is-current {
+        font-weight: 600;
+        color: var(--issue-primary);
+        background: #e9f2ff;
+        cursor: default;
+    }
 
-        .pager-btn:disabled {
-            color: var(--issue-subtle);
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    .pager-btn:disabled {
+        color: var(--issue-subtle);
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-        .pager-btn:focus-visible {
-            outline: 2px solid var(--issue-primary);
-            outline-offset: 1px;
-        }
+    .pager-btn:focus-visible {
+        outline: 2px solid var(--issue-primary);
+        outline-offset: 1px;
+    }
 
     .pager-ellipsis {
         min-width: 24px;
@@ -431,15 +433,15 @@
         cursor: pointer;
     }
 
-        .pager-select:hover {
-            background-color: var(--issue-hover);
-        }
+    .pager-select:hover {
+        background-color: var(--issue-hover);
+    }
 
-        .pager-select:focus {
-            outline: none;
-            border-color: var(--issue-primary);
-            box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
-        }
+    .pager-select:focus {
+        outline: none;
+        border-color: var(--issue-primary);
+        box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
+    }
 
     @media (max-width: 576px) {
         .pager {
@@ -449,6 +451,62 @@
         .pager-range {
             width: 100%;
             text-align: center;
+        }
+    }
+
+    .col-due {
+        width: 150px;
+    }
+
+    .due {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.125rem 0.375rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--issue-muted);
+        border-radius: 3px;
+        white-space: nowrap;
+    }
+
+    .due svg {
+        flex: none;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .due-overdue {
+        color: #ae2e24;
+        background: #ffeceb;
+        font-weight: 600;
+    }
+
+    .due-duetoday {
+        color: #7f5f01;
+        background: #fff7d6;
+        font-weight: 600;
+    }
+
+    .due-upcoming {
+        color: var(--issue-text);
+    }
+
+    .due-none {
+        color: var(--issue-subtle);
+    }
+    /* tâche terminée : date affichée sans alerte */
+
+    .due-empty {
+        color: var(--issue-subtle);
+    }
+
+    @media (max-width: 768px) {
+        .col-due {
+            width: 110px;
         }
     }
 }

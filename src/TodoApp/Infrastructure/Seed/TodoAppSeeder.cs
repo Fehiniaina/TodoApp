@@ -13,6 +13,7 @@ public static class TodoAppSeeder
     )
     {
         await using var context = await factory.CreateDbContextAsync();
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var userIds = await context.Users.Select(u => u.Id).ToListAsync();
         if (userIds.Count == 0)
@@ -30,7 +31,8 @@ public static class TodoAppSeeder
                 ownerId: f.PickRandom(userIds),
                 title: f.Lorem.Sentence(3, 5),
                 description: f.Lorem.Paragraph(),
-                priority: f.PickRandom<TaskPriority>()
+                priority: f.PickRandom<TaskPriority>(),
+                dueDate: today.AddDays(f.Random.Int(-7, 21)).OrNull(f, 0.25f)
             ));
 
         var tasks = taskFaker.Generate(10);

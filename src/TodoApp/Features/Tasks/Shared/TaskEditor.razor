@@ -21,6 +21,12 @@
         </InputSelect>
     </div>
 
+    <div class="mb-3">
+        <label class="form-label" for="task-due-date">Échéance</label>
+        <InputDate id="task-due-date" class="form-control" @bind-Value="Model.DueDate" />
+        <div class="form-text">Optionnelle. Laissez vide pour une tâche sans date limite.</div>
+    </div>
+
     @if (ErrorMessage is not null)
     {
         <div class="alert alert-danger" role="alert">@ErrorMessage</div>

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D8TzHZxkrMQ=",
+  "dgSpecHash": "ry7yUar/i3I=",
   "success": true,
-  "projectFilePath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\src\\TodoAPp\\TodoApp.csproj",
+  "projectFilePath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\src\\TodoApp\\TodoApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\bogus\\35.6.5\\bogus.35.6.5.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\efcore.namingconventions\\10.0.1\\efcore.namingconventions.10.0.1.nupkg.sha512",

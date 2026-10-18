@@ -44,7 +44,7 @@ public partial class CreateTaskForm
         try
         {
             var result = await Handler.HandleAsync(
-                new CreateTaskCommand(Model.Title, string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description, Model.Priority));
+                new CreateTaskCommand(Model.Title, string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description, Model.Priority, Model.DueDate));
 
             if (result.IsFailure)
             {

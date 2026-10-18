@@ -10,7 +10,8 @@ namespace TodoApp.Features.Tasks.CreateTask;
 internal sealed record CreateTaskCommand(
     string Title,
     string? Description,
-    TaskPriority Priority);
+    TaskPriority Priority,
+    DateOnly? DueDate = null);
 
 internal sealed record CreateTaskResult(
     Guid Id,
@@ -43,7 +44,8 @@ internal sealed class CreateTaskHandler(
             ownerId,
             command.Title.Trim(),
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description,
-            command.Priority);
+            command.Priority,
+            command.DueDate);
 
         db.Tasks.Add(task);
         await db.SaveChangesAsync(cancellationToken);

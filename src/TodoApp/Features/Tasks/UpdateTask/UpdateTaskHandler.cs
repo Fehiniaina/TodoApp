@@ -12,7 +12,8 @@ internal sealed record UpdateTaskCommand(
     Guid Id,
     string Title,
     string? Description,
-    TaskPriority Priority);
+    TaskPriority Priority,
+    DateOnly? DueDate = null);
 
 internal sealed class UpdateTaskCommandValidator : AbstractValidator<UpdateTaskCommand>
 {
@@ -67,7 +68,7 @@ internal sealed class UpdateTaskHandler(
             return Error.NotFound("Task.NotFound", "Cette tâche n'existe pas ou a été supprimée.");
         }
 
-        task.Update(command.Title, command.Description, command.Priority);
+        task.Update(command.Title, command.Description, command.Priority, command.DueDate);
 
         await db.SaveChangesAsync(cancellationToken);
         notifier.NotifyChanged();

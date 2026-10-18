@@ -9,6 +9,7 @@ using TodoApp.Data;
 using TodoApp.Features;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
+using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -78,6 +79,9 @@ builder.Services.AddHealthChecks()
 
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddScoped<UserTimeZone>();
+builder.Services.AddScoped<IUserClock, UserClock>();
 
 var app = builder.Build();
 

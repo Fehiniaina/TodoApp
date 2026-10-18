@@ -26,7 +26,14 @@ internal sealed class TaskItem
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
-    public static TaskItem Create(string ownerId, string title, string? description, TaskPriority priority) =>
+    public DateOnly? DueDate { get; private set; }
+
+    public static TaskItem Create(
+        string ownerId,
+        string title,
+        string? description,
+        TaskPriority priority,
+        DateOnly? dueDate) =>
         new()
         {
             Id = Guid.CreateVersion7(),
@@ -34,14 +41,16 @@ internal sealed class TaskItem
             Title = title.Trim(),
             Description = NormalizeDescription(description),
             Priority = EnsureDefined(priority),
-            CreatedAtUtc = DateTime.UtcNow
+            CreatedAtUtc = DateTime.UtcNow,
+            DueDate = dueDate
         };
 
-    public void Update(string title, string? description, TaskPriority priority)
+    public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate)
     {
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
         Priority = EnsureDefined(priority);
+        DueDate = dueDate;
     }
 
     public void Complete(DateTime completedAtUtc)

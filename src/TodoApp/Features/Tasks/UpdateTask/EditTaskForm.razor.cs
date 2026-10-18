@@ -30,6 +30,7 @@ public partial class EditTaskForm
             Title = TaskToEdit.Title,
             Description = TaskToEdit.Description,
             Priority = TaskToEdit.Priority,
+            DueDate = TaskToEdit.DueDate,
         };
 
     private async Task SubmitAsync()
@@ -42,7 +43,7 @@ public partial class EditTaskForm
         try
         {
             var result = await Handler.HandleAsync(
-                new UpdateTaskCommand(TaskToEdit.Id, Model.Title, Model.Description, Model.Priority));
+                new UpdateTaskCommand(TaskToEdit.Id, Model.Title, Model.Description, Model.Priority, Model.DueDate));
 
             if (result.IsFailure)
             {
