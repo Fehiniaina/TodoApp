@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -206,6 +207,13 @@ public partial class TaskList : IDisposable
         }
     }
 
+    private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
+
+    private static string FormatDate(DateTime utc) =>
+        utc.ToLocalTime().ToString("d MMM yyyy", French);
+
+    private static string FormatDateTime(DateTime utc) =>
+        utc.ToLocalTime().ToString("d MMM yyyy 'à' HH:mm", French);
 
     public void Dispose() => Notifier.Changed -= OnTasksChanged;
 }

@@ -6,14 +6,15 @@
 
 @attribute [Authorize]
 
-<PageTitle>Tasks</PageTitle>
+<PageTitle>Mes tâches · TodoApp</PageTitle>
 
-<div class="tasks-page">
-    <div class="tasks-page-header">
-        <h1 class="tasks-page-title">My Tasks</h1>
-    </div>
-
-    <div class="tasks-page-body">
-        <TaskList @rendermode="InteractiveServer" />
-    </div>
+<div class="page-header">
+    <nav class="breadcrumbs" aria-label="Fil d'Ariane">
+        <a href="">Accueil</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Mes tâches</span>
+    </nav>
+    <h1 class="page-title">Mes tâches</h1>
 </div>
+
+<TaskList @rendermode="InteractiveServer" />
