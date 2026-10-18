@@ -13,88 +13,109 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>Connexion · TodoApp</PageTitle>
 
 <div class="auth-wrapper">
 
-    @* Left panel: branding *@
-    <div class="auth-brand-panel" aria-hidden="true">
+    <aside class="auth-brand-panel" aria-hidden="true">
         <div class="auth-brand-content">
             <div class="auth-logo">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 11l3 3L22 4" />
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                 </svg>
             </div>
-            <h1 class="auth-brand-title">TodoApp</h1>
-            <p class="auth-brand-subtitle">Organize your tasks,<br />accomplish more every day.</p>
-        </div>
-    </div>
 
-    @* Right panel: form *@
-    <div class="auth-form-panel">
+            <p class="auth-brand-title">TodoApp</p>
+            <p class="auth-brand-subtitle">Organisez vos tâches,<br />avancez un peu plus chaque jour.</p>
+
+            <ul class="auth-brand-features">
+                <li>Priorités de « Basse » à « Urgente »</li>
+                <li>Suivi des tâches terminées</li>
+                <li>Une liste toujours à jour</li>
+            </ul>
+        </div>
+
+        <p class="auth-brand-footer">© @DateTime.UtcNow.Year TodoApp</p>
+    </aside>
+
+    <main class="auth-form-panel">
         <div class="auth-form-container">
-            <div class="auth-form-header">
-                <h2 class="auth-form-title">Welcome back</h2>
-                <p class="auth-form-lead">Sign in to your account</p>
+
+            <div class="auth-mobile-logo" aria-hidden="true">
+                <span class="auth-logo auth-logo-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                </span>
+                <span>TodoApp</span>
             </div>
+
+            <header class="auth-form-header">
+                <h1 class="auth-form-title">Bon retour 👋</h1>
+                <p class="auth-form-lead">Connectez-vous pour retrouver vos tâches.</p>
+            </header>
 
             <StatusMessage Message="@errorMessage" />
 
-            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login" class="auth-form">
                 <DataAnnotationsValidator />
-                <ValidationSummary class="auth-validation-summary" role="alert" />
 
                 <div class="auth-field">
-                    <label for="Input.Email" class="auth-label">Email address</label>
+                    <label for="Input.Email" class="auth-label">Adresse e-mail</label>
                     <InputText @bind-Value="Input.Email" id="Input.Email" class="auth-input"
-                               autocomplete="username webauthn" aria-required="true"
-                               placeholder="you@example.com" />
-                    <ValidationMessage For="() => Input.Email" class="auth-field-error" />
+                               type="email" autocomplete="username webauthn" aria-required="true"
+                               placeholder="vous@exemple.com" />
+                    <ValidationMessage For="() => Input.Email" />
                 </div>
 
                 <div class="auth-field">
                     <div class="auth-label-row">
-                        <label for="Input.Password" class="auth-label">Password</label>
-                        <a href="Account/ForgotPassword" class="auth-link auth-link-sm">Forgot password?</a>
+                        <label for="Input.Password" class="auth-label">Mot de passe</label>
+                        <a href="Account/ForgotPassword" class="auth-link auth-link-sm">Mot de passe oublié ?</a>
                     </div>
                     <InputText type="password" @bind-Value="Input.Password" id="Input.Password"
                                class="auth-input" autocomplete="current-password"
                                aria-required="true" placeholder="••••••••" />
-                    <ValidationMessage For="() => Input.Password" class="auth-field-error" />
+                    <ValidationMessage For="() => Input.Password" />
                 </div>
 
-                <div class="auth-remember">
-                    <InputCheckbox @bind-Value="Input.RememberMe" id="rememberMe"
-                                   class="auth-checkbox" />
-                    <label for="rememberMe" class="auth-remember-label">Keep me signed in</label>
-                </div>
+                <label class="auth-remember" for="rememberMe">
+                    <InputCheckbox @bind-Value="Input.RememberMe" id="rememberMe" class="auth-checkbox" />
+                    <span>Rester connecté</span>
+                </label>
 
-                <button type="submit" class="auth-btn-primary">Sign in</button>
+                <button type="submit" class="auth-btn auth-btn-primary">Se connecter</button>
 
-                <div class="auth-divider">
-                    <span>or</span>
-                </div>
+                <div class="auth-divider" role="separator"><span>ou</span></div>
 
                 <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey"
-                               EmailName="Input.Email" class="auth-btn-secondary">
-                    Sign in with a passkey
+                               EmailName="Input.Email" class="auth-btn auth-btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="7.5" cy="15.5" r="5.5" />
+                        <path d="m21 2-9.6 9.6" />
+                        <path d="m15.5 7.5 3 3L22 7l-3-3" />
+                    </svg>
+                    Se connecter avec une passkey
                 </PasskeySubmit>
-
             </EditForm>
 
-            <p class="auth-footer-text">
-                No account yet?
-                <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))"
-                   class="auth-link">Create one</a>
-            </p>
-            <p class="auth-footer-text">
-                <a href="Account/ResendEmailConfirmation" class="auth-link">Resend email confirmation</a>
-            </p>
+            <footer class="auth-footer">
+                <p>
+                    Pas encore de compte ?
+                    <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))"
+                       class="auth-link">Créer un compte</a>
+                </p>
+                <p>
+                    <a href="Account/ResendEmailConfirmation" class="auth-link auth-link-muted">Renvoyer l'e-mail de confirmation</a>
+                </p>
+            </footer>
         </div>
-    </div>
-
+    </main>
 </div>
 
 @code {
@@ -152,8 +173,7 @@
 
         if (result.Succeeded)
         {
-            Logger.LogInformation("User logged in.");
-            Logger.LogInformation(ReturnUrl);
+            Logger.LogInformation("User logged in. Redirecting to {ReturnUrl}", ReturnUrl);
             RedirectManager.RedirectTo(ReturnUrl);
         }
         else if (result.RequiresTwoFactor)
