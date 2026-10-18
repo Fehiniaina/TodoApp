@@ -41,6 +41,7 @@ internal sealed class ListTasksHandler(
 
         var items = await ownerTasks
             .OrderByDescending(t => t.CreatedAtUtc)
+            .ThenByDescending(t => t.Priority)
             .ThenBy(t => t.Id)
             .Skip((page -1) * pageSize)
             .Take(pageSize)

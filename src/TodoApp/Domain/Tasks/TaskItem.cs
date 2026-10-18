@@ -33,7 +33,7 @@ internal sealed class TaskItem
             OwnerId = ownerId,
             Title = title.Trim(),
             Description = NormalizeDescription(description),
-            Priority = priority,
+            Priority = EnsureDefined(priority),
             CreatedAtUtc = DateTime.UtcNow
         };
 
@@ -41,7 +41,7 @@ internal sealed class TaskItem
     {
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
-        Priority = priority;
+        Priority = EnsureDefined(priority);
     }
 
     public void Complete(DateTime completedAtUtc)
@@ -74,4 +74,9 @@ internal sealed class TaskItem
 
     private static string? NormalizeDescription(string? description) =>
         string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+
+    private static TaskPriority EnsureDefined(TaskPriority priority) =>
+    Enum.IsDefined(priority)
+        ? priority
+        : throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown task priority.");
 }

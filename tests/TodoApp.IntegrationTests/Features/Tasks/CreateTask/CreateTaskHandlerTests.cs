@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
+using TodoApp.Data;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Tasks.CreateTask;
@@ -23,6 +24,21 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         new TaskChangeNotifier());
 
     // ── success path ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Diagnostic_PriorityIsMappedToPostgresEnum()
+    {
+        using var fromFixture = fixture.CreateDbContext();
+        using var fromFactory = new TestDbContextFactory(fixture).CreateDbContext();
+
+        string? ColumnType(ApplicationDbContext db) =>
+            db.Model.FindEntityType(typeof(TaskItem))!
+              .FindProperty(nameof(TaskItem.Priority))!
+              .GetColumnType();
+
+        Assert.Equal("task_priority", ColumnType(fromFixture));
+        Assert.Equal("task_priority", ColumnType(fromFactory));
+    }
 
     [Fact]
     public async Task HandleAsync_ValidCommand_ReturnsSuccess()

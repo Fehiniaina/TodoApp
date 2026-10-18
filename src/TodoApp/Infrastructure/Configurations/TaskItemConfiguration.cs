@@ -21,8 +21,6 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             .HasMaxLength(2000);
 
         builder.Property(task => task.Priority)
-            .HasConversion<string>()
-            .HasMaxLength(20)
             .IsRequired();
 
         builder.Property(task => task.CreatedAtUtc)

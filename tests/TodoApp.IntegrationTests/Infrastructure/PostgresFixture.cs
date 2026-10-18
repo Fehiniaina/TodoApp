@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Respawn;
 using Respawn.Graph;
 using TodoApp.Data;
-using TodoApp.Infrastructure.Configurations;
+using Microsoft.Extensions.Configuration;
 
 namespace TodoApp.IntegrationTests.Infrastructure;
 
@@ -73,16 +72,14 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     public ApplicationDbContext CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(ConnectionString)
-            .UseSnakeCaseNamingConvention()
+        var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        builder.UseTodoAppNpgsql(ConnectionString)
             // EF Core 10 raises PendingModelChangesWarning as an exception during MigrateAsync
             // even when all migrations are up to date. Safe to suppress in tests: MigrateAsync
             // applies the correct schema regardless of the model-hash check.
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
-            .Options;
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
-        return new ApplicationDbContext(options);
+        return new ApplicationDbContext(builder.Options);
     }
 
     public async Task ResetAsync()

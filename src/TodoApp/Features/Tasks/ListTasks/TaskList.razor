@@ -66,7 +66,7 @@ else
                 </td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.Title</td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.Description</td>
-                <td class="bg-neutral-primary-soft border-b border-default">@task.Priority</td>
+                <td class="bg-neutral-primary-soft border-b border-default">@task.Priority.ToLabel()</td>
                 <td class="bg-neutral-primary-soft border-b border-default">@task.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
                 <td class="text-end text-nowrap">
                     @if (_pendingDeleteId == task.Id)

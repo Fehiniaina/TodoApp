@@ -16,7 +16,7 @@
         <InputSelect id="task-priority" class="form-select" @bind-Value="Model.Priority">
             @foreach (var priority in Enum.GetValues<TaskPriority>())
             {
-                <option value="@priority">@priority</option>
+                <option value="@priority">@priority.ToLabel()</option>
             }
         </InputSelect>
     </div>

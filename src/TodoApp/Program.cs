@@ -38,16 +38,12 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options => {
-    options.UseNpgsql(
-        connectionString,
-        npgsqlOptions => npgsqlOptions
+    options.UseTodoAppNpgsql(connectionString, npgsql => npgsql
         .EnableRetryOnFailure(
             maxRetryCount: 3,
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorCodesToAdd: null
-        ))
-        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-        .UseSnakeCaseNamingConvention();
+        ));
 
     if (builder.Environment.IsDevelopment())
     {

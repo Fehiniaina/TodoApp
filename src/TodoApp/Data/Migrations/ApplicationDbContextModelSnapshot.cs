@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TodoApp.Data;
+using TodoApp.Domain.Tasks;
 
 #nullable disable
 
@@ -20,6 +21,7 @@ namespace TodoApp.Data.Migrations
                 .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "task_priority", new[] { "high", "low", "medium", "urgent" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -329,10 +331,8 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("owner_id");
 
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                    b.Property<TaskPriority>("Priority")
+                        .HasColumnType("task_priority")
                         .HasColumnName("priority");
 
                     b.Property<string>("Title")
