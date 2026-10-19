@@ -6,8 +6,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.Trash;
 
-public sealed record TrashedTaskSummary(Guid Id, string Title, TaskPriority Priority, DateTime DeletedAt);
-
 internal sealed class ListTrashedTasksHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     ICurrentUser currentUser) : IHandler

@@ -12,6 +12,8 @@ public static class TodoAppSeeder
         IDbContextFactory<ApplicationDbContext> factory
     )
     {
+        ArgumentNullException.ThrowIfNull(factory);
+
         await using var context = await factory.CreateDbContextAsync();
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 

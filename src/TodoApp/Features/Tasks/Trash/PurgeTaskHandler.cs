@@ -5,8 +5,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.Trash;
 
-internal sealed record PurgeTaskCommand(Guid Id);
-
 internal sealed class PurgeTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     ICurrentUser currentUser) : IHandler

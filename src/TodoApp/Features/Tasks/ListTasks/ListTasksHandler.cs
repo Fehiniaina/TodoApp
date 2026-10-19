@@ -5,26 +5,10 @@ using TodoApp.Domain.Tasks;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
-internal sealed record ListTasksQuery(
-    string OwnerId,
-    string? Priority = default,
-    int Page = 1,
-    int PageSize = 10);
-
-public sealed record TaskSummary(
-    Guid Id,
-    string Title,
-    string? Description,
-    TaskPriority Priority,
-    DateTime CreatedAtUtc,
-    bool IsCompleted,
-    DateTime? CompletedAt,
-    DateOnly? DueDate);
-
 internal sealed class ListTasksHandler(
     IDbContextFactory<ApplicationDbContext> factory) : IHandler
 {
-    private int MaxPageSize = 100;
+    private readonly int MaxPageSize = 100;
 
     public async Task<Result<PagedResult<TaskSummary>>> HandleAsync(
         ListTasksQuery query,

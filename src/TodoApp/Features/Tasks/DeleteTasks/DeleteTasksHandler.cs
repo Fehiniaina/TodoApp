@@ -5,8 +5,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.DeleteTasks;
 
-internal sealed record DeleteTasksCommand(Guid Id, string OwnerId);
-
 internal sealed class DeleteTasksHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     TaskChangeNotifier notifier,

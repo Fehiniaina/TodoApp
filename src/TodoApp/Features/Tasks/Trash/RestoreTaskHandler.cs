@@ -5,8 +5,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.Trash;
 
-internal sealed record RestoreTaskCommand(Guid Id);
-
 internal sealed class RestoreTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     ICurrentUser currentUser,

@@ -151,9 +151,6 @@
 
         if (UserManager.Options.SignIn.RequireConfirmedAccount)
         {
-            // RedirectManager.RedirectTo(
-            //     "Account/RegisterConfirmation",
-            //     new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
             RedirectManager.RedirectTo(
                 "/",
                 new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
@@ -165,7 +162,7 @@
         }
     }
 
-    private ApplicationUser CreateUser()
+    private static ApplicationUser CreateUser()
     {
         try
         {

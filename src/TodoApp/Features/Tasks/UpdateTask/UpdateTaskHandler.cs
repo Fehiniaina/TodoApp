@@ -8,38 +8,6 @@ using TodoApp.Features.Shared.Errors;
 
 namespace TodoApp.Features.Tasks.UpdateTask;
 
-internal sealed record UpdateTaskCommand(
-    Guid Id,
-    string Title,
-    string? Description,
-    TaskPriority Priority,
-    DateOnly? DueDate = null);
-
-internal sealed class UpdateTaskCommandValidator : AbstractValidator<UpdateTaskCommand>
-{
-    public UpdateTaskCommandValidator()
-    {
-        RuleFor(c => c.Title)
-            .NotEmpty()
-                .WithErrorCode(TaskErrors.TitleRequired.Code)
-                .WithMessage(TaskErrors.TitleRequired.Message)
-            .MaximumLength(200)
-                .WithErrorCode(TaskErrors.TitleTooLong.Code)
-                .WithMessage(TaskErrors.TitleTooLong.Message);
-
-        RuleFor(c => c.Description)
-            .MaximumLength(2000)
-                .WithErrorCode(TaskErrors.DescriptionTooLong.Code)
-                .WithMessage(TaskErrors.DescriptionTooLong.Message)
-            .When(c => c.Description is not null);
-
-        RuleFor(c => c.Priority)
-            .IsInEnum()
-                .WithErrorCode(TaskErrors.InvalidPriority.Code)
-                .WithMessage(TaskErrors.InvalidPriority.Message);
-    }
-}
-
 internal sealed class UpdateTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     IValidator<UpdateTaskCommand> validator,

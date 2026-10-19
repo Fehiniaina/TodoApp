@@ -5,10 +5,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.ToggleTaskCompletion;
 
-internal sealed record ToggleTaskCompletionCommand(Guid Id, bool IsCompleted);
-
-internal sealed record ToggleTaskCompletionResult(Guid Id, bool IsCompleted, DateTime? CompletedAt);
-
 internal sealed class ToggleTaskCompletionHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     ICurrentUser currentUser,

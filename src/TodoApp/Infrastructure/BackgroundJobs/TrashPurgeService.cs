@@ -4,7 +4,7 @@ using TodoApp.Data;
 
 namespace TodoApp.Infrastructure.BackgroundJobs;
 
-internal sealed class TrashPurgeService(
+internal sealed partial class TrashPurgeService(
     IDbContextFactory<ApplicationDbContext> factory,
     TimeProvider timeProvider,
     ILogger<TrashPurgeService> logger) : BackgroundService
@@ -23,23 +23,20 @@ internal sealed class TrashPurgeService(
                 await using var db = await factory.CreateDbContextAsync(stoppingToken);
                 var threshold = timeProvider.GetUtcNow().UtcDateTime - Retention;
 
-                var purged = await db.Tasks
+                await db.Tasks
                     .IgnoreQueryFilters([QueryFilters.SoftDelete])
                     .Where(t => t.IsDeleted && t.DeletedAt < threshold)
                     .ExecuteDeleteAsync(stoppingToken);
-
-                if (purged > 0)
-                {
-                    logger.LogInformation("Purged {Count} task(s) older than {RetentionDays} days from trash",
-                        purged, Retention.TotalDays);
-                }
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 // Une purge ratée ne doit pas arrêter le service : on réessaiera au prochain tick.
-                logger.LogError(ex, "Trash purge failed");
+                LogOnError(ex);
             }
         }
         while (await timer.WaitForNextTickAsync(stoppingToken));
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Trash purge failed")]
+    private partial void LogOnError(Exception ex);
 }
