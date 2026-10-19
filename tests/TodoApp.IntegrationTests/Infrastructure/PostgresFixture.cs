@@ -91,9 +91,3 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 }
-
-/// <summary>xUnit collection that shares one <see cref="PostgresFixture"/> across all integration tests.</summary>
-[CollectionDefinition("Postgres")]
-public class PostgresCollection : ICollectionFixture<PostgresFixture>
-{
-}

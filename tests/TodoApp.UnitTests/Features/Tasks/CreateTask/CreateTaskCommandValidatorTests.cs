@@ -19,7 +19,7 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(title: ""));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateTaskCommand.Title));
+        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(title: "   "));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateTaskCommand.Title));
+        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(title: new string('x', 201)));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateTaskCommand.Title));
+        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(priority: (TaskPriority)999));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateTaskCommand.Priority));
+        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(description: new string('x', 2001)));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateTaskCommand.Description));
+        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
     }
 
     [Fact]
