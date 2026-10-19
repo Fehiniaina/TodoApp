@@ -10,4 +10,6 @@ public sealed record TaskSummary(
     DateTime CreatedAtUtc,
     bool IsCompleted,
     DateTime? CompletedAt,
-    DateOnly? DueDate);
+    DateOnly? DueDate,
+    int ChecklistDone,
+    int ChecklistTotal);

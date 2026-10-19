@@ -10,4 +10,5 @@ internal static class OperationsTask
     public const string TrashTask = nameof(TrashTask);
     public const string RestoreTask = nameof(RestoreTask);
     public const string PurgeTask = nameof(PurgeTask);
+    public const string UpdateChecklist = nameof(UpdateChecklist);
 }

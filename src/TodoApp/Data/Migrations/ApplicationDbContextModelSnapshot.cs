@@ -480,6 +480,48 @@ namespace TodoApp.Data.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
+
+            modelBuilder.Entity("TodoApp.Domain.Tasks.TaskItem", b =>
+                {
+                    b.OwnsMany("TodoApp.Domain.Tasks.ChecklistItem", "Checklist", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<bool>("IsDone")
+                                .HasColumnType("boolean")
+                                .HasColumnName("is_done");
+
+                            b1.Property<int>("Position")
+                                .HasColumnType("integer")
+                                .HasColumnName("position");
+
+                            b1.Property<Guid>("TaskId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("task_id");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("title");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_checklist_items");
+
+                            b1.HasIndex("TaskId", "Position")
+                                .HasDatabaseName("ix_checklist_items_task_id_position");
+
+                            b1.ToTable("checklist_items", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("TaskId")
+                                .HasConstraintName("fk_checklist_items_tasks_task_id");
+                        });
+
+                    b.Navigation("Checklist");
+                });
 #pragma warning restore 612, 618
         }
     }

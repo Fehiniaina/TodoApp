@@ -1,4 +1,5 @@
 @using TodoApp.Components.Shared
+@using TodoApp.Features.Tasks.Checklist
 
 <div class="issue-toolbar">
     <span class="issue-count">
@@ -7,7 +8,7 @@
     </span>
     <div class="issue-toolbar-actions">
         <a href="tasks/trash" class="btn-ghost">Corbeille</a>
-        <button type="button" class="btn-create" @onclick="OpenCreateModal">…</button>
+        <button type="button" class="btn-create" @onclick="OpenCreateModal">Ajouter</button>
     </div>
 </div>
 
@@ -73,10 +74,20 @@ else
                         <button type="button" class="issue-title" @onclick="() => OpenEditModal(task)">
                             @task.Title
                         </button>
-                        @if (!string.IsNullOrWhiteSpace(task.Description))
-                        {
-                            <span class="issue-desc">@task.Description</span>
-                        }
+                        <div class="issue-meta">
+                            @if (task.ChecklistTotal > 0)
+                            {
+                                <span class="checklist-badge @(task.ChecklistDone == task.ChecklistTotal ? "is-complete" : null)"
+                                      title="Checklist : @task.ChecklistDone étape(s) terminée(s) sur @task.ChecklistTotal">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" /></svg>
+                                    @task.ChecklistDone/@task.ChecklistTotal
+                                </span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(task.Description))
+                            {
+                                <span class="issue-desc">@task.Description</span>
+                            }
+                        </div>
                     </td>
 
                     <td class="col-description">@task.Description</td>
@@ -156,5 +167,8 @@ else
                       TaskToEdit="_editingTask"
                       OnSaved="CloseEditModal"
                       OnCancel="CloseEditModal" />
+        <hr class="my-4" />
+
+        <ChecklistEditor @key="_editingTask.Id" TaskId="_editingTask.Id" />
     </Modal>
 }

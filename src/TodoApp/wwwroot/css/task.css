@@ -12,15 +12,15 @@
         margin-bottom: 0.25rem;
     }
 
-    .breadcrumbs a {
-        color: var(--issue-muted);
-        text-decoration: none;
-    }
+        .breadcrumbs a {
+            color: var(--issue-muted);
+            text-decoration: none;
+        }
 
-    .breadcrumbs a:hover {
-        color: var(--issue-primary);
-        text-decoration: underline;
-    }
+            .breadcrumbs a:hover {
+                color: var(--issue-primary);
+                text-decoration: underline;
+            }
 
     .page-title {
         font-size: 1.5rem;
@@ -62,16 +62,16 @@
         background: var(--issue-primary, #0c66e4);
     }
 
-    .btn-create:hover {
-        background: var(--issue-primary-hover, #0055cc);
-    }
+        .btn-create:hover {
+            background: var(--issue-primary-hover, #0055cc);
+        }
 
-    .btn-create svg {
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        fill: none;
-    }
+        .btn-create svg {
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            fill: none;
+        }
 
     .btn-ghost {
         color: var(--issue-text, #172b4d);
@@ -88,25 +88,25 @@
         color: var(--issue-text);
     }
 
-    .issue-table th {
-        padding: 0.5rem 0.625rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--issue-muted);
-        text-align: left;
-        border-bottom: 2px solid var(--issue-border);
-    }
+        .issue-table th {
+            padding: 0.5rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--issue-muted);
+            text-align: left;
+            border-bottom: 2px solid var(--issue-border);
+        }
 
-    .issue-table td {
-        height: 44px;
-        padding: 0.25rem 0.625rem;
-        vertical-align: middle;
-        border-bottom: 1px solid var(--issue-border);
-    }
+        .issue-table td {
+            height: 44px;
+            padding: 0.25rem 0.625rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--issue-border);
+        }
 
-    .issue-table .issue-row:hover td {
-        background: var(--issue-hover);
-    }
+        .issue-table .issue-row:hover td {
+            background: var(--issue-hover);
+        }
 
     .col-check {
         width: 44px;
@@ -159,16 +159,16 @@
         text-overflow: ellipsis;
     }
 
-    .issue-title:hover {
-        color: var(--issue-primary);
-        text-decoration: underline;
-    }
+        .issue-title:hover {
+            color: var(--issue-primary);
+            text-decoration: underline;
+        }
 
-    .issue-title:focus-visible {
-        outline: 2px solid var(--issue-primary);
-        outline-offset: 2px;
-        border-radius: 2px;
-    }
+        .issue-title:focus-visible {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
 
     .issue-desc {
         display: block;
@@ -190,14 +190,14 @@
         gap: 0.375rem;
     }
 
-    .priority svg {
-        flex: none;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .priority svg {
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
     .priority-label {
         color: var(--issue-text);
@@ -272,18 +272,18 @@
         cursor: pointer;
     }
 
-    .icon-btn svg {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .icon-btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .icon-btn:hover {
-        color: var(--issue-text);
-        background: #dcdfe4;
-    }
+        .icon-btn:hover {
+            color: var(--issue-text);
+            background: #dcdfe4;
+        }
 
     .icon-btn-danger:hover {
         color: var(--issue-danger);
@@ -311,7 +311,6 @@
     }
 
     .btn-confirm-danger {
-        color: #fff;
         background: var(--issue-danger);
         border: 0;
     }
@@ -525,5 +524,136 @@
     .btn-ghost:focus-visible {
         outline: 2px solid var(--issue-primary, #0c66e4);
         outline-offset: 2px;
+    }
+    /* Liste : méta sous le titre */
+    .issue-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .issue-meta .issue-desc {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .checklist-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        flex: none;
+        padding: 0 0.3rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--issue-muted);
+        background: #f1f2f4;
+        border-radius: 3px;
+    }
+
+    .checklist-badge.is-complete {
+        color: #216e4e;
+        background: #dcfff1;
+    }
+
+    .checklist-badge svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    /* Éditeur */
+    .checklist-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .checklist-heading {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--issue-text);
+    }
+
+    .checklist-count {
+        font-size: 0.8125rem;
+        color: var(--issue-muted);
+    }
+
+    .checklist-bar {
+        height: 6px;
+        background: #f1f2f4;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    .checklist-bar-fill {
+        height: 100%;
+        background: var(--issue-primary);
+        transition: width 0.2s;
+    }
+
+    .checklist-bar-fill.is-complete {
+        background: #22a06b;
+    }
+
+    .checklist-items {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 0.75rem;
+    }
+
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.25rem;
+        border-radius: var(--issue-radius);
+    }
+
+    .checklist-item:hover {
+        background: var(--issue-hover);
+    }
+
+    .checklist-item label {
+        flex: 1;
+        margin: 0;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .checklist-item.is-done label {
+        color: var(--issue-subtle);
+        text-decoration: line-through;
+    }
+
+    .checklist-item .icon-btn {
+        opacity: 0;
+    }
+
+    .checklist-item:hover .icon-btn,
+    .checklist-item:focus-within .icon-btn {
+        opacity: 1;
+    }
+
+    @media (hover: none) {
+        .checklist-item .icon-btn {
+            opacity: 1;
+        }
+    }
+
+    .checklist-add {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .checklist-bar-fill {
+            transition: none;
+        }
     }
 }

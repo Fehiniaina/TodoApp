@@ -84,6 +84,12 @@ builder.Services.AddScoped<IUserClock, UserClock>();
 
 builder.Services.AddHostedService<TrashPurgeService>();
 
+builder.Services
+    .AddOptions<TrashPurgeOptions>()
+    .Bind(builder.Configuration.GetSection(TrashPurgeOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -7,6 +7,8 @@ internal sealed class TaskItem
     {
     }
 
+    private readonly List<ChecklistItem> _checklist = [];
+
     public Guid Id { get; private set; }
     public string OwnerId { get; private set; } = null!;
     public string Title { get; private set; } = null!;
@@ -21,6 +23,14 @@ internal sealed class TaskItem
     public bool IsDeleted { get; private set; }
     public DateTime? DeletedAt { get; private set; }
 
+    public const int MaxChecklistItems = 50;
+
+    /// <summary>Vue en lecture seule, sans copie. L'ordre n'est pas garanti (ordre de chargement EF).</summary>
+    public IReadOnlyCollection<ChecklistItem> Checklist => _checklist.AsReadOnly();
+
+    /// <summary>Étapes triées par position (alloue une nouvelle liste).</summary>
+    public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
+        [.. _checklist.OrderBy(i => i.Position)];
 
     public static TaskItem Create(
         string ownerId,
@@ -84,6 +94,44 @@ internal sealed class TaskItem
         if (!IsDeleted) return;
         IsDeleted = false;
         DeletedAt = null;
+    }
+
+    public ChecklistItem AddChecklistItem(string title)
+    {
+        if (_checklist.Count >= MaxChecklistItems)
+        {
+            throw new InvalidOperationException($"A task cannot have more than {MaxChecklistItems} checklist items.");
+        }
+
+        var item = new ChecklistItem(Guid.CreateVersion7(), NormalizeTitle(title), _checklist.Count);
+        _checklist.Add(item);
+        return item;
+    }
+
+    public bool SetChecklistItemDone(Guid itemId, bool isDone)
+    {
+        var item = _checklist.Find(i => i.Id == itemId);
+        if (item is null) return false;
+
+        item.SetDone(isDone);
+        return true;
+    }
+
+    public bool RemoveChecklistItem(Guid itemId)
+    {
+        var item = _checklist.Find(i => i.Id == itemId);
+        if (item is null) return false;
+
+        _checklist.Remove(item);
+
+        // Positions contiguës (0, 1, 2…) après suppression.
+        var ordered = _checklist.OrderBy(i => i.Position).ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            ordered[i].MoveTo(i);
+        }
+
+        return true;
     }
 
     private static string NormalizeTitle(string title)

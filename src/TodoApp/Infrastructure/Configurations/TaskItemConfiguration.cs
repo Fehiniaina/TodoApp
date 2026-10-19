@@ -41,5 +41,27 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         // Pour la corbeille et la purge.
         builder.HasIndex(task => new { task.OwnerId, task.DeletedAt })
                .HasFilter("is_deleted = true");
+
+        builder.OwnsMany(task => task.Checklist, item =>
+        {
+            item.ToTable("checklist_items");
+
+            // FK "task_id" (propriété fantôme) → tasks.id, ON DELETE CASCADE.
+            item.WithOwner().HasForeignKey("TaskId");
+
+            item.HasKey(i => i.Id);
+
+            // Indispensable : la clé est générée côté C# (Guid v7).
+            item.Property(i => i.Id).ValueGeneratedNever();
+
+            item.Property(i => i.Title).IsRequired().HasMaxLength(200);
+            item.Property(i => i.Position).IsRequired();
+
+            item.HasIndex("TaskId", nameof(ChecklistItem.Position));
+        });
+
+        builder.Navigation(task => task.Checklist)
+           .HasField("_checklist")
+           .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
