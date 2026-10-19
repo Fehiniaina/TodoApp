@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Components
+@using TodoApp.Features.Shared.Notifications
+@implements IDisposable
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;">
+    @foreach (var notification in Notifications.Items)
+    {
+        <div @key="notification.Id"
+             class="toast show align-items-center border-0 @BackgroundCss(notification.Level)"
+             role="@(IsUrgent(notification.Level) ? "alert" : "status")"
+             aria-live="@(IsUrgent(notification.Level) ? "assertive" : "polite")"
+             aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <span class="bi @Icon(notification.Level) me-2" aria-hidden="true"></span>
+                    @if (notification.Title is not null)
+                    {
+                        <strong class="me-1">@notification.Title</strong>
+                    }
+                    @notification.Message
+                </div>
+                <button type="button"
+                        class="btn-close @CloseButtonCss(notification.Level) me-2 m-auto"
+                        aria-label="Fermer"
+                        @onclick="() => Notifications.Dismiss(notification.Id)"></button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] private NotificationService Notifications { get; set; } = null!;
+
+    protected override void OnInitialized() => Notifications.Changed += OnChanged;
+
+    // Changed peut être levé depuis un thread de Task.Delay : on repasse par le dispatcher Blazor.
+    private void OnChanged(object? sender, EventArgs e) => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Notifications.Changed -= OnChanged;
+
+    private static bool IsUrgent(NotificationLevel level) =>
+        level is NotificationLevel.Error or NotificationLevel.Warning;
+
+    private static string BackgroundCss(NotificationLevel level) => level switch
+    {
+        NotificationLevel.Success => "text-bg-success",
+        NotificationLevel.Info => "text-bg-info",
+        NotificationLevel.Warning => "text-bg-warning",
+        NotificationLevel.Error => "text-bg-danger",
+        _ => "text-bg-secondary",
+    };
+
+    // info et warning ont un texte sombre : on garde la croix noire.
+    private static string CloseButtonCss(NotificationLevel level) =>
+        level is NotificationLevel.Success or NotificationLevel.Error ? "btn-close-white" : "";
+
+    private static string Icon(NotificationLevel level) => level switch
+    {
+        NotificationLevel.Success => "bi-check-circle-fill",
+        NotificationLevel.Info => "bi-info-circle-fill",
+        NotificationLevel.Warning => "bi-exclamation-triangle-fill",
+        NotificationLevel.Error => "bi-x-octagon-fill",
+        _ => "bi-bell-fill",
+    };
+}

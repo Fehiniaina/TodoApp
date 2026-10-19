@@ -7,22 +7,10 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.CreateTask;
 
-internal sealed record CreateTaskCommand(
-    string OwnerId,
-    string Title,
-    string? Description,
-    TaskPriority Priority);
-
-internal sealed record CreateTaskResult(
-    Guid Id,
-    string Title,
-    string? Description,
-    TaskPriority Priority,
-    DateTime CreatedAtUtc);
-
 internal sealed class CreateTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     IValidator<CreateTaskCommand> validator,
+    ICurrentUser currentUser,
     TaskChangeNotifier notifier) : IHandler
 {
     public async Task<Result<CreateTaskResult>> HandleAsync(
@@ -37,12 +25,14 @@ internal sealed class CreateTaskHandler(
         }
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
+        var ownerId = await currentUser.GetIdAsync();
 
         var task = TaskItem.Create(
-            command.OwnerId,
+            ownerId,
             command.Title.Trim(),
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description,
-            command.Priority);
+            command.Priority,
+            command.DueDate);
 
         db.Tasks.Add(task);
         await db.SaveChangesAsync(cancellationToken);

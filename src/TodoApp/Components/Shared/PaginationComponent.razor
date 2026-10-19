@@ -1,10 +1,11 @@
 ﻿@typeparam TItem
 
-<div>
-    <table class="table">
-        <thead>
-            @ChildContentHeader
-        </thead>
+<div class="paged-table">
+    <table class="@TableClass">
+        @if (ChildContentHeader is not null)
+        {
+            <thead>@ChildContentHeader</thead>
+        }
         <tbody>
             @foreach (var item in Items)
             {
@@ -13,58 +14,93 @@
         </tbody>
     </table>
 
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <nav aria-label="Pagination des tâches">
-            <ul class="pagination mb-0">
-                <li class="page-item @(CurrentPage <= 1 ? "disabled" : null)">
-                    <button class="page-link" @onclick="() => ChangePageAsync(CurrentPage - 1)">Précédent</button>
-                </li>
-                @foreach (int? page in VisiblePages())
+    <div class="pager">
+        <span class="pager-range" aria-live="polite">@RangeText</span>
+
+        @if (TotalPages > 1)
+        {
+            <nav class="pager-nav" aria-label="@AriaLabel">
+                <button type="button" class="pager-btn" aria-label="Page précédente"
+                        disabled="@IsPreviousDisabled"
+                        @onclick="() => ChangePageAsync(CurrentPage - 1)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" /></svg>
+                </button>
+
+                @foreach (var page in VisiblePages())
                 {
                     if (page is int target)
                     {
-                        <li class="page-item @(target == CurrentPage ? "active" : null)">
-                            <button class="page-link"
-                                    aria-current="@(target == CurrentPage ? "page" : null)"
-                                    @onclick="() => ChangePageAsync(target)">@target</button>
-                        </li>
+                        <button type="button"
+                                class="pager-btn @(target == CurrentPage ? "is-current" : null)"
+                                aria-label="@($"Page {target}")"
+                                aria-current="@(target == CurrentPage ? "page" : null)"
+                                @onclick="() => ChangePageAsync(target)">
+                            @target
+                        </button>
                     }
                     else
                     {
-                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        <span class="pager-ellipsis" aria-hidden="true">…</span>
                     }
                 }
-                <li class="page-item @(CurrentPage >= TotalPages ? "disabled" : null)">
-                    <button class="page-link" @onclick="() => ChangePageAsync(CurrentPage + 1)">Suivant</button>
-                </li>
-            </ul>
-        </nav>
-    </div>
 
+                <button type="button" class="pager-btn" aria-label="Page suivante"
+                        disabled="@IsNextDisabled"
+                        @onclick="() => ChangePageAsync(CurrentPage + 1)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
+                </button>
+            </nav>
+        }
+
+        @if (PageSizes.Length > 0)
+        {
+            <label class="pager-size">
+                <span>Par page</span>
+                <select class="pager-select" value="@PageSize" @onchange="OnPageSizeChangedAsync">
+                    @foreach (var size in PageSizes)
+                    {
+                        <option value="@size">@size</option>
+                    }
+                </select>
+            </label>
+        }
+    </div>
 </div>
 
 @code {
     [Parameter] public IReadOnlyList<TItem> Items { get; set; } = [];
-    [Parameter] public int DefaultPageSize { get; set; } = 10;
 
     [Parameter, EditorRequired] public int TotalCount { get; set; }
     [Parameter] public int CurrentPage { get; set; } = 1;
     [Parameter] public int PageSize { get; set; } = 10;
-    [Parameter] public int[] PageSizes { get; set; } = { 5, 10, 20, 50 };
+    [Parameter] public int[] PageSizes { get; set; } = [5, 10, 20, 50];
+    [Parameter] public int PageWindow { get; set; } = 2;
+
+    [Parameter] public string TableClass { get; set; } = "table";
+    [Parameter] public string AriaLabel { get; set; } = "Pagination";
 
     [Parameter] public EventCallback<int> PageChanged { get; set; }
     [Parameter] public EventCallback<int> PageSizeChanged { get; set; }
-    [Parameter] public int PageWindow { get; set; } = 2;
 
     [Parameter] public RenderFragment? ChildContentHeader { get; set; }
     [Parameter, EditorRequired] public RenderFragment<TItem> ChildContentRow { get; set; } = default!;
 
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalCount / (double)PageSize));
 
-    private List<TItem> PaginatedData => Items.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalCount / (double)PageSize));  
+    private bool IsPreviousDisabled => CurrentPage <= 1;
+    private bool IsNextDisabled => CurrentPage >= TotalPages;
 
-    private bool IsPreviousDisabled => CurrentPage == 1;
-    private bool IsNextDisabled => CurrentPage == TotalPages;
+    private string RangeText
+    {
+        get
+        {
+            if (TotalCount == 0) return "Aucun élément";
+
+            var first = (CurrentPage - 1) * PageSize + 1;
+            var last = Math.Min(CurrentPage * PageSize, TotalCount);
+            return $"{first}–{last} sur {TotalCount}";
+        }
+    }
 
     private IEnumerable<int?> VisiblePages()
     {
@@ -73,34 +109,22 @@
 
         yield return 1;
 
-        if (start > 2)
-        {
-            yield return null;
-        }
+        if (start > 2) yield return null;
 
-        for (int page = start;page <= end; page++)
-        {
-            yield return page;
-        }
+        for (int page = start; page <= end; page++) yield return page;
 
-        if (end < TotalPages - 1)
-        {
-            yield return null;
-        }
+        if (end < TotalPages - 1) yield return null;
 
-        if (TotalPages > 1)
-        {
-            yield return TotalPages;
-        }
+        if (TotalPages > 1) yield return TotalPages;
     }
 
     private Task ChangePageAsync(int page) =>
         page < 1 || page > TotalPages || page == CurrentPage
-        ? Task.CompletedTask
-        : PageChanged.InvokeAsync(page);
+            ? Task.CompletedTask
+            : PageChanged.InvokeAsync(page);
 
     private Task OnPageSizeChangedAsync(ChangeEventArgs e) =>
         int.TryParse(e.Value?.ToString(), out int size)
-        ? PageSizeChanged.InvokeAsync(size)
-        : Task.CompletedTask;
+            ? PageSizeChanged.InvokeAsync(size)
+            : Task.CompletedTask;
 }

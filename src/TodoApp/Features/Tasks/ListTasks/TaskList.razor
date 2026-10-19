@@ -1,5 +1,16 @@
 @using TodoApp.Components.Shared
 
+<div class="issue-toolbar">
+    <span class="issue-count">
+        @{ var count = _result?.TotalCount ?? 0; }
+        @count @(count > 1 ? "tâches" : "tâche")
+    </span>
+    <div class="issue-toolbar-actions">
+        <a href="tasks/trash" class="btn-ghost">Corbeille</a>
+        <button type="button" class="btn-create" @onclick="OpenCreateModal">…</button>
+    </div>
+</div>
+
 @if (_isLoading)
 {
     <div class="task-list-empty">
@@ -24,57 +35,126 @@ else if (_result is null || _result.TotalCount == 0)
 }
 else
 {
-    <PaginationComponent 
-            TItem="TaskSummary" 
-            Items="_result.Items"
-            TotalCount="_result.TotalCount"
-            CurrentPage="_currentPage"
-            PageSize="_pageSize"
-            PageChanged="OnPageChangedAsync"
-            PageSizeChanged="OnPageSizeChangedAsync">
-        <ChildContentHeader>
-            <tr>
-                <th scope="col">Titre</th>
-                <th scope="col">Description</th>
-                <th scope="col">Priorité</th>
-                <th scope="col">Créée le</th>
-                <th scope="col" class="text-end">Actions</th>
-            </tr>
-        </ChildContentHeader>
-        <ChildContentRow Context="task">
-            <tr class="bg-neutral-primary-soft border-b border-default" @key="task.Id">
-                <td class="bg-neutral-primary-soft border-b border-default">@task.Title</td>
-                <td class="bg-neutral-primary-soft border-b border-default">@task.Description</td>
-                <td class="bg-neutral-primary-soft border-b border-default">@task.Priority</td>
-                <td class="bg-neutral-primary-soft border-b border-default">@task.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                <td class="text-end text-nowrap">
-                    @if (_pendingDeleteId == task.Id)
-                    {
-                        <span class="me-2">Supprimer ?</span>
-                        <button class="btn btn-sm btn-danger" disabled="@_isDeleting"
-                                @onclick="() => ConfirmDeleteAsync(task.Id)" @(_isDeleting ? "Suppression…" : "Oui" )>
-                            Oui
+    <div class="issue-list">
+        <PaginationComponent TItem="TaskSummary"
+                             Items="_result.Items"
+                             TotalCount="_result.TotalCount"
+                             CurrentPage="_currentPage"
+                             PageSize="_pageSize"
+                             PageChanged="OnPageChangedAsync"
+                             PageSizeChanged="OnPageSizeChangedAsync"
+                             TableClass="issue-table"
+                             AriaLabel="Pagination des tâches">
+            <ChildContentHeader>
+                <tr>
+                    <th scope="col" class="col-check"><span class="visually-hidden">Terminée</span></th>
+                    <th scope="col" class="col-summary">Résumé</th>
+                    <th scope="col" class="col-description">Description</th>
+                    <th scope="col" class="col-priority">Priorité</th>
+                    <th scope="col" class="col-status">Statut</th>
+                    <th scope="col" class="col-due">Échéance</th>
+                    <th scope="col" class="col-date">Créée le</th>
+                    <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </ChildContentHeader>
+
+            <ChildContentRow Context="task">
+                <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
+                    <td class="col-check">
+                        <input type="checkbox"
+                               class="issue-check"
+                               checked="@task.IsCompleted"
+                               disabled="@_togglingIds.Contains(task.Id)"
+                               aria-label="@($"Marquer « {task.Title} » comme {(task.IsCompleted ? "non terminée" : "terminée")}")"
+                               @onchange="e => ToggleCompletionAsync(task, (bool)e.Value!)" />
+                    </td>
+
+                    <td class="col-summary">
+                        <button type="button" class="issue-title" @onclick="() => OpenEditModal(task)">
+                            @task.Title
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary" disabled="@_isDeleting"
-                                @onclick="CancelDelete">
-                            Non
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-sm btn-outline-primary me-1"
-                                aria-label="@($"Modifier {task.Title}")"
-                                @onclick="() => OnEdit.InvokeAsync(task)">
-                            Modifier
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger"
-                                aria-label="@($"Supprimer {task.Title}")"
-                                @onclick="() => RequestDelete(task.Id)">
-                            Supprimer
-                        </button>
-                    }
-                </td>
-            </tr>
-        </ChildContentRow>
-    </PaginationComponent>
+                        @if (!string.IsNullOrWhiteSpace(task.Description))
+                        {
+                            <span class="issue-desc">@task.Description</span>
+                        }
+                    </td>
+
+                    <td class="col-description">@task.Description</td>
+
+                    <td class="col-priority">
+                        <PriorityIcon Priority="task.Priority" />
+                    </td>
+
+                    <td class="col-status">
+                        @if (task.CompletedAt is { } completedAt)
+                        {
+                            <span class="lozenge lozenge-done" title="Terminée le @FormatDateTime(completedAt)">Terminé</span>
+                        }
+                        else
+                        {
+                            <span class="lozenge lozenge-todo">À faire</span>
+                        }
+                    </td>
+
+                    <td class="col-date"><DueDateBadge DueDate="task.DueDate" IsCompleted="task.IsCompleted" Today="_today" /></td>
+                    <td class="col-date">@FormatDate(task.CreatedAtUtc)</td>
+
+                    <td class="col-actions">
+                        @if (_pendingDeleteId == task.Id)
+                        {
+                            <div class="issue-confirm">
+                                <button type="button" class="btn-confirm-danger" disabled="@_isDeleting"
+                                        @onclick="() => ConfirmDeleteAsync(task.Id)">
+                                    @(_isDeleting ? "…" : "Supprimer")
+                                </button>
+                                <button type="button" class="btn-confirm-cancel" disabled="@_isDeleting"
+                                        @onclick="CancelDelete">
+                                    Annuler
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="issue-actions">
+                                <button type="button" class="icon-btn"
+                                        aria-label="@($"Modifier {task.Title}")" title="Modifier"
+                                        @onclick="() => OpenEditModal(task)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="icon-btn icon-btn-danger"
+                                        aria-label="@($"Supprimer {task.Title}")" title="Supprimer"
+                                        @onclick="() => RequestDelete(task.Id)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                        <button type="button" class="icon-btn icon-btn-danger"
+                            aria-label="@($"Mettre {task.Title} à la corbeille")" title="Mettre à la corbeille"
+                            @onclick="() => MoveToTrashAsync(task)">
+                    </td>
+                </tr>
+            </ChildContentRow>
+        </PaginationComponent>
+    </div>
+}
+
+@if (_showCreateModal)
+{
+    <Modal Title="Nouvelle tâche" OnClose="CloseCreateModal">
+        <CreateTaskForm OnCreated="OnTaskCreatedAsync" OnCancel="CloseCreateModal" />
+    </Modal>
+}
+
+@if (_editingTask is not null)
+{
+    <Modal Title="Modifier la tâche" OnClose="CloseEditModal">
+        <EditTaskForm @key="_editingTask.Id"
+                      TaskToEdit="_editingTask"
+                      OnSaved="CloseEditModal"
+                      OnCancel="CloseEditModal" />
+    </Modal>
 }

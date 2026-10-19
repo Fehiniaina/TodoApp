@@ -1,36 +1,6 @@
-@using TodoApp.Domain.Tasks
-
-<EditForm Model="Model" OnValidSubmit="SubmitAsync" FormName="create-task">
-    <div class="mb-3">
-        <label class="form-label" for="task-title">Title <span aria-hidden="true">*</span></label>
-        <InputText id="task-title" class="form-control" @bind-Value="Model.Title" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label" for="task-description">Description</label>
-        <InputTextArea id="task-description" class="form-control" rows="3" @bind-Value="Model.Description" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label" for="task-priority">Priority</label>
-        <InputSelect id="task-priority" class="form-select" @bind-Value="Model.Priority">
-            @foreach (var priority in Enum.GetValues<TaskPriority>())
-            {
-                <option value="@priority">@priority</option>
-            }
-        </InputSelect>
-    </div>
-
-    <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
-        @(IsSubmitting ? "Saving…" : "Create task")
-    </button>
-</EditForm>
-
-@if (ErrorMessage is not null)
-{
-    <div class="alert alert-danger mt-3" role="alert">@ErrorMessage</div>
-}
-@if (SuccessMessage is not null)
-{
-    <div class="alert alert-success mt-3" role="alert">@SuccessMessage</div>
-}
+<TaskEditor Model="Model"
+            SubmitText="Créer la tâche"
+            IsSubmitting="IsSubmitting"
+            ErrorMessage="@ErrorMessage"
+            OnValidSubmit="SubmitAsync"
+            OnCancel="OnCancel" />

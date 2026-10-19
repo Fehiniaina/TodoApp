@@ -12,6 +12,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(typeof(TaskItemConfiguration).Assembly);
     }

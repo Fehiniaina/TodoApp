@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using TodoApp.Components.Shared
 
 <AuthorizeView>
     <Authorized>
@@ -23,6 +24,8 @@
         </div>
     </NotAuthorized>
 </AuthorizeView>
+
+<NotificationHost @rendermode="InteractiveServer" />
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

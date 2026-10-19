@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +8,11 @@ using TodoApp.Components;
 using TodoApp.Components.Account;
 using TodoApp.Data;
 using TodoApp.Features;
+using TodoApp.Features.Shared;
+using TodoApp.Features.Shared.Notifications;
+using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
+using TodoApp.Infrastructure.BackgroundJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,13 +20,14 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services)
     .Enrich.FromLogContext()
-    .WriteTo.Console());
+    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
@@ -35,16 +41,12 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options => {
-    options.UseNpgsql(
-        connectionString,
-        npgsqlOptions => npgsqlOptions
+    options.UseTodoAppNpgsql(connectionString, npgsql => npgsql
         .EnableRetryOnFailure(
             maxRetryCount: 3,
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorCodesToAdd: null
-        ))
-        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-        .UseSnakeCaseNamingConvention();
+        ));
 
     if (builder.Environment.IsDevelopment())
     {
@@ -71,9 +73,16 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddTaskFeatures(builder.Configuration);
-
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
+
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.AddScoped<UserTimeZone>();
+builder.Services.AddScoped<IUserClock, UserClock>();
+
+builder.Services.AddHostedService<TrashPurgeService>();
 
 var app = builder.Build();
 
@@ -105,4 +114,4 @@ app.MapAdditionalIdentityEndpoints();
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
-app.Run();
+await app.RunAsync();

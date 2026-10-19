@@ -1,6 +1,6 @@
 ﻿namespace TodoApp.Common;
 
-public static class ErrorExtensions
+internal static class ErrorExtensions
 {
     public static IResult ToProblem(this Error error) => Results.Problem(
         statusCode: error.Type switch

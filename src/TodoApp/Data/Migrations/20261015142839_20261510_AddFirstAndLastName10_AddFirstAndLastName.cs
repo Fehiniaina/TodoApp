@@ -10,45 +10,18 @@ namespace TodoApp.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "last_name",
-                table: "AspNetUsers",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.AddColumn<string>(
+                name: "first_name", table: "AspNetUsers", type: "text", nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
-                name: "first_name",
-                table: "AspNetUsers",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.AddColumn<string>(
+                name: "last_name", table: "AspNetUsers", type: "text", nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "last_name",
-                table: "AspNetUsers",
-                type: "text",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "first_name",
-                table: "AspNetUsers",
-                type: "text",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+            migrationBuilder.DropColumn(name: "first_name", table: "AspNetUsers");
+            migrationBuilder.DropColumn(name: "last_name", table: "AspNetUsers");
         }
     }
 }

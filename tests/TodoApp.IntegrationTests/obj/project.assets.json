@@ -15,148 +15,10 @@
           }
         }
       },
-      "BouncyCastle.Cryptography/2.7.0": {
-        "type": "package",
-        "compile": {
-          "lib/net6.0/BouncyCastle.Cryptography.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net6.0/BouncyCastle.Cryptography.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "coverlet.collector/6.0.4": {
         "type": "package",
         "build": {
           "build/netstandard2.0/coverlet.collector.targets": {}
-        }
-      },
-      "Docker.DotNet.Enhanced/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3",
-          "Docker.DotNet.Enhanced.LegacyHttp": "4.3.3",
-          "Docker.DotNet.Enhanced.NPipe": "4.3.3",
-          "Docker.DotNet.Enhanced.NativeHttp": "4.3.3",
-          "Docker.DotNet.Enhanced.Unix": "4.3.3",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Docker.DotNet.Enhanced.Handler.Abstractions/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.Handler.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.Handler.Abstractions.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Docker.DotNet.Enhanced.LegacyHttp/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.LegacyHttp.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.LegacyHttp.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        }
-      },
-      "Docker.DotNet.Enhanced.NativeHttp/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.NativeHttp.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.NativeHttp.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Docker.DotNet.Enhanced.NPipe/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.NPipe.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.NPipe.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        }
-      },
-      "Docker.DotNet.Enhanced.Unix/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.Unix.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.Unix.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        }
-      },
-      "Docker.DotNet.Enhanced.X509/4.3.3": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
-        },
-        "compile": {
-          "lib/net10.0/Docker.DotNet.X509.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
-        },
-        "runtime": {
-          "lib/net10.0/Docker.DotNet.X509.dll": {
-            "related": ".xml"
-          },
-          "lib/net10.0/Microsoft.Net.Http.Client.dll": {}
         }
       },
       "EFCore.NamingConventions/10.0.1": {
@@ -201,6 +63,15 @@
           "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Meziantou.Analyzer/2.0.257": {
+        "type": "package",
+        "build": {
+          "buildTransitive/Meziantou.Analyzer.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Meziantou.Analyzer.props": {}
         }
       },
       "Microsoft.AspNetCore.Cryptography.Internal/10.0.12": {
@@ -392,11 +263,11 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.12": {
+      "Microsoft.Extensions.Configuration/10.0.13": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.12",
-          "Microsoft.Extensions.Primitives": "10.0.12"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.13",
+          "Microsoft.Extensions.Primitives": "10.0.13"
         },
         "compile": {
           "lib/net10.0/Microsoft.Extensions.Configuration.dll": {
@@ -412,10 +283,10 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.12": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.13": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.12"
+          "Microsoft.Extensions.Primitives": "10.0.13"
         },
         "compile": {
           "lib/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
@@ -449,6 +320,94 @@
         },
         "build": {
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
+        }
+      },
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "10.0.13",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.13"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "10.0.13",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.13",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.13",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.13",
+          "Microsoft.Extensions.Primitives": "10.0.13"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.Configuration.Json/10.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "10.0.13",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.13",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.13",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.13"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.Json.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.Configuration.UserSecrets/10.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.13",
+          "Microsoft.Extensions.Configuration.Json": "10.0.13",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.13",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.13"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.UserSecrets.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Configuration.UserSecrets.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/Microsoft.Extensions.Configuration.UserSecrets.props": {},
+          "buildTransitive/net8.0/Microsoft.Extensions.Configuration.UserSecrets.targets": {}
         }
       },
       "Microsoft.Extensions.DependencyInjection/10.0.12": {
@@ -543,10 +502,10 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.0": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.13": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.0"
+          "Microsoft.Extensions.Primitives": "10.0.13"
         },
         "compile": {
           "lib/net10.0/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -555,6 +514,43 @@
         },
         "runtime": {
           "lib/net10.0/Microsoft.Extensions.FileProviders.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.FileProviders.Physical/10.0.13": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.13",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.13",
+          "Microsoft.Extensions.Primitives": "10.0.13"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.FileProviders.Physical.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.FileProviders.Physical.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.13": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.dll": {
             "related": ".xml"
           }
         },
@@ -705,7 +701,7 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.12": {
+      "Microsoft.Extensions.Primitives/10.0.13": {
         "type": "package",
         "compile": {
           "lib/net10.0/Microsoft.Extensions.Primitives.dll": {
@@ -1041,6 +1037,9 @@
           "lib/netstandard2.1/Respawn.dll": {}
         }
       },
+      "Roslynator.Analyzers/4.14.1": {
+        "type": "package"
+      },
       "Serilog/4.3.0": {
         "type": "package",
         "compile": {
@@ -1201,71 +1200,8 @@
           }
         }
       },
-      "SharpZipLib/1.4.2": {
-        "type": "package",
-        "compile": {
-          "lib/net6.0/ICSharpCode.SharpZipLib.dll": {
-            "related": ".pdb;.xml"
-          }
-        },
-        "runtime": {
-          "lib/net6.0/ICSharpCode.SharpZipLib.dll": {
-            "related": ".pdb;.xml"
-          }
-        }
-      },
-      "SSH.NET/2026.0.0": {
-        "type": "package",
-        "dependencies": {
-          "BouncyCastle.Cryptography": "2.7.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.3"
-        },
-        "compile": {
-          "lib/net10.0/Renci.SshNet.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Renci.SshNet.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Testcontainers/4.16.0": {
-        "type": "package",
-        "dependencies": {
-          "Docker.DotNet.Enhanced": "4.3.3",
-          "Docker.DotNet.Enhanced.X509": "4.3.3",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
-          "SSH.NET": "2026.0.0",
-          "SharpZipLib": "1.4.2"
-        },
-        "compile": {
-          "lib/net10.0/Testcontainers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Testcontainers.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Testcontainers.PostgreSql/4.16.0": {
-        "type": "package",
-        "dependencies": {
-          "Testcontainers": "4.16.0"
-        },
-        "compile": {
-          "lib/net10.0/Testcontainers.PostgreSql.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Testcontainers.PostgreSql.dll": {
-            "related": ".xml"
-          }
-        }
+      "SonarAnalyzer.CSharp/10.16.0.128591": {
+        "type": "package"
       },
       "xunit/2.9.3": {
         "type": "package",
@@ -1288,7 +1224,7 @@
           }
         }
       },
-      "xunit.analyzers/1.18.0": {
+      "xunit.analyzers/1.26.0": {
         "type": "package"
       },
       "xunit.assert/2.9.3": {
@@ -1370,11 +1306,15 @@
           "Bogus": "35.6.5",
           "EFCore.NamingConventions": "10.0.1",
           "FluentValidation.DependencyInjectionExtensions": "12.2.0",
+          "Meziantou.Analyzer": "2.0.257",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "10.0.12",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.12",
           "Microsoft.EntityFrameworkCore.Tools": "10.0.12",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.3",
-          "Serilog.AspNetCore": "10.0.0"
+          "Roslynator.Analyzers": "4.14.1",
+          "Serilog.AspNetCore": "10.0.0",
+          "SonarAnalyzer.CSharp": "10.16.0.128591",
+          "xunit.analyzers": "1.26.0"
         },
         "compile": {
           "bin/placeholder/TodoApp.dll": {}
@@ -1408,26 +1348,6 @@
         "lib/netstandard1.3/Bogus.xml",
         "lib/netstandard2.0/Bogus.dll",
         "lib/netstandard2.0/Bogus.xml"
-      ]
-    },
-    "BouncyCastle.Cryptography/2.7.0": {
-      "sha512": "U+12df8UEWHgBi04YVf/Lgi2dy3SItlIYvHjjEVa/BngCQIzDCDRBk50DDByCfDvSbe5pRNFr3b7UrVK2kMcLw==",
-      "type": "package",
-      "path": "bouncycastle.cryptography/2.7.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE.md",
-        "README.md",
-        "bouncycastle.cryptography.2.7.0.nupkg.sha512",
-        "bouncycastle.cryptography.nuspec",
-        "lib/net461/BouncyCastle.Cryptography.dll",
-        "lib/net461/BouncyCastle.Cryptography.xml",
-        "lib/net6.0/BouncyCastle.Cryptography.dll",
-        "lib/net6.0/BouncyCastle.Cryptography.xml",
-        "lib/netstandard2.0/BouncyCastle.Cryptography.dll",
-        "lib/netstandard2.0/BouncyCastle.Cryptography.xml",
-        "packageIcon.png"
       ]
     },
     "coverlet.collector/6.0.4": {
@@ -1500,187 +1420,6 @@
         "coverlet.collector.nuspec"
       ]
     },
-    "Docker.DotNet.Enhanced/4.3.3": {
-      "sha512": "nGicLwvd42FhRk+khY5uS6cx49ErNdwYKnYBg0F4m4BDKLp/R77AVmmN9xAiqI3W/wN5ZCHkdUhgxf5ORkZuFQ==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.dll",
-        "lib/net10.0/Docker.DotNet.xml",
-        "lib/net8.0/Docker.DotNet.dll",
-        "lib/net8.0/Docker.DotNet.xml",
-        "lib/net9.0/Docker.DotNet.dll",
-        "lib/net9.0/Docker.DotNet.xml",
-        "lib/netstandard2.0/Docker.DotNet.dll",
-        "lib/netstandard2.0/Docker.DotNet.xml",
-        "lib/netstandard2.1/Docker.DotNet.dll",
-        "lib/netstandard2.1/Docker.DotNet.xml"
-      ]
-    },
-    "Docker.DotNet.Enhanced.Handler.Abstractions/4.3.3": {
-      "sha512": "9Cp8hOgtynixcDoAs9lnEaQosluojSYmiW3fsLsLIVfZjlq/fznSIZNUhnmyT4Xo1Iyuok/y49WL/25O47u0Pw==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.handler.abstractions/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.handler.abstractions.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.handler.abstractions.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.Handler.Abstractions.dll",
-        "lib/net10.0/Docker.DotNet.Handler.Abstractions.xml",
-        "lib/net8.0/Docker.DotNet.Handler.Abstractions.dll",
-        "lib/net8.0/Docker.DotNet.Handler.Abstractions.xml",
-        "lib/net9.0/Docker.DotNet.Handler.Abstractions.dll",
-        "lib/net9.0/Docker.DotNet.Handler.Abstractions.xml",
-        "lib/netstandard2.0/Docker.DotNet.Handler.Abstractions.dll",
-        "lib/netstandard2.0/Docker.DotNet.Handler.Abstractions.xml",
-        "lib/netstandard2.1/Docker.DotNet.Handler.Abstractions.dll",
-        "lib/netstandard2.1/Docker.DotNet.Handler.Abstractions.xml"
-      ]
-    },
-    "Docker.DotNet.Enhanced.LegacyHttp/4.3.3": {
-      "sha512": "7j3M16emv9PAQN7VwFn23xLYNj8GJmwPOcogveHkaWnOCqiC+anRaNKQwqIBNApM1AuwZKivehTKTPmmrjUUnw==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.legacyhttp/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.legacyhttp.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.legacyhttp.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.LegacyHttp.dll",
-        "lib/net10.0/Docker.DotNet.LegacyHttp.xml",
-        "lib/net10.0/Microsoft.Net.Http.Client.dll",
-        "lib/net8.0/Docker.DotNet.LegacyHttp.dll",
-        "lib/net8.0/Docker.DotNet.LegacyHttp.xml",
-        "lib/net8.0/Microsoft.Net.Http.Client.dll",
-        "lib/net9.0/Docker.DotNet.LegacyHttp.dll",
-        "lib/net9.0/Docker.DotNet.LegacyHttp.xml",
-        "lib/net9.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.0/Docker.DotNet.LegacyHttp.dll",
-        "lib/netstandard2.0/Docker.DotNet.LegacyHttp.xml",
-        "lib/netstandard2.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.1/Docker.DotNet.LegacyHttp.dll",
-        "lib/netstandard2.1/Docker.DotNet.LegacyHttp.xml",
-        "lib/netstandard2.1/Microsoft.Net.Http.Client.dll"
-      ]
-    },
-    "Docker.DotNet.Enhanced.NativeHttp/4.3.3": {
-      "sha512": "iNzK+jRFeEMobSA7l/h4ARwCKOOefOWtVN5/RB0ft6/6H6IQXvVUuOgGyZAjYLBT7TsyClRYno2B904f3dtBuQ==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.nativehttp/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.nativehttp.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.nativehttp.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.NativeHttp.dll",
-        "lib/net10.0/Docker.DotNet.NativeHttp.xml",
-        "lib/net8.0/Docker.DotNet.NativeHttp.dll",
-        "lib/net8.0/Docker.DotNet.NativeHttp.xml",
-        "lib/net9.0/Docker.DotNet.NativeHttp.dll",
-        "lib/net9.0/Docker.DotNet.NativeHttp.xml",
-        "lib/netstandard2.0/Docker.DotNet.NativeHttp.dll",
-        "lib/netstandard2.0/Docker.DotNet.NativeHttp.xml",
-        "lib/netstandard2.1/Docker.DotNet.NativeHttp.dll",
-        "lib/netstandard2.1/Docker.DotNet.NativeHttp.xml"
-      ]
-    },
-    "Docker.DotNet.Enhanced.NPipe/4.3.3": {
-      "sha512": "ZTLYufuEfY0e6qLOgeH9QgXx2KYuoABRVaY5A8rsggyLgYqbDj9rCRfVAhHPCUv83S7pVxDHy+Tvm/BnxjWVpg==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.npipe/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.npipe.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.npipe.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.NPipe.dll",
-        "lib/net10.0/Docker.DotNet.NPipe.xml",
-        "lib/net10.0/Microsoft.Net.Http.Client.dll",
-        "lib/net8.0/Docker.DotNet.NPipe.dll",
-        "lib/net8.0/Docker.DotNet.NPipe.xml",
-        "lib/net8.0/Microsoft.Net.Http.Client.dll",
-        "lib/net9.0/Docker.DotNet.NPipe.dll",
-        "lib/net9.0/Docker.DotNet.NPipe.xml",
-        "lib/net9.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.0/Docker.DotNet.NPipe.dll",
-        "lib/netstandard2.0/Docker.DotNet.NPipe.xml",
-        "lib/netstandard2.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.1/Docker.DotNet.NPipe.dll",
-        "lib/netstandard2.1/Docker.DotNet.NPipe.xml",
-        "lib/netstandard2.1/Microsoft.Net.Http.Client.dll"
-      ]
-    },
-    "Docker.DotNet.Enhanced.Unix/4.3.3": {
-      "sha512": "ypo8qNbmvHw1t9VfpRTMogCw2vht6VjkXzlGYUUeP2H2bf83USURdla1maW1njn2oq2rfLUFOGMfmt+A37QU2w==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.unix/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.unix.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.unix.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.Unix.dll",
-        "lib/net10.0/Docker.DotNet.Unix.xml",
-        "lib/net10.0/Microsoft.Net.Http.Client.dll",
-        "lib/net8.0/Docker.DotNet.Unix.dll",
-        "lib/net8.0/Docker.DotNet.Unix.xml",
-        "lib/net8.0/Microsoft.Net.Http.Client.dll",
-        "lib/net9.0/Docker.DotNet.Unix.dll",
-        "lib/net9.0/Docker.DotNet.Unix.xml",
-        "lib/net9.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.0/Docker.DotNet.Unix.dll",
-        "lib/netstandard2.0/Docker.DotNet.Unix.xml",
-        "lib/netstandard2.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.1/Docker.DotNet.Unix.dll",
-        "lib/netstandard2.1/Docker.DotNet.Unix.xml",
-        "lib/netstandard2.1/Microsoft.Net.Http.Client.dll"
-      ]
-    },
-    "Docker.DotNet.Enhanced.X509/4.3.3": {
-      "sha512": "oBDibWezEv4hgj3RIQxI3DVcxkNV1MdrD0d/jhjUu+h3DL+qc0wlkQva15kkwMatXmC/hWp1VP0DMoFXe+BmEw==",
-      "type": "package",
-      "path": "docker.dotnet.enhanced.x509/4.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "docker.dotnet.enhanced.x509.4.3.3.nupkg.sha512",
-        "docker.dotnet.enhanced.x509.nuspec",
-        "icon.png",
-        "lib/net10.0/Docker.DotNet.X509.dll",
-        "lib/net10.0/Docker.DotNet.X509.xml",
-        "lib/net10.0/Microsoft.Net.Http.Client.dll",
-        "lib/net8.0/Docker.DotNet.X509.dll",
-        "lib/net8.0/Docker.DotNet.X509.xml",
-        "lib/net8.0/Microsoft.Net.Http.Client.dll",
-        "lib/net9.0/Docker.DotNet.X509.dll",
-        "lib/net9.0/Docker.DotNet.X509.xml",
-        "lib/net9.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.0/Docker.DotNet.X509.dll",
-        "lib/netstandard2.0/Docker.DotNet.X509.xml",
-        "lib/netstandard2.0/Microsoft.Net.Http.Client.dll",
-        "lib/netstandard2.1/Docker.DotNet.X509.dll",
-        "lib/netstandard2.1/Docker.DotNet.X509.xml",
-        "lib/netstandard2.1/Microsoft.Net.Http.Client.dll"
-      ]
-    },
     "EFCore.NamingConventions/10.0.1": {
       "sha512": "Xs5k8XfNKPkkQSkGmZkmDI1je0prLTdxse+s8PgTFZxyBrlrTLzTBUTVJtQKSsbvu4y+luAv8DdtO5SALJE++A==",
       "type": "package",
@@ -1721,6 +1460,37 @@
         "fluentvalidation.dependencyinjectionextensions.nuspec",
         "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll",
         "lib/net8.0/FluentValidation.DependencyInjectionExtensions.xml"
+      ]
+    },
+    "Meziantou.Analyzer/2.0.257": {
+      "sha512": "HADbzZ4rto3boQpWyXIFFc9bxDPviscCXiSQWOTICKD1OJ4gwa9aMfANoQngOk/2en3I9YAHwQ0WXxVMzCTJ+A==",
+      "type": "package",
+      "path": "meziantou.analyzer/2.0.257",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "README.md",
+        "analyzers/dotnet/roslyn3.8/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Meziantou.Analyzer.dll",
+        "analyzers/dotnet/roslyn4.14/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn4.14/cs/Meziantou.Analyzer.dll",
+        "analyzers/dotnet/roslyn4.2/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn4.2/cs/Meziantou.Analyzer.dll",
+        "analyzers/dotnet/roslyn4.4/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn4.4/cs/Meziantou.Analyzer.dll",
+        "analyzers/dotnet/roslyn4.6/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn4.6/cs/Meziantou.Analyzer.dll",
+        "analyzers/dotnet/roslyn4.8/cs/Meziantou.Analyzer.CodeFixers.dll",
+        "analyzers/dotnet/roslyn4.8/cs/Meziantou.Analyzer.dll",
+        "build/Meziantou.Analyzer.props",
+        "buildMultiTargeting/Meziantou.Analyzer.props",
+        "buildTransitive/Meziantou.Analyzer.props",
+        "configuration/default.editorconfig",
+        "configuration/none.editorconfig",
+        "icon.png",
+        "meziantou.analyzer.2.0.257.nupkg.sha512",
+        "meziantou.analyzer.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Cryptography.Internal/10.0.12": {
@@ -2005,10 +1775,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration/10.0.12": {
-      "sha512": "e3IPP32CRNL031VZJAUTlCTG0YN7WFh4mN3fsSHTDQCJB+3+f0jGycv4fXk3rrftaY3B85XrQaj7sRthrOsavg==",
+    "Microsoft.Extensions.Configuration/10.0.13": {
+      "sha512": "inhujYI/nikhmLxYI6ZEcaCgZ28ipJsKMPPxxr2XWf3vM0Q2P+E9R3hDHABZOLBxzD3gjpgcbSH/+hd2+gvI2A==",
       "type": "package",
-      "path": "microsoft.extensions.configuration/10.0.12",
+      "path": "microsoft.extensions.configuration/10.0.13",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2029,15 +1799,15 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.xml",
-        "microsoft.extensions.configuration.10.0.12.nupkg.sha512",
+        "microsoft.extensions.configuration.10.0.13.nupkg.sha512",
         "microsoft.extensions.configuration.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration.Abstractions/10.0.12": {
-      "sha512": "8xaGcvS/qZ1otoxPQCEJkNva389CVL/plNcvIETZhQTETYdRkYDPEYhUMoAGONo4FU45ufdfE0j29AfWVVj0wA==",
+    "Microsoft.Extensions.Configuration.Abstractions/10.0.13": {
+      "sha512": "DY4C2qzTt2lOIY3VoscBH/TCwTolI5DKOfgJLuI+k1QUvRNT5vTMS58AOerNiihdVRStO0wEpLeRWA8jytzHBQ==",
       "type": "package",
-      "path": "microsoft.extensions.configuration.abstractions/10.0.12",
+      "path": "microsoft.extensions.configuration.abstractions/10.0.13",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2058,7 +1828,7 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.xml",
-        "microsoft.extensions.configuration.abstractions.10.0.12.nupkg.sha512",
+        "microsoft.extensions.configuration.abstractions.10.0.13.nupkg.sha512",
         "microsoft.extensions.configuration.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -2100,6 +1870,128 @@
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Binder.xml",
         "microsoft.extensions.configuration.binder.10.0.12.nupkg.sha512",
         "microsoft.extensions.configuration.binder.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.13": {
+      "sha512": "qJK2dm9/AxyPVfqqBaZtjkUFl2hnBR/CQnMJtSO5LdEoyATMqvZjeQVY+8l0oa6PM6qlVe28iMEyXIRQ0wyZjA==",
+      "type": "package",
+      "path": "microsoft.extensions.configuration.environmentvariables/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.Configuration.EnvironmentVariables.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Configuration.EnvironmentVariables.targets",
+        "lib/net10.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+        "lib/net10.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
+        "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+        "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
+        "lib/net8.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+        "lib/net8.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
+        "lib/net9.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+        "lib/net9.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
+        "microsoft.extensions.configuration.environmentvariables.10.0.13.nupkg.sha512",
+        "microsoft.extensions.configuration.environmentvariables.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.Configuration.FileExtensions/10.0.13": {
+      "sha512": "kwC1DY55CsqPmDtJAz+7alD3G+gJcM+XwHSZrcRO8mJGYB9hRq1qC6ZH8DL0SPW9WtJ/Bae5ikzPic8SxSv6Vw==",
+      "type": "package",
+      "path": "microsoft.extensions.configuration.fileextensions/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.Configuration.FileExtensions.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Configuration.FileExtensions.targets",
+        "lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.dll",
+        "lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
+        "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll",
+        "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.xml",
+        "lib/net8.0/Microsoft.Extensions.Configuration.FileExtensions.dll",
+        "lib/net8.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
+        "lib/net9.0/Microsoft.Extensions.Configuration.FileExtensions.dll",
+        "lib/net9.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
+        "microsoft.extensions.configuration.fileextensions.10.0.13.nupkg.sha512",
+        "microsoft.extensions.configuration.fileextensions.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.Configuration.Json/10.0.13": {
+      "sha512": "acCWM2+WR67kBAz6gAhD2zG+IZH9Q2VpKv5le7Msiu0vAMsnnLXpnV3BAzxd8/i+uOEo/dfb2XRYTynRVTDvEg==",
+      "type": "package",
+      "path": "microsoft.extensions.configuration.json/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.Configuration.Json.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Configuration.Json.targets",
+        "lib/net10.0/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/net10.0/Microsoft.Extensions.Configuration.Json.xml",
+        "lib/net462/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/net462/Microsoft.Extensions.Configuration.Json.xml",
+        "lib/net8.0/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/net8.0/Microsoft.Extensions.Configuration.Json.xml",
+        "lib/net9.0/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/net9.0/Microsoft.Extensions.Configuration.Json.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.Json.xml",
+        "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.dll",
+        "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.xml",
+        "microsoft.extensions.configuration.json.10.0.13.nupkg.sha512",
+        "microsoft.extensions.configuration.json.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.Configuration.UserSecrets/10.0.13": {
+      "sha512": "kQ/Tx972unP+ueQL8SSninthIj6w6XP2o0VnJPFC5HQIimPMwEN704MOspEgDkmm4FUL5SuxLEU0bNiW4HEZFA==",
+      "type": "package",
+      "path": "microsoft.extensions.configuration.usersecrets/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.Configuration.UserSecrets.targets",
+        "buildTransitive/net462/Microsoft.Extensions.Configuration.UserSecrets.props",
+        "buildTransitive/net462/Microsoft.Extensions.Configuration.UserSecrets.targets",
+        "buildTransitive/net8.0/Microsoft.Extensions.Configuration.UserSecrets.props",
+        "buildTransitive/net8.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
+        "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.UserSecrets.props",
+        "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
+        "lib/net10.0/Microsoft.Extensions.Configuration.UserSecrets.dll",
+        "lib/net10.0/Microsoft.Extensions.Configuration.UserSecrets.xml",
+        "lib/net462/Microsoft.Extensions.Configuration.UserSecrets.dll",
+        "lib/net462/Microsoft.Extensions.Configuration.UserSecrets.xml",
+        "lib/net8.0/Microsoft.Extensions.Configuration.UserSecrets.dll",
+        "lib/net8.0/Microsoft.Extensions.Configuration.UserSecrets.xml",
+        "lib/net9.0/Microsoft.Extensions.Configuration.UserSecrets.dll",
+        "lib/net9.0/Microsoft.Extensions.Configuration.UserSecrets.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.UserSecrets.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Configuration.UserSecrets.xml",
+        "microsoft.extensions.configuration.usersecrets.10.0.13.nupkg.sha512",
+        "microsoft.extensions.configuration.usersecrets.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -2250,10 +2142,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.FileProviders.Abstractions/10.0.0": {
-      "sha512": "/ppSdehKk3fuXjlqCDgSOtjRK/pSHU8eWgzSHfHdwVm5BP4Dgejehkw+PtxKG2j98qTDEHDst2Y99aNsmJldmw==",
+    "Microsoft.Extensions.FileProviders.Abstractions/10.0.13": {
+      "sha512": "BZDwtN3uoWRghDi5lRRZPDjMMCg2Ds7J6YEYjqka/TLjqnzquEpXyvchrIMeoubwT1ns23ow6PPeAoBHJO81Rw==",
       "type": "package",
-      "path": "microsoft.extensions.fileproviders.abstractions/10.0.0",
+      "path": "microsoft.extensions.fileproviders.abstractions/10.0.13",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2274,8 +2166,66 @@
         "lib/net9.0/Microsoft.Extensions.FileProviders.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Abstractions.xml",
-        "microsoft.extensions.fileproviders.abstractions.10.0.0.nupkg.sha512",
+        "microsoft.extensions.fileproviders.abstractions.10.0.13.nupkg.sha512",
         "microsoft.extensions.fileproviders.abstractions.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.FileProviders.Physical/10.0.13": {
+      "sha512": "U7HkgGCNPICN5k7NVK6dmLsSPSPeO/EbNcuxOl/5qdC9Ahjp9UZWKOvlnUC+rYurmoxIlwyv9e5j0BaQlTOELA==",
+      "type": "package",
+      "path": "microsoft.extensions.fileproviders.physical/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.FileProviders.Physical.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.FileProviders.Physical.targets",
+        "lib/net10.0/Microsoft.Extensions.FileProviders.Physical.dll",
+        "lib/net10.0/Microsoft.Extensions.FileProviders.Physical.xml",
+        "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll",
+        "lib/net462/Microsoft.Extensions.FileProviders.Physical.xml",
+        "lib/net8.0/Microsoft.Extensions.FileProviders.Physical.dll",
+        "lib/net8.0/Microsoft.Extensions.FileProviders.Physical.xml",
+        "lib/net9.0/Microsoft.Extensions.FileProviders.Physical.dll",
+        "lib/net9.0/Microsoft.Extensions.FileProviders.Physical.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Physical.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Physical.xml",
+        "microsoft.extensions.fileproviders.physical.10.0.13.nupkg.sha512",
+        "microsoft.extensions.fileproviders.physical.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Extensions.FileSystemGlobbing/10.0.13": {
+      "sha512": "vQVzmAbnzlhXSXA2caYnlxtG9GXxEwtj5bODiWLu06A6iqeJmfBtlfKjuOSJGRy0/CFaNUrm7u9nxEUlljc2Rg==",
+      "type": "package",
+      "path": "microsoft.extensions.filesystemglobbing/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.FileSystemGlobbing.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.FileSystemGlobbing.targets",
+        "lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+        "lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.xml",
+        "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll",
+        "lib/net462/Microsoft.Extensions.FileSystemGlobbing.xml",
+        "lib/net8.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+        "lib/net8.0/Microsoft.Extensions.FileSystemGlobbing.xml",
+        "lib/net9.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+        "lib/net9.0/Microsoft.Extensions.FileSystemGlobbing.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.xml",
+        "microsoft.extensions.filesystemglobbing.10.0.13.nupkg.sha512",
+        "microsoft.extensions.filesystemglobbing.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -2526,10 +2476,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Primitives/10.0.12": {
-      "sha512": "dYfCLR52UA+3DL7C4I/pvSaRPkNqxrUAQmbFL2u0zvYKKzqgrFCJl08Df+F1aYc8leu9JvpC9bsURUdpExcBXQ==",
+    "Microsoft.Extensions.Primitives/10.0.13": {
+      "sha512": "ZjTwxzhiw2TMEzIbUDkMF0dfDB2I4NQgIfKD0ELu9/5Mk+SRGdKZcD0/lvBrRCAPo6KN2r0BW86MRancoyJkoA==",
       "type": "package",
-      "path": "microsoft.extensions.primitives/10.0.12",
+      "path": "microsoft.extensions.primitives/10.0.13",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2550,7 +2500,7 @@
         "lib/net9.0/Microsoft.Extensions.Primitives.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.xml",
-        "microsoft.extensions.primitives.10.0.12.nupkg.sha512",
+        "microsoft.extensions.primitives.10.0.13.nupkg.sha512",
         "microsoft.extensions.primitives.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -2833,6 +2783,38 @@
         "respawn.nuspec"
       ]
     },
+    "Roslynator.Analyzers/4.14.1": {
+      "sha512": "yMSjze/xMYDF6PCE60/ULWx0tttNyKAndw2KijNxbKil0FX8nvDeEneDZGma8Uifk17RlfZqIXxf1mmBmhRHjg==",
+      "type": "package",
+      "path": "roslynator.analyzers/4.14.1",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator.CSharp.Analyzers.CodeFixes.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator.CSharp.Analyzers.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.CSharp.Workspaces.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.CSharp.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.Common.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.Core.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.Workspaces.Common.dll",
+        "analyzers/dotnet/roslyn3.8/cs/Roslynator_Analyzers_Roslynator.Workspaces.Core.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator.CSharp.Analyzers.CodeFixes.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator.CSharp.Analyzers.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.CSharp.Workspaces.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.CSharp.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.Common.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.Core.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.Workspaces.Common.dll",
+        "analyzers/dotnet/roslyn4.7/cs/Roslynator_Analyzers_Roslynator.Workspaces.Core.dll",
+        "docs/README.md",
+        "icon.png",
+        "roslynator.analyzers.4.14.1.nupkg.sha512",
+        "roslynator.analyzers.nuspec",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
     "Serilog/4.3.0": {
       "sha512": "+cDryFR0GRhsGOnZSKwaDzRRl4MupvJ42FhCE4zhQRVanX0Jpg6WuCBk59OVhVDPmab1bB+nRykAnykYELA9qQ==",
       "type": "package",
@@ -3051,98 +3033,23 @@
         "serilog.sinks.file.nuspec"
       ]
     },
-    "SharpZipLib/1.4.2": {
-      "sha512": "yjj+3zgz8zgXpiiC3ZdF/iyTBbz2fFvMxZFEBPUcwZjIvXOf37Ylm+K58hqMfIBt5JgU/Z2uoUS67JmTLe973A==",
+    "SonarAnalyzer.CSharp/10.16.0.128591": {
+      "sha512": "W/jZGbsMFvnTY112Ab2WZArzWtkGQuMrQdromFpDak+GO/DKcgn4O2tTun/fQgDBpnQJOyyTdzQrQPzPJ544jg==",
       "type": "package",
-      "path": "sharpziplib/1.4.2",
+      "path": "sonaranalyzer.csharp/10.16.0.128591",
+      "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "images/sharpziplib-nuget-256x256.png",
-        "lib/net6.0/ICSharpCode.SharpZipLib.dll",
-        "lib/net6.0/ICSharpCode.SharpZipLib.pdb",
-        "lib/net6.0/ICSharpCode.SharpZipLib.xml",
-        "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
-        "lib/netstandard2.0/ICSharpCode.SharpZipLib.pdb",
-        "lib/netstandard2.0/ICSharpCode.SharpZipLib.xml",
-        "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll",
-        "lib/netstandard2.1/ICSharpCode.SharpZipLib.pdb",
-        "lib/netstandard2.1/ICSharpCode.SharpZipLib.xml",
-        "sharpziplib.1.4.2.nupkg.sha512",
-        "sharpziplib.nuspec"
-      ]
-    },
-    "SSH.NET/2026.0.0": {
-      "sha512": "Yu9dirPq8l3oaat0+OQ7K0nUf5MmYltpia5UGqsApTG4zTPvBC1cxbNnC3NERij26dUST0A3Ef1QdHSn5ArbWQ==",
-      "type": "package",
-      "path": "ssh.net/2026.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "SS-NET-icon-h500.png",
-        "lib/net10.0/Renci.SshNet.dll",
-        "lib/net10.0/Renci.SshNet.xml",
-        "lib/net462/Renci.SshNet.dll",
-        "lib/net462/Renci.SshNet.xml",
-        "lib/net8.0/Renci.SshNet.dll",
-        "lib/net8.0/Renci.SshNet.xml",
-        "lib/net9.0/Renci.SshNet.dll",
-        "lib/net9.0/Renci.SshNet.xml",
-        "lib/netstandard2.0/Renci.SshNet.dll",
-        "lib/netstandard2.0/Renci.SshNet.xml",
-        "ssh.net.2026.0.0.nupkg.sha512",
-        "ssh.net.nuspec"
-      ]
-    },
-    "Testcontainers/4.16.0": {
-      "sha512": "JmMUZk6ZXQovbGQjaMB+YxOR0PbJTdYjOYjRcrm5LrA2dhLVMuCbhVGGunzCGIQfFMUB5Lno2LPOHMMuaGmuIg==",
-      "type": "package",
-      "path": "testcontainers/4.16.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "README.md",
-        "docs/banner.png",
-        "docs/logo.png",
-        "lib/net10.0/Testcontainers.dll",
-        "lib/net10.0/Testcontainers.xml",
-        "lib/net8.0/Testcontainers.dll",
-        "lib/net8.0/Testcontainers.xml",
-        "lib/net9.0/Testcontainers.dll",
-        "lib/net9.0/Testcontainers.xml",
-        "lib/netstandard2.0/Testcontainers.dll",
-        "lib/netstandard2.0/Testcontainers.xml",
-        "lib/netstandard2.1/Testcontainers.dll",
-        "lib/netstandard2.1/Testcontainers.xml",
-        "testcontainers.4.16.0.nupkg.sha512",
-        "testcontainers.nuspec"
-      ]
-    },
-    "Testcontainers.PostgreSql/4.16.0": {
-      "sha512": "QqvFS8Oj+i6deH3QJOMd7jgFF9P3h7RZ37wOaoR97ZahMcSYMYCb+COR4nUVznT1d7EavEcZdUs1QV0ow69JiA==",
-      "type": "package",
-      "path": "testcontainers.postgresql/4.16.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "LICENSE",
-        "README.md",
-        "docs/banner.png",
-        "docs/logo.png",
-        "lib/net10.0/Testcontainers.PostgreSql.dll",
-        "lib/net10.0/Testcontainers.PostgreSql.xml",
-        "lib/net8.0/Testcontainers.PostgreSql.dll",
-        "lib/net8.0/Testcontainers.PostgreSql.xml",
-        "lib/net9.0/Testcontainers.PostgreSql.dll",
-        "lib/net9.0/Testcontainers.PostgreSql.xml",
-        "lib/netstandard2.0/Testcontainers.PostgreSql.dll",
-        "lib/netstandard2.0/Testcontainers.PostgreSql.xml",
-        "lib/netstandard2.1/Testcontainers.PostgreSql.dll",
-        "lib/netstandard2.1/Testcontainers.PostgreSql.xml",
-        "testcontainers.postgresql.4.16.0.nupkg.sha512",
-        "testcontainers.postgresql.nuspec"
+        "analyzers/SonarAnalyzer.CSharp.dll",
+        "images/sonarsource_64.png",
+        "licenses/LICENSE.txt",
+        "licenses/THIRD_PARTY_LICENSES/Google.Protobuf-LICENSE.txt",
+        "licenses/THIRD_PARTY_LICENSES/StyleCop.Analyzers-LICENSE.txt",
+        "sonaranalyzer.csharp.10.16.0.128591.nupkg.sha512",
+        "sonaranalyzer.csharp.nuspec",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
       ]
     },
     "xunit/2.9.3": {
@@ -3175,10 +3082,10 @@
         "xunit.abstractions.nuspec"
       ]
     },
-    "xunit.analyzers/1.18.0": {
-      "sha512": "OtFMHN8yqIcYP9wcVIgJrq01AfTxijjAqVDy/WeQVSyrDC1RzBWeQPztL49DN2syXRah8TYnfvk035s7L95EZQ==",
+    "xunit.analyzers/1.26.0": {
+      "sha512": "YrWZOfuU1Scg4iGizAlMNALOxVS+HPSVilfscNDEJAyrTIVdF4c+8o+Aerw2RYnrJxafj/F56YkJOKCURUWQmA==",
       "type": "package",
-      "path": "xunit.analyzers/1.18.0",
+      "path": "xunit.analyzers/1.26.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -3189,7 +3096,7 @@
         "analyzers/dotnet/cs/xunit.analyzers.fixes.dll",
         "tools/install.ps1",
         "tools/uninstall.ps1",
-        "xunit.analyzers.1.18.0.nupkg.sha512",
+        "xunit.analyzers.1.26.0.nupkg.sha512",
         "xunit.analyzers.nuspec"
       ]
     },
@@ -3293,12 +3200,17 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "Meziantou.Analyzer >= 2.0.257",
+      "Microsoft.Extensions.Configuration.EnvironmentVariables >= 10.0.13",
+      "Microsoft.Extensions.Configuration.UserSecrets >= 10.0.13",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
       "Respawn >= 7.0.0",
-      "Testcontainers.PostgreSql >= 4.16.0",
+      "Roslynator.Analyzers >= 4.14.1",
+      "SonarAnalyzer.CSharp >= 10.16.0.128591",
       "TodoApp >= 1.0.0",
       "coverlet.collector >= 6.0.4",
       "xunit >= 2.9.3",
+      "xunit.analyzers >= 1.26.0",
       "xunit.runner.visualstudio >= 3.1.4"
     ]
   },
@@ -3342,6 +3254,7 @@
         }
       },
       "warningProperties": {
+        "allWarningsAsErrors": true,
         "warnAsError": [
           "NU1605"
         ]
@@ -3358,6 +3271,19 @@
         "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
+          "Meziantou.Analyzer": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[2.0.257, )"
+          },
+          "Microsoft.Extensions.Configuration.EnvironmentVariables": {
+            "target": "Package",
+            "version": "[10.0.13, )"
+          },
+          "Microsoft.Extensions.Configuration.UserSecrets": {
+            "target": "Package",
+            "version": "[10.0.13, )"
+          },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.14.1, )"
@@ -3366,9 +3292,15 @@
             "target": "Package",
             "version": "[7.0.0, )"
           },
-          "Testcontainers.PostgreSql": {
+          "Roslynator.Analyzers": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
-            "version": "[4.16.0, )"
+            "version": "[4.14.1, )"
+          },
+          "SonarAnalyzer.CSharp": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[10.16.0.128591, )"
           },
           "coverlet.collector": {
             "target": "Package",
@@ -3377,6 +3309,11 @@
           "xunit": {
             "target": "Package",
             "version": "[2.9.3, )"
+          },
+          "xunit.analyzers": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "target": "Package",
+            "version": "[1.26.0, )"
           },
           "xunit.runner.visualstudio": {
             "target": "Package",

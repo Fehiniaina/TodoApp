@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TodoApp.Data;
+using TodoApp.Domain.Tasks;
 
 #nullable disable
 
@@ -20,6 +21,7 @@ namespace TodoApp.Data.Migrations
                 .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "task_priority", new[] { "high", "low", "medium", "urgent" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -307,24 +309,42 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
                         .HasColumnName("description");
 
+                    b.Property<DateOnly?>("DueDate")
+                        .HasColumnType("date")
+                        .HasColumnName("due_date");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_completed");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("owner_id");
 
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                    b.Property<TaskPriority>("Priority")
+                        .HasColumnType("task_priority")
                         .HasColumnName("priority");
 
                     b.Property<string>("Title")
@@ -340,8 +360,13 @@ namespace TodoApp.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_tasks_id");
 
+                    b.HasIndex("OwnerId", "DeletedAt")
+                        .HasDatabaseName("ix_tasks_owner_id_deleted_at")
+                        .HasFilter("is_deleted = true");
+
                     b.HasIndex("OwnerId", "Priority")
-                        .HasDatabaseName("ix_tasks_owner_id_priority");
+                        .HasDatabaseName("ix_tasks_owner_id_priority")
+                        .HasFilter("is_deleted = false");
 
                     b.ToTable("tasks", (string)null);
                 });

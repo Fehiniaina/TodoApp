@@ -7,9 +7,6 @@ internal sealed class CreateTaskCommandValidator : AbstractValidator<CreateTaskC
 {
     public CreateTaskCommandValidator()
     {
-        RuleFor(c => c.OwnerId)
-            .NotEmpty();
-
         RuleFor(c => c.Title)
             .NotEmpty()
                 .WithErrorCode(TaskErrors.TitleRequired.Code)

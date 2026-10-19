@@ -1,0 +1,30 @@
+﻿@using TodoApp.Domain.Tasks
+
+<span class="priority priority-@Priority.ToString().ToLowerInvariant()" title="Priorité : @Priority.ToLabel()">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        @switch (Priority)
+        {
+            case TaskPriority.Urgent:
+                <path d="M3.5 8.5 8 4l4.5 4.5M3.5 12.5 8 8l4.5 4.5" />
+                break;
+            case TaskPriority.High:
+                <path d="M3.5 10.5 8 6l4.5 4.5" />
+                break;
+            case TaskPriority.Medium:
+                <path d="M3.5 6h9M3.5 10h9" />
+                break;
+            case TaskPriority.Low:
+                <path d="M3.5 5.5 8 10l4.5-4.5" />
+                break;
+        }
+    </svg>
+    @if (ShowLabel)
+    {
+        <span class="priority-label">@Priority.ToLabel()</span>
+    }
+</span>
+
+@code {
+    [Parameter, EditorRequired] public TaskPriority Priority { get; set; }
+    [Parameter] public bool ShowLabel { get; set; } = true;
+}
