@@ -1,0 +1,68 @@
+﻿@page "/tasks/trash"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using TodoApp.Features.Tasks.Shared
+
+<PageTitle>Corbeille · TodoApp</PageTitle>
+
+<div class="page-header">
+    <nav class="breadcrumbs" aria-label="Fil d'Ariane">
+        <a href="tasks">Mes tâches</a><span aria-hidden="true">/</span><span aria-current="page">Corbeille</span>
+    </nav>
+    <h1 class="page-title">Corbeille</h1>
+    <p class="issue-count">Les tâches sont supprimées définitivement après 30 jours.</p>
+</div>
+
+@if (_items is null)
+{
+    <p class="text-secondary">Chargement…</p>
+}
+else if (_items.Count == 0)
+{
+    <p class="text-secondary">La corbeille est vide.</p>
+}
+else
+{
+    <table class="issue-table">
+        <thead>
+            <tr>
+                <th scope="col">Résumé</th>
+                <th scope="col" class="col-priority">Priorité</th>
+                <th scope="col" class="col-date">Supprimée le</th>
+                <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in _items)
+            {
+                <tr @key="task.Id" class="issue-row">
+                    <td class="col-summary"><span class="issue-title">@task.Title</span></td>
+                    <td class="col-priority"><PriorityIcon Priority="task.Priority" /></td>
+                    <td class="col-date">@FormatDate(task.DeletedAt)</td>
+                    <td class="col-actions">
+                        @if (_pendingPurgeId == task.Id)
+                        {
+                            <div class="issue-confirm">
+                                <button type="button" class="btn-confirm-danger" @onclick="() => PurgeAsync(task)">Supprimer</button>
+                                <button type="button" class="btn-confirm-cancel" @onclick="() => _pendingPurgeId = null">Annuler</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="issue-confirm">
+                                <button type="button" class="btn-confirm-cancel" @onclick="() => RestoreAsync(task)">Restaurer</button>
+                                <button type="button" class="icon-btn icon-btn-danger" title="Supprimer définitivement"
+                                        aria-label="@($"Supprimer définitivement {task.Title}")"
+                                        @onclick="() => _pendingPurgeId = task.Id">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

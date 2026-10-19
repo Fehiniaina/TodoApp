@@ -1,3 +1,15 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    :root {
+        --issue-text: #172b4d;
+        --issue-muted: #626f86;
+        --issue-subtle: #8590a2;
+        --issue-border: #dfe1e6;
+        --issue-hover: #f4f5f7;
+        --issue-primary: #0c66e4;
+        --issue-primary-hover: #0055cc;
+        --issue-danger: #c9372c;
+        --issue-radius: 4px;
+    }
 }

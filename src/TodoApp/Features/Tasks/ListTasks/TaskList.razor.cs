@@ -14,7 +14,7 @@ using TodoApp.Features.Tasks.ToggleTaskCompletion;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
-public partial class TaskList : IDisposable
+public sealed partial class TaskList : IDisposable
 {
     private Guid? _pendingDeleteId;
     private bool _isDeleting;
@@ -129,11 +129,18 @@ public partial class TaskList : IDisposable
     }
 
     // Called by TaskChangeNotifier on a background thread — must marshal to the circuit thread.
-    private void OnTasksChanged() =>
-        InvokeAsync(async () =>
+    private void OnTasksChanged(object? sender, EventArgs e) =>
+        _ = InvokeAsync(async () =>
         {
-            await LoadTasksAsync(); // recharge la page courante, sans revenir à la première
-            StateHasChanged();
+            try
+            {
+                await LoadTasksAsync(); // recharge la page courante, sans revenir à la première
+                StateHasChanged();
+            }
+            catch (Exception ex) 
+            {
+                await DispatchExceptionAsync(ex);
+            }
         });
 
     private async Task ToggleCompletionAsync(TaskSummary original, bool isCompleted)
@@ -229,8 +236,30 @@ public partial class TaskList : IDisposable
 
     private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
 
-    public void Dispose() => Notifier.Changed -= OnTasksChanged;
-
     private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
     private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
+
+    private async Task MoveToTrashAsync(TaskSummary task)
+    {
+        try
+        {
+            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(task.Id, _ownerId!));
+
+            if (result.IsFailure)
+            {
+                Logger.OperationFailed(OperationsTask.TrashTask, result.Error.Code, result.Error.Message);
+                Notification.Warning(result.Error.Message, "Suppression impossible");
+                return;
+            }
+
+            Notification.Info($"« {task.Title} » a été déplacée dans la corbeille.", "Tâche supprimée");
+        }
+        catch (Exception ex)
+        {
+            Logger.UnexpectedError(OperationsTask.TrashTask, ex);
+            Notification.Error("Une erreur inattendue est survenue. Réessayez plus tard.", "Erreur");
+        }
+    }
+
+    public void Dispose() => Notifier.Changed -= OnTasksChanged;
 }

@@ -11,6 +11,7 @@ using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
+using TodoApp.Infrastructure.BackgroundJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,8 @@ builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddScoped<UserTimeZone>();
 builder.Services.AddScoped<IUserClock, UserClock>();
+
+builder.Services.AddHostedService<TrashPurgeService>();
 
 var app = builder.Build();
 

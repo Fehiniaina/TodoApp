@@ -34,7 +34,7 @@
     protected override void OnInitialized() => Notifications.Changed += OnChanged;
 
     // Changed peut être levé depuis un thread de Task.Delay : on repasse par le dispatcher Blazor.
-    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    private void OnChanged(object? sender, EventArgs e) => _ = InvokeAsync(StateHasChanged);
 
     public void Dispose() => Notifications.Changed -= OnChanged;
 

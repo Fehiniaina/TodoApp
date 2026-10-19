@@ -5,10 +5,10 @@
         @{ var count = _result?.TotalCount ?? 0; }
         @count @(count > 1 ? "tâches" : "tâche")
     </span>
-    <button type="button" class="btn-create" @onclick="OpenCreateModal">
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" /></svg>
-        Créer
-    </button>
+    <div class="issue-toolbar-actions">
+        <a href="tasks/trash" class="btn-ghost">Corbeille</a>
+        <button type="button" class="btn-create" @onclick="OpenCreateModal">…</button>
+    </div>
 </div>
 
 @if (_isLoading)
@@ -132,6 +132,9 @@ else
                                 </button>
                             </div>
                         }
+                        <button type="button" class="icon-btn icon-btn-danger"
+                            aria-label="@($"Mettre {task.Title} à la corbeille")" title="Mettre à la corbeille"
+                            @onclick="() => MoveToTrashAsync(task)">
                     </td>
                 </tr>
             </ChildContentRow>

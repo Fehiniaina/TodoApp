@@ -7,7 +7,7 @@ namespace TodoApp.Features.Shared;
 /// </summary>
 internal sealed class TaskChangeNotifier
 {
-    public event Action? Changed;
+    public event EventHandler? Changed;
 
-    public void NotifyChanged() => Changed?.Invoke();
+    public void NotifyChanged() => Changed?.Invoke(this, EventArgs.Empty);
 }

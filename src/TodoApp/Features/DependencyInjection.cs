@@ -19,8 +19,11 @@ internal static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 
         // Register database seeder as hosted service (runs once at startup in Development only)
-        // services.AddHostedService<DatabaseSeederHostedService>();
+
+#pragma warning disable S125 // Sections of code should not be commented out
+                            //services.AddHostedService<DatabaseSeederHostedService>();
 
         return services;
+#pragma warning restore S125 // Sections of code should not be commented out
     }
 }

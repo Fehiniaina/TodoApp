@@ -5,4 +5,4 @@ namespace TodoApp.Common;
 /// auto-registered by <c>RegisterHandlersFromAssemblyContaining</c>; never
 /// register a handler by hand.
 /// </summary>
-public interface IHandler;
+internal interface IHandler;

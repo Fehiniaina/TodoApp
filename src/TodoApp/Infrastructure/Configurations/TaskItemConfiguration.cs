@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TodoApp.Data;
 using TodoApp.Domain.Tasks;
 
 namespace TodoApp.Infrastructure.Configurations;
@@ -29,5 +30,16 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.HasIndex(task => task.Id)
             .IsUnique();
         builder.HasIndex(task => new { task.OwnerId , task.Priority}); // composite index
+
+        // Filtre nommé (EF Core 10) : on peut le désactiver seul, sans toucher à d'éventuels autres filtres.
+        builder.HasQueryFilter(QueryFilters.SoftDelete, task => !task.IsDeleted);
+
+        // Les requêtes courantes ne portent que sur les tâches actives : index partiel, plus petit et plus rapide.
+        builder.HasIndex(task => new { task.OwnerId, task.Priority })
+               .HasFilter("is_deleted = false");
+
+        // Pour la corbeille et la purge.
+        builder.HasIndex(task => new { task.OwnerId, task.DeletedAt })
+               .HasFilter("is_deleted = true");
     }
 }

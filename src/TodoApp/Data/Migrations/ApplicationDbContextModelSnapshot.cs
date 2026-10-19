@@ -317,6 +317,10 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
@@ -329,6 +333,10 @@ namespace TodoApp.Data.Migrations
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_completed");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
@@ -352,8 +360,13 @@ namespace TodoApp.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_tasks_id");
 
+                    b.HasIndex("OwnerId", "DeletedAt")
+                        .HasDatabaseName("ix_tasks_owner_id_deleted_at")
+                        .HasFilter("is_deleted = true");
+
                     b.HasIndex("OwnerId", "Priority")
-                        .HasDatabaseName("ix_tasks_owner_id_priority");
+                        .HasDatabaseName("ix_tasks_owner_id_priority")
+                        .HasFilter("is_deleted = false");
 
                     b.ToTable("tasks", (string)null);
                 });

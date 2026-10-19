@@ -14,7 +14,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TodoApp.Features.Tasks.CreateTask;
 
-// Blazor components are instantiated by the framework with property injection;
 // constructor injection is not supported. [Inject] is used here in lieu of the
 // primary-constructor pattern applied to non-component classes.
 public partial class CreateTaskForm

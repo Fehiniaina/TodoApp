@@ -7,19 +7,6 @@ using TodoApp.Features.Shared;
 
 namespace TodoApp.Features.Tasks.CreateTask;
 
-internal sealed record CreateTaskCommand(
-    string Title,
-    string? Description,
-    TaskPriority Priority,
-    DateOnly? DueDate = null);
-
-internal sealed record CreateTaskResult(
-    Guid Id,
-    string Title,
-    string? Description,
-    TaskPriority Priority,
-    DateTime CreatedAtUtc);
-
 internal sealed class CreateTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     IValidator<CreateTaskCommand> validator,

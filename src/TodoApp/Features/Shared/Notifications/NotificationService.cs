@@ -1,27 +1,18 @@
-﻿namespace TodoApp.Features.Shared.Notifications;
-
-public enum NotificationLevel
-{
-    Success,
-    Info,
-    Warning,
-    Error,
-}
-
-public sealed record Notification(Guid Id, NotificationLevel Level, string Message, string? Title);
+namespace TodoApp.Features.Shared.Notifications;
 
 /// <summary>
 /// Per-circuit notification store. Components raise notifications;
 /// <c>NotificationHost</c> renders them.
 /// </summary>
-internal sealed class NotificationService
+internal sealed class NotificationService(TimeProvider timeProvider) : IDisposable
 {
     private const int MaxVisible = 5;
 
     private readonly List<Notification> _items = [];
     private readonly Lock _lock = new();
 
-    public event Action? Changed;
+    public event EventHandler? Changed;
+    private readonly CancellationTokenSource _cts = new();
 
     public IReadOnlyList<Notification> Items
     {
@@ -46,7 +37,7 @@ internal sealed class NotificationService
             }
         }
 
-        Changed?.Invoke();
+        Changed?.Invoke(this, EventArgs.Empty);
 
         var delay = duration ?? DefaultDuration(level);
         if (delay > TimeSpan.Zero)
@@ -65,8 +56,14 @@ internal sealed class NotificationService
 
         if (removed)
         {
-            Changed?.Invoke();
+            Changed?.Invoke(this, EventArgs.Empty);
         }
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
     }
 
     // Errors stay until the user closes them: a message that disappears before
@@ -80,7 +77,14 @@ internal sealed class NotificationService
 
     private async Task DismissLaterAsync(Guid id, TimeSpan delay)
     {
-        await Task.Delay(delay);
-        Dismiss(id);
+        try
+        {
+            await Task.Delay(delay, timeProvider, _cts.Token);
+            Dismiss(id);
+        }
+        catch(OperationCanceledException) when (_cts.IsCancellationRequested)
+        {
+            // Circuit fermé : rien à faire.
+        }
     }
 }
