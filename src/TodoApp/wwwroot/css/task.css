@@ -1,4 +1,4 @@
-﻿body {
+body {
     /* ───────── En-tête de page ───────── */
     .page-header {
         margin-bottom: 1.25rem;
@@ -377,35 +377,35 @@
         cursor: pointer;
     }
 
-    .pager-btn svg {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.75;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .pager-btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .pager-btn:hover:not(:disabled):not(.is-current) {
-        background: var(--issue-hover);
-    }
+        .pager-btn:hover:not(:disabled):not(.is-current) {
+            background: var(--issue-hover);
+        }
 
-    .pager-btn.is-current {
-        font-weight: 600;
-        color: var(--issue-primary);
-        background: #e9f2ff;
-        cursor: default;
-    }
+        .pager-btn.is-current {
+            font-weight: 600;
+            color: var(--issue-primary);
+            background: #e9f2ff;
+            cursor: default;
+        }
 
-    .pager-btn:disabled {
-        color: var(--issue-subtle);
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+        .pager-btn:disabled {
+            color: var(--issue-subtle);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-    .pager-btn:focus-visible {
-        outline: 2px solid var(--issue-primary);
-        outline-offset: 1px;
-    }
+        .pager-btn:focus-visible {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 1px;
+        }
 
     .pager-ellipsis {
         min-width: 24px;
@@ -432,15 +432,15 @@
         cursor: pointer;
     }
 
-    .pager-select:hover {
-        background-color: var(--issue-hover);
-    }
+        .pager-select:hover {
+            background-color: var(--issue-hover);
+        }
 
-    .pager-select:focus {
-        outline: none;
-        border-color: var(--issue-primary);
-        box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
-    }
+        .pager-select:focus {
+            outline: none;
+            border-color: var(--issue-primary);
+            box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
+        }
 
     @media (max-width: 576px) {
         .pager {
@@ -469,14 +469,14 @@
         white-space: nowrap;
     }
 
-    .due svg {
-        flex: none;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .due svg {
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
     .due-overdue {
         color: #ae2e24;
@@ -533,10 +533,10 @@
         min-width: 0;
     }
 
-    .issue-meta .issue-desc {
-        flex: 1;
-        min-width: 0;
-    }
+        .issue-meta .issue-desc {
+            flex: 1;
+            min-width: 0;
+        }
 
     .checklist-badge {
         display: inline-flex;
@@ -551,18 +551,18 @@
         border-radius: 3px;
     }
 
-    .checklist-badge.is-complete {
-        color: #216e4e;
-        background: #dcfff1;
-    }
+        .checklist-badge.is-complete {
+            color: #216e4e;
+            background: #dcfff1;
+        }
 
-    .checklist-badge svg {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .checklist-badge svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
     /* Éditeur */
     .checklist-header {
         display: flex;
@@ -597,9 +597,9 @@
         transition: width 0.2s;
     }
 
-    .checklist-bar-fill.is-complete {
-        background: #22a06b;
-    }
+        .checklist-bar-fill.is-complete {
+            background: #22a06b;
+        }
 
     .checklist-items {
         list-style: none;
@@ -615,30 +615,30 @@
         border-radius: var(--issue-radius);
     }
 
-    .checklist-item:hover {
-        background: var(--issue-hover);
-    }
+        .checklist-item:hover {
+            background: var(--issue-hover);
+        }
 
-    .checklist-item label {
-        flex: 1;
-        margin: 0;
-        font-size: 0.875rem;
-        cursor: pointer;
-    }
+        .checklist-item label {
+            flex: 1;
+            margin: 0;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
 
-    .checklist-item.is-done label {
-        color: var(--issue-subtle);
-        text-decoration: line-through;
-    }
+        .checklist-item.is-done label {
+            color: var(--issue-subtle);
+            text-decoration: line-through;
+        }
 
-    .checklist-item .icon-btn {
-        opacity: 0;
-    }
+        .checklist-item .icon-btn {
+            opacity: 0;
+        }
 
-    .checklist-item:hover .icon-btn,
-    .checklist-item:focus-within .icon-btn {
-        opacity: 1;
-    }
+        .checklist-item:hover .icon-btn,
+        .checklist-item:focus-within .icon-btn {
+            opacity: 1;
+        }
 
     @media (hover: none) {
         .checklist-item .icon-btn {
@@ -655,5 +655,105 @@
         .checklist-bar-fill {
             transition: none;
         }
+    }
+
+    .recurring-badge {
+        display: inline-flex;
+        color: var(--issue-muted);
+    }
+
+        .recurring-badge svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .weekday-picker {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .weekday-chip {
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--issue-text);
+        background: #f1f2f4;
+        border-radius: 50%;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .weekday-chip.is-selected {
+            color: #fff;
+            background: var(--issue-primary);
+        }
+
+        .weekday-chip:focus-within {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 2px;
+        }
+
+    .col-status {
+        width: 150px;
+    }
+
+    .status-select {
+        appearance: none;
+        max-width: 100%;
+        padding: 0.125rem 1.25rem 0.125rem 0.5rem;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+        background-repeat: no-repeat;
+        background-position: right 0.3rem center;
+        background-size: 10px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    }
+
+    .status-select:focus-visible {
+        outline: 2px solid var(--issue-primary, #0c66e4);
+        outline-offset: 2px;
+    }
+
+    .status-select:disabled {
+        opacity: 0.6;
+        cursor: wait;
+    }
+    /* Les options s'affichent dans la liste native : texte normal, pas en majuscules colorées. */
+    .status-select option {
+        text-transform: none;
+        font-weight: 400;
+        color: #172b4d;
+        background: #fff;
+    }
+
+    .status-select.lozenge-todo {
+        color: #44546f;
+        background-color: #e9ebee;
+    }
+
+    .status-select.lozenge-progress {
+        color: #0055cc;
+        background-color: #e9f2ff;
+    }
+
+    .status-select.lozenge-review {
+        color: #5e4db2;
+        background-color: #f3f0ff;
+    }
+
+    .status-select.lozenge-done {
+        color: #216e4e;
+        background-color: #dcfff1;
     }
 }

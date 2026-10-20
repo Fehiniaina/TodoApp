@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks.Recurrence;
 
 namespace TodoApp.Data;
 
@@ -14,7 +15,8 @@ internal static class DbContextOptionsBuilderExtensions
             .UseNpgsql(connectionString, npgsql =>
             {
                 npgsql.MapEnum<TaskPriority>("task_priority");
-                configureNpgsql?.Invoke(npgsql);   // réglages propres à l'hôte (retry…)
+                npgsql.MapEnum<RecurrenceFrequency>("recurrence_frequency");
+                configureNpgsql?.Invoke(npgsql);
             })
             .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             .UseSnakeCaseNamingConvention();

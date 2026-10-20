@@ -13,6 +13,7 @@ using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
+using TodoApp.Infrastructure.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,15 @@ builder.Services
     .Bind(builder.Configuration.GetSection(TrashPurgeOptions.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+builder.Services
+    .AddOptions<RecurringTaskOptions>()
+    .Bind(builder.Configuration.GetSection(RecurringTaskOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddSingleton<RecurringTaskScheduler>();
+builder.Services.AddHostedService<RecurringTaskService>();
 
 var app = builder.Build();
 

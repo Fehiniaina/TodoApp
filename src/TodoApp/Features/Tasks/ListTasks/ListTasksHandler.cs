@@ -32,8 +32,8 @@ internal sealed class ListTasksHandler(
             .Take(pageSize)
             .Select(t => new TaskSummary(
                 t.Id, t.Title, t.Description, t.Priority, t.CreatedAtUtc,
-                t.IsCompleted, t.CompletedAt, t.DueDate,
-                t.Checklist.Count(i => i.IsDone), t.Checklist.Count))
+                t.Status, t.CompletedAt, t.DueDate,
+                t.Checklist.Count(i => i.IsDone), t.Checklist.Count, t.RecurringTaskId))
             .ToListAsync(cancellationToken);
 
         return new PagedResult<TaskSummary>(items, totalCount, pageSize);

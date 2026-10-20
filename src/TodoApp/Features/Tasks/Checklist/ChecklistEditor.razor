@@ -1,4 +1,4 @@
-﻿<section class="checklist" aria-labelledby="checklist-heading-@TaskId">
+<section class="checklist" aria-labelledby="checklist-heading-@TaskId">
     <div class="checklist-header">
         <h3 id="checklist-heading-@TaskId" class="checklist-heading">Checklist</h3>
         @if (_items.Count > 0)
@@ -33,7 +33,8 @@
     }
 
     <form class="checklist-add" @onsubmit="AddAsync">
-        <input class="form-control form-control-sm" placeholder="Ajouter une étape…"
+        <input @ref="_newTitleInput"
+               class="form-control form-control-sm" placeholder="Ajouter une étape…"
                aria-label="Nouvelle étape" maxlength="200" disabled="@_busy"
                @bind="_newTitle" @bind:event="oninput" />
         <button type="submit" class="btn-ghost" disabled="@(_busy || string.IsNullOrWhiteSpace(_newTitle))">

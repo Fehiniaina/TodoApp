@@ -1,6 +1,12 @@
+@using TodoApp.Features.Tasks.Recurrence
+
 <TaskEditor Model="Model"
             SubmitText="Créer la tâche"
             IsSubmitting="IsSubmitting"
             ErrorMessage="@ErrorMessage"
             OnValidSubmit="SubmitAsync"
-            OnCancel="OnCancel" />
+            OnCancel="OnCancel">
+    <ExtraFields>
+        <RecurrencePicker Model="Recurrence" />
+    </ExtraFields>
+</TaskEditor>

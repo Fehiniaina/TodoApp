@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks.Checklist;
 using TodoApp.Features.Shared.Logging;
@@ -15,6 +15,10 @@ public partial class ChecklistEditor
 
     [Parameter, EditorRequired] public Guid TaskId { get; set; }
 
+    /// <summary>Place le curseur dans le champ « Ajouter une étape » à l'ouverture.</summary>
+    [Parameter] public bool AutoFocus { get; set; }
+    private ElementReference _newTitleInput;
+
     private IReadOnlyList<ChecklistItemDto> _items = [];
     private string? _newTitle;
     private bool _busy;
@@ -23,6 +27,14 @@ public partial class ChecklistEditor
     private int Percent => _items.Count == 0 ? 0 : Done * 100 / _items.Count;
 
     protected override async Task OnParametersSetAsync() => _items = await Handler.GetAsync(TaskId);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AutoFocus)
+        {
+            await _newTitleInput.FocusAsync();
+        }
+    }
 
     private async Task AddAsync()
     {
