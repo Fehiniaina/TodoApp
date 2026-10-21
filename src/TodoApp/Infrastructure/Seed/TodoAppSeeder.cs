@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
@@ -8,38 +8,112 @@ namespace TodoApp.Infrastructure.Seed;
 
 public static class TodoAppSeeder
 {
-    public static async Task SeedAsync(
-        IDbContextFactory<ApplicationDbContext> factory
-    )
+    private const int TaskCount = 30;
+
+    private static readonly TaskItemStatus[] WorkflowPath =
+    [
+        TaskItemStatus.InProgress,
+        TaskItemStatus.InValidation,
+        TaskItemStatus.Resolved,
+    ];
+
+    public static async Task SeedAsync(IDbContextFactory<ApplicationDbContext> factory, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        await using var context = await factory.CreateDbContextAsync();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        await using var context = await factory.CreateDbContextAsync(cancellationToken);
 
-        var userIds = await context.Users.Select(u => u.Id).ToListAsync();
+        var userIds = await context.Users.Select(u => u.Id).ToListAsync(cancellationToken);
         if (userIds.Count == 0)
         {
-            return; // No users registered yet — nothing to seed tasks against.
+            return;
         }
 
-        if (await context.Tasks.AnyAsync())
+        if (await context.Tasks.IgnoreQueryFilters().AnyAsync(cancellationToken))
         {
-            return; // Already seeded.
+            return;
         }
 
-        var taskFaker = new Faker<TaskItem>()
-            .CustomInstantiator(f => TaskItem.Create(
-                ownerId: f.PickRandom(userIds),
-                title: f.Lorem.Sentence(3, 5),
-                description: f.Lorem.Paragraph(),
-                priority: f.PickRandom<TaskPriority>(),
-                dueDate: today.AddDays(f.Random.Int(-7, 21)).OrNull(f, 0.25f)
-            ));
+        Randomizer.Seed = new Random(20261021);
 
-        var tasks = taskFaker.Generate(10);
+        var faker = new Faker("fr");
+        var nowUtc = DateTime.UtcNow;
+        var today = DateOnly.FromDateTime(nowUtc);
+
+        var tasks = faker.Random
+            .Shuffle(SeedCatalog.Tasks)
+            .Take(TaskCount)
+            .Select(template => CreateTask(faker, template, userIds, today, nowUtc))
+            .ToList();
 
         context.Tasks.AddRange(tasks);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static TaskItem CreateTask(
+        Faker f, TaskTemplate template, List<string> userIds, DateOnly today, DateTime nowUtc)
+    {
+        var steps = f.Random.WeightedRandom([0, 1, 2, 3], [0.35f, 0.30f, 0.15f, 0.20f]);
+
+        var values = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["{n}"] = f.Random.Int(120, 980).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["{client}"] = f.Company.CompanyName(),
+            ["{person}"] = f.Name.FirstName(),
+            ["{version}"] = f.System.Semver(),
+        };
+
+        var task = TaskItem.Create(
+            ownerId: f.PickRandom(userIds),
+            title: Fill(template.Title, values),
+            description: template.Description is null ? null : Fill(template.Description, values),
+            priority: f.Random.Bool(0.8f) ? template.Priority : f.PickRandom<TaskPriority>(),
+            dueDate: DueDate(f, today, steps));
+
+        AddChecklist(f, task, template.Checklist, steps);
+        AdvanceStatus(f, task, steps, nowUtc);
+
+        return task;
+    }
+
+    private static string Fill(string text, Dictionary<string, string> values) =>
+        values.Aggregate(text, (current, pair) => current.Replace(pair.Key, pair.Value, StringComparison.Ordinal));
+
+    /// <summary>Tâches résolues : échéance passée ; autres : de « en retard » à « dans 3 semaines ». 25 % sans échéance.</summary>
+    private static DateOnly? DueDate(Faker f, DateOnly today, int steps)
+    {
+        var offset = steps == WorkflowPath.Length ? f.Random.Int(-14, 0) : f.Random.Int(-5, 21);
+        return today.AddDays(offset).OrNull(f, 0.25f);
+    }
+
+    /// <summary>Étapes cochées dans l'ordre, cohérentes avec l'avancement de la tâche.</summary>
+    private static void AddChecklist(Faker f, TaskItem task, string[] items, int steps)
+    {
+        var doneCount = steps switch
+        {
+            0 => 0,
+            1 => f.Random.Int(0, Math.Max(0, items.Length - 1)),
+            _ => items.Length,
+        };
+
+        for (var i = 0; i < items.Length; i++)
+        {
+            var item = task.AddChecklistItem(items[i]);
+
+            if (i < doneCount)
+            {
+                task.SetChecklistItemDone(item.Id, isDone: true);
+            }
+        }
+    }
+
+    /// <summary>Fait avancer la tâche dans le workflow, étape par étape, comme le ferait un utilisateur.</summary>
+    private static void AdvanceStatus(Faker f, TaskItem task, int steps, DateTime nowUtc)
+    {
+        for (var i = 0; i < steps; i++)
+        {
+            var at = nowUtc.AddDays(-(steps - i)).AddHours(-f.Random.Int(0, 8));
+            task.ChangeStatus(WorkflowPath[i], task.OwnerId, at);
+        }
     }
 }

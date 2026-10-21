@@ -14,6 +14,7 @@ using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
+using TodoApp.Infrastructure.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +100,7 @@ builder.Services
 
 builder.Services.AddSingleton<RecurringTaskScheduler>();
 builder.Services.AddHostedService<RecurringTaskService>();
+builder.Services.AddHostedService<DatabaseSeederHostedService>();
 
 var app = builder.Build();
 
