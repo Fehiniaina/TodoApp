@@ -27,7 +27,7 @@ internal sealed class ChangeTaskStatusHandler(
 
         var task = await db.Tasks
             .AsTracking()
-            .SingleOrDefaultAsync(t => t.Id == command.TaskId && t.OwnerId == actorId, cancellationToken);
+            .SingleOrDefaultAsync(t => t.Id == command.TaskId && t.CreatedById == actorId, cancellationToken);
 
         if (task is null)
         {

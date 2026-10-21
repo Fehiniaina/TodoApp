@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Errors;
+using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.UpdateTask;
 
@@ -22,14 +23,15 @@ internal sealed class UpdateTaskHandler(
             return Error.Validation("Task.IsInvalid", validation.Errors[0].ErrorMessage);
         }
 
-        var ownerId = await currentUser.GetIdAsync();
+        var createdById = await currentUser.GetIdAsync();
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         // Filtre sur le propriétaire : la tâche d'un autre utilisateur est traitée comme inexistante.
         var task = await db.Tasks
             .AsTracking()
-            .SingleOrDefaultAsync(t => t.Id == command.Id && t.OwnerId == ownerId, cancellationToken);
+            .VisibleTo(createdById)
+            .SingleOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 
         if (task is null)
         {

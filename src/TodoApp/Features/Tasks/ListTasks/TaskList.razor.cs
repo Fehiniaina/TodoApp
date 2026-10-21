@@ -32,6 +32,7 @@ public sealed partial class TaskList : IDisposable
     [Inject] private UserTimeZone UserTimeZone { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
+    [Inject] private ICurrentUser CurrentUser { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -40,7 +41,7 @@ public sealed partial class TaskList : IDisposable
     private int _pageSize = 10;
     private bool _isLoading = true;
     private string? _errorMessage;
-    private string? _ownerId;
+    private string? _createdById;
     private DateOnly _today;
 
     private readonly HashSet<Guid> _changingIds = [];
@@ -52,7 +53,7 @@ public sealed partial class TaskList : IDisposable
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthenticationState;
-        _ownerId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _createdById = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
         _today = Clock.Today;
 
         Notifier.Changed += OnTasksChanged;
@@ -89,7 +90,7 @@ public sealed partial class TaskList : IDisposable
 
     private async Task LoadTasksAsync()
     {
-        if (string.IsNullOrEmpty(_ownerId))
+        if (string.IsNullOrEmpty(_createdById))
         {
             _errorMessage = "Impossible d'identifier l'utilisateur courant.";
             _isLoading = false;
@@ -97,7 +98,7 @@ public sealed partial class TaskList : IDisposable
         }
 
         _isLoading = true;
-        var result = await Handler.HandleAsync(new ListTasksQuery(_ownerId, Page: _currentPage, PageSize: _pageSize));
+        var result = await Handler.HandleAsync(new ListTasksQuery(_createdById, Page: _currentPage, PageSize: _pageSize));
         _isLoading = false;
 
         if (result.IsFailure)
@@ -223,7 +224,7 @@ public sealed partial class TaskList : IDisposable
     {
         try
         {
-            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(task.Id, _ownerId!));
+            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(task.Id));
 
             if (result.IsFailure)
             {

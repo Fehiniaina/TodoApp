@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Features.Shared;
+using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.Trash;
 
@@ -12,13 +13,14 @@ internal sealed class RestoreTaskHandler(
 {
     public async Task<Result> HandleAsync(RestoreTaskCommand command, CancellationToken cancellationToken = default)
     {
-        var ownerId = await currentUser.GetIdAsync();
+        var createdById = await currentUser.GetIdAsync();
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var task = await db.Tasks
             .IgnoreQueryFilters([QueryFilters.SoftDelete])
             .AsTracking()
-            .SingleOrDefaultAsync(t => t.Id == command.Id && t.OwnerId == ownerId && t.IsDeleted, cancellationToken);
+            .CreatedBy(createdById)
+            .SingleOrDefaultAsync(t => t.Id == command.Id && t.IsDeleted, cancellationToken);
 
         if (task is null)
         {

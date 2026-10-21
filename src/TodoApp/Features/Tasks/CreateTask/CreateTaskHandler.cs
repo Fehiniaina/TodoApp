@@ -25,10 +25,10 @@ internal sealed class CreateTaskHandler(
         }
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
-        var ownerId = await currentUser.GetIdAsync();
+        var createdById = await currentUser.GetIdAsync();
 
         var task = TaskItem.Create(
-            ownerId,
+            createdById,
             command.Title.Trim(),
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description,
             command.Priority,

@@ -14,7 +14,7 @@ internal sealed class TaskItem : AggregateRoot
     private readonly List<ChecklistItem> _checklist = [];
 
     public Guid Id { get; private set; }
-    public string OwnerId { get; private set; } = null!;
+    public string CreatedById { get; private set; } = null!;
     public string Title { get; private set; } = null!;
     public string? Description { get; private set; }
     public TaskPriority Priority { get; private set; }
@@ -47,17 +47,17 @@ internal sealed class TaskItem : AggregateRoot
         [.. _checklist.OrderBy(i => i.Position)];
 
     public static TaskItem Create(
-        string ownerId,
+        string createdBy,
         string title,
         string? description,
         TaskPriority priority,
         DateOnly? dueDate)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(ownerId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(createdBy);
         return new TaskItem
         {
             Id = Guid.CreateVersion7(),
-            OwnerId = ownerId,
+            CreatedById = createdBy,
             Title = NormalizeTitle(title),
             Description = NormalizeDescription(description),
             Priority = EnsureDefined(priority),
@@ -162,10 +162,10 @@ internal sealed class TaskItem : AggregateRoot
     }
 
     public static TaskItem CreateOccurrence(
-    string ownerId, string title, string? description, TaskPriority priority,
+    string createdBy, string title, string? description, TaskPriority priority,
     DateOnly dueDate, Guid recurringTaskId)
     {
-        var task = Create(ownerId, title, description, priority, dueDate);
+        var task = Create(createdBy, title, description, priority, dueDate);
         task.RecurringTaskId = recurringTaskId;
         return task;
     }

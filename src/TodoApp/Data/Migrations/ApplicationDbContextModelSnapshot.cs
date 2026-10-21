@@ -406,6 +406,11 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("created_by_id");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
@@ -422,11 +427,6 @@ namespace TodoApp.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
-
-                    b.Property<string>("OwnerId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("owner_id");
 
                     b.Property<TaskPriority>("Priority")
                         .HasColumnType("task_priority")
@@ -449,12 +449,12 @@ namespace TodoApp.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_tasks");
 
-                    b.HasIndex("OwnerId", "DeletedAt")
-                        .HasDatabaseName("ix_tasks_owner_id_deleted_at")
+                    b.HasIndex("CreatedById", "DeletedAt")
+                        .HasDatabaseName("ix_tasks_created_by_id_deleted_at")
                         .HasFilter("is_deleted = true");
 
-                    b.HasIndex("OwnerId", "Priority")
-                        .HasDatabaseName("ix_tasks_owner_id_priority")
+                    b.HasIndex("CreatedById", "Priority")
+                        .HasDatabaseName("ix_tasks_created_by_id_priority")
                         .HasFilter("is_deleted = false");
 
                     b.HasIndex("RecurringTaskId", "DueDate")

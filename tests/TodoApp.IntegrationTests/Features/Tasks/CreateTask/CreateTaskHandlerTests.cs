@@ -69,7 +69,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal("Write tests", persisted.Title);
         Assert.Equal("Important!", persisted.Description);
         Assert.Equal(TaskPriority.High, persisted.Priority);
-        Assert.Equal(OwnerA, persisted.OwnerId);
+        Assert.Equal(OwnerA, persisted.CreatedById);
     }
 
     // ── validation failure ───────────────────────────────────────────────────
@@ -108,7 +108,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         // Act: query database as ownerB
         await using var db = fixture.CreateDbContext();
         var ownerBTasks = await db.Tasks.AsNoTracking()
-            .Where(t => t.OwnerId == "owner-B")
+            .Where(t => t.CreatedById == "owner-B")
             .ToListAsync();
 
         // Assert: ownerB has no tasks
@@ -132,7 +132,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal("Write tests", persisted.Title);
         Assert.Equal("Important!", persisted.Description);
         Assert.Equal(TaskPriority.High, persisted.Priority);
-        Assert.Equal(OwnerA, persisted.OwnerId);
+        Assert.Equal(OwnerA, persisted.CreatedById);
     }
 
     [Fact]
@@ -146,8 +146,8 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 
         // Act
         await using var db = fixture.CreateDbContext();
-        var ownerATasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerA).ToListAsync();
-        var ownerBTasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerB).ToListAsync();
+        var ownerATasks = await db.Tasks.AsNoTracking().Where(t => t.CreatedById == OwnerA).ToListAsync();
+        var ownerBTasks = await db.Tasks.AsNoTracking().Where(t => t.CreatedById == OwnerB).ToListAsync();
 
         // Assert
         var task = Assert.Single(ownerBTasks);

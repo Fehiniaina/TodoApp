@@ -20,7 +20,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
     {
         builder.HasKey(task => task.Id);
 
-        builder.Property(task => task.OwnerId).IsRequired();
+        builder.Property(task => task.CreatedById).IsRequired();
         builder.Property(task => task.Title).IsRequired().HasMaxLength(200);
         builder.Property(task => task.Description).HasMaxLength(2000);
         builder.Property(task => task.Priority).IsRequired();
@@ -35,10 +35,10 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
     {
         builder.HasQueryFilter(QueryFilters.SoftDelete, task => !task.IsDeleted);
 
-        builder.HasIndex(task => new { task.OwnerId, task.Priority })
+        builder.HasIndex(task => new { task.CreatedById, task.Priority })
                .HasFilter("is_deleted = false");
 
-        builder.HasIndex(task => new { task.OwnerId, task.DeletedAt })
+        builder.HasIndex(task => new { task.CreatedById, task.DeletedAt })
                .HasFilter("is_deleted = true");
     }
 

@@ -1,7 +1,7 @@
-﻿namespace TodoApp.Features.Tasks.ListTasks;
+namespace TodoApp.Features.Tasks.ListTasks;
 
 internal sealed record ListTasksQuery(
-    string OwnerId,
+    string CreatedById,
     string? Priority = default,
     int Page = 1,
     int PageSize = 10);

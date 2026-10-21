@@ -2,11 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Shared;
+using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
 internal sealed class ListTasksHandler(
-    IDbContextFactory<ApplicationDbContext> factory) : IHandler
+    IDbContextFactory<ApplicationDbContext> factory,
+    ICurrentUser currentUser) : IHandler
 {
     private readonly int MaxPageSize = 100;
 
@@ -17,10 +20,11 @@ internal sealed class ListTasksHandler(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
         int page = Math.Max(query.Page, 1);
         int pageSize = Math.Clamp(query.PageSize, 1, MaxPageSize);
+        var createdById = await currentUser.GetIdAsync();
 
         var ownerTasks = db.Tasks
             .AsNoTracking()
-            .Where(t => t.OwnerId == query.OwnerId);
+            .VisibleTo(createdById);
 
         int totalCount = await ownerTasks.CountAsync(cancellationToken);
 

@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
 using TodoApp.Data;
+using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks.Checklist;
 using TodoApp.Features.Shared;
+using TodoApp.Features.Tasks.Shared;
 
-namespace TodoApp.Domain.Tasks.Checklist;
+namespace TodoApp.Features.Tasks.Checklist;
 
 internal sealed class ChecklistHandler(
     IDbContextFactory<ApplicationDbContext> factory,
@@ -18,11 +21,12 @@ internal sealed class ChecklistHandler(
 
     public async Task<IReadOnlyList<ChecklistItemDto>> GetAsync(Guid taskId, CancellationToken cancellationToken = default)
     {
-        var ownerId = await currentUser.GetIdAsync();
+        var createdById = await currentUser.GetIdAsync();
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         return await db.Tasks
-            .Where(t => t.Id == taskId && t.OwnerId == ownerId)
+            .VisibleTo(createdById)
+            .Where(t => t.Id == taskId)
             .SelectMany(t => t.Checklist)
             .OrderBy(i => i.Position)
             .Select(i => new ChecklistItemDto(i.Id, i.Title, i.IsDone))
@@ -66,12 +70,12 @@ internal sealed class ChecklistHandler(
     private async Task<Result<IReadOnlyList<ChecklistItemDto>>> MutateAsync(
         Guid taskId, Func<TaskItem, Error?> mutate, CancellationToken cancellationToken)
     {
-        var ownerId = await currentUser.GetIdAsync();
+        var createdBy = await currentUser.GetIdAsync();
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var task = await db.Tasks
             .AsTracking()
-            .SingleOrDefaultAsync(t => t.Id == taskId && t.OwnerId == ownerId, cancellationToken);
+            .SingleOrDefaultAsync(t => t.Id == taskId && t.CreatedById == createdBy, cancellationToken);
 
         if (task is null) return TaskNotFound;
 

@@ -64,7 +64,7 @@ public static class TodoAppSeeder
         };
 
         var task = TaskItem.Create(
-            ownerId: f.PickRandom(userIds),
+            createdBy: f.PickRandom(userIds),
             title: Fill(template.Title, values),
             description: template.Description is null ? null : Fill(template.Description, values),
             priority: f.Random.Bool(0.8f) ? template.Priority : f.PickRandom<TaskPriority>(),
@@ -113,7 +113,7 @@ public static class TodoAppSeeder
         for (var i = 0; i < steps; i++)
         {
             var at = nowUtc.AddDays(-(steps - i)).AddHours(-f.Random.Int(0, 8));
-            task.ChangeStatus(WorkflowPath[i], task.OwnerId, at);
+            task.ChangeStatus(WorkflowPath[i], task.CreatedById, at);
         }
     }
 }
