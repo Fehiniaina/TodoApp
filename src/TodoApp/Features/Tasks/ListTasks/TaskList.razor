@@ -1,14 +1,31 @@
+@using TodoApp.Features.Tasks.AssignTask
 @using TodoApp.Components.Shared
 @using TodoApp.Domain.Tasks
 @using TodoApp.Features.Tasks.Checklist
 @using TodoApp.Features.Tasks.Shared
+@using TodoApp.Features.Users
 @using Microsoft.Extensions.Logging
 
 <div class="issue-toolbar">
-    <span class="issue-count">
-        @{ var count = _result?.TotalCount ?? 0; }
-        @count @(count > 1 ? "tâches" : "tâche")
-    </span>
+    <div class="issue-toolbar-left">
+        <div class="issue-filters" role="group" aria-label="Filtrer les tâches">
+            @foreach (var (scope, label) in Scopes)
+            {
+                <button type="button"
+                        class="filter-chip @(_scope == scope ? "is-active" : null)"
+                        aria-pressed="@(_scope == scope)"
+                        @onclick="() => ChangeScopeAsync(scope)">
+                    @label
+                </button>
+            }
+        </div>
+
+        <span class="issue-count">
+            @{ var count = _result?.TotalCount ?? 0; }
+            @count @(count > 1 ? "tâches" : "tâche")
+        </span>
+    </div>
+
     <div class="issue-toolbar-actions">
         <a href="tasks/trash" class="btn-ghost">Corbeille</a>
         <button type="button" class="btn-create" @onclick="OpenCreateModal">
@@ -58,6 +75,7 @@ else
                     <th scope="col" class="col-summary">Résumé</th>
                     <th scope="col" class="col-priority">Priorité</th>
                     <th scope="col" class="col-status">Statut</th>
+                    <th scope="col" class="col-assignee">Assigné</th>
                     <th scope="col" class="col-due">Échéance</th>
                     <th scope="col" class="col-date">Créée le</th>
                     <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
@@ -113,6 +131,10 @@ else
                         </select>
                     </td>
 
+                    <td class="col-assignee">
+                         <UserAvatar UserId="@task.AssigneeId" Name="@task.AssigneeName" />
+                    </td>
+
                     <td class="col-due">
                         <DueDateBadge DueDate="task.DueDate" IsCompleted="task.IsCompleted" Today="_today" />
                     </td>
@@ -162,6 +184,8 @@ else
 @if (_editingTask is not null)
 {
     <Modal Title="Modifier la tâche" OnClose="CloseEditModal">
+        <AssigneePicker TaskId="_editingTask.Id" AssigneeId="@_editingTask.AssigneeId" />
+
         @* Une seule @key, sur le conteneur : les deux composants sont recréés ensemble
            quand on change de tâche, sans clé dupliquée entre frères. *@
         <div @key="_editingTask.Id">

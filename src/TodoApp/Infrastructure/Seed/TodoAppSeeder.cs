@@ -72,6 +72,7 @@ public static class TodoAppSeeder
 
         AddChecklist(f, task, template.Checklist, steps);
         AdvanceStatus(f, task, steps, nowUtc);
+        AssignTo(f, task, userIds, nowUtc, steps);
 
         return task;
     }
@@ -114,6 +115,14 @@ public static class TodoAppSeeder
         {
             var at = nowUtc.AddDays(-(steps - i)).AddHours(-f.Random.Int(0, 8));
             task.ChangeStatus(WorkflowPath[i], task.CreatedById, at);
+        }
+    }
+
+    private static void AssignTo(Faker f, TaskItem task, List<string> userIds, DateTime nowUtc, int steps)
+    {
+        if (userIds.Count > 1 && f.Random.Bool(0.6f))
+        {
+            task.AssignTo(f.PickRandom(userIds), task.CreatedById, nowUtc.AddDays(-steps - 1));
         }
     }
 }

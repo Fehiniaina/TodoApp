@@ -14,7 +14,12 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     private const string OwnerA = "owner-A";
     private const string OwnerB = "owner-B";
 
-    public Task InitializeAsync() => fixture.ResetAsync();
+    public async Task InitializeAsync()
+    {
+        await fixture.ResetAsync();
+        await fixture.CreateUsersAsync(OwnerA, OwnerB);
+    }
+
     public Task DisposeAsync() => Task.CompletedTask;
 
     private CreateTaskHandler CreateHandler(string ownerId = OwnerA) => new(

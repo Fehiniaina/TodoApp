@@ -14,6 +14,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         ConfigureSoftDelete(builder);
         ConfigureChecklist(builder);
         ConfigureRecurrence(builder);
+        ConfigureAssignment(builder);
     }
 
     private static void ConfigureProperties(EntityTypeBuilder<TaskItem> builder)
@@ -73,5 +74,16 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.HasIndex(task => new { task.RecurringTaskId, task.DueDate })
                .IsUnique()
                .HasFilter("recurring_task_id IS NOT NULL");
+    }
+
+    private static void ConfigureAssignment(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.HasOne<ApplicationUser>()
+               .WithMany()
+               .HasForeignKey(t => t.AssigneeId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(t => t.AssigneeId)
+               .HasFilter("is_deleted = false AND assignee_id IS NOT NULL");
     }
 }

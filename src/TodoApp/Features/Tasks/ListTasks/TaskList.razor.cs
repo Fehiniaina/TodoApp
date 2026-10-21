@@ -50,6 +50,8 @@ public sealed partial class TaskList : IDisposable
     private TaskSummary? _editingTask;
     private bool _focusChecklist;
 
+    private TaskScope _scope = TaskScope.All;
+
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthenticationState;
@@ -98,7 +100,7 @@ public sealed partial class TaskList : IDisposable
         }
 
         _isLoading = true;
-        var result = await Handler.HandleAsync(new ListTasksQuery(_createdById, Page: _currentPage, PageSize: _pageSize));
+        var result = await Handler.HandleAsync(new ListTasksQuery(_scope, Page: _currentPage, PageSize: _pageSize));
         _isLoading = false;
 
         if (result.IsFailure)
@@ -258,6 +260,22 @@ public sealed partial class TaskList : IDisposable
     private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
 
     private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
+
+    private static readonly (TaskScope Scope, string Label)[] Scopes =
+    [
+        (TaskScope.All, "Toutes"),
+        (TaskScope.AssignedToMe, "Assignées à moi"),
+        (TaskScope.CreatedByMe, "Créées par moi"),
+    ];
+
+    private Task ChangeScopeAsync(TaskScope scope)
+    {
+        if (scope == _scope) return Task.CompletedTask;
+
+        _scope = scope;
+        _currentPage = 1;
+        return LoadTasksAsync();
+    }
 
     private string? StatusTooltip(TaskSummary task) =>
         task.CompletedAt is { } completedAt ? $"Résolue le {FormatDateTime(completedAt)}" : null;

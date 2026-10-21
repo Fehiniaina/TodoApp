@@ -42,6 +42,8 @@ internal sealed class TaskItem : AggregateRoot
 
     public Guid? RecurringTaskId { get; private set; }
 
+    public string? AssigneeId { get; private set; }
+
     /// <summary>Étapes triées par position (alloue une nouvelle liste).</summary>
     public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
         [.. _checklist.OrderBy(i => i.Position)];
@@ -161,6 +163,27 @@ internal sealed class TaskItem : AggregateRoot
         Raise(new TaskStatusChanged(Id, actorId, previous, newStatus, nowUtc));
     }
 
+    public void AssignTo(string? assigneeId, string actorId, DateTime nowUtc)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
+        EnsureUtc(nowUtc);
+
+        if (assigneeId is not null && string.IsNullOrWhiteSpace(assigneeId))
+        {
+            throw new ArgumentException("Assignee id cannot be blank; use null to unassign.", nameof(assigneeId));
+        }
+
+        if (string.Equals(assigneeId, AssigneeId, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var previous = AssigneeId;
+        AssigneeId = assigneeId;
+
+        Raise(new TaskAssigned(Id, actorId, previous, assigneeId, nowUtc));
+    }
+
     public static TaskItem CreateOccurrence(
     string createdBy, string title, string? description, TaskPriority priority,
     DateOnly dueDate, Guid recurringTaskId)
@@ -183,4 +206,12 @@ internal sealed class TaskItem : AggregateRoot
     Enum.IsDefined(priority)
         ? priority
         : throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown task priority.");
+
+    private static void EnsureUtc(DateTime value)
+    {
+        if (value.Kind != DateTimeKind.Utc)
+        {
+            throw new ArgumentException("Timestamp must be in UTC.", nameof(value));
+        }
+    }
 }

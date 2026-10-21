@@ -398,6 +398,10 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("AssigneeId")
+                        .HasColumnType("text")
+                        .HasColumnName("assignee_id");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("completed_at");
@@ -448,6 +452,10 @@ namespace TodoApp.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_tasks");
+
+                    b.HasIndex("AssigneeId")
+                        .HasDatabaseName("ix_tasks_assignee_id")
+                        .HasFilter("is_deleted = false AND assignee_id IS NOT NULL");
 
                     b.HasIndex("CreatedById", "DeletedAt")
                         .HasDatabaseName("ix_tasks_created_by_id_deleted_at")
@@ -577,6 +585,12 @@ namespace TodoApp.Data.Migrations
 
             modelBuilder.Entity("TodoApp.Domain.Tasks.TaskItem", b =>
                 {
+                    b.HasOne("TodoApp.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_tasks_asp_net_users_assignee_id");
+
                     b.HasOne("TodoApp.Domain.Tasks.Recurrence.RecurringTask", null)
                         .WithMany()
                         .HasForeignKey("RecurringTaskId")
