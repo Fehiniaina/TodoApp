@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Recurrence;
+using TodoApp.Infrastructure.Persistence;
 
 namespace TodoApp.Data;
 
@@ -19,5 +20,6 @@ internal static class DbContextOptionsBuilderExtensions
                 configureNpgsql?.Invoke(npgsql);
             })
             .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-            .UseSnakeCaseNamingConvention();
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(DomainEventsInterceptor.Instance);
 }

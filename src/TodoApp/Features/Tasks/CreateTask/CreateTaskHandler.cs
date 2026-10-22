@@ -11,6 +11,7 @@ internal sealed class CreateTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     IValidator<CreateTaskCommand> validator,
     ICurrentUser currentUser,
+    TimeProvider timeProvider,
     TaskChangeNotifier notifier) : IHandler
 {
     public async Task<Result<CreateTaskResult>> HandleAsync(
@@ -24,7 +25,6 @@ internal sealed class CreateTaskHandler(
             return Error.Validation("Task.IsInvalid", first.ErrorMessage);
         }
 
-        await using var db = await factory.CreateDbContextAsync(cancellationToken);
         var createdById = await currentUser.GetIdAsync();
 
         var task = TaskItem.Create(
@@ -32,8 +32,10 @@ internal sealed class CreateTaskHandler(
             command.Title.Trim(),
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description,
             command.Priority,
-            command.DueDate);
+            command.DueDate,
+            timeProvider.GetUtcNow().UtcDateTime);
 
+        await using var db = await factory.CreateDbContextAsync(cancellationToken);
         db.Tasks.Add(task);
         await db.SaveChangesAsync(cancellationToken);
 

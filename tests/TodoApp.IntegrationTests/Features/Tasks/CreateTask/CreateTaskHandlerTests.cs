@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
@@ -13,6 +14,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 {
     private const string OwnerA = "owner-A";
     private const string OwnerB = "owner-B";
+    private readonly FakeTimeProvider _time = new(new DateTimeOffset(2026, 10, 21, 9, 0, 0, TimeSpan.Zero));
 
     public async Task InitializeAsync()
     {
@@ -26,6 +28,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         new TestDbContextFactory(fixture),
         new CreateTaskCommandValidator(),
         new FakeCurrentUser(ownerId),
+        _time,
         new TaskChangeNotifier());
 
     // ── success path ────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Domain.Tasks.Recurrence;
 using TodoApp.Infrastructure.Configurations;
 
@@ -11,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // internal: TaskItem is an internal domain entity; tests access it via InternalsVisibleTo.
     internal DbSet<TaskItem> Tasks => Set<TaskItem>();
     internal DbSet<RecurringTask> RecurringTasks => Set<RecurringTask>();
+    internal DbSet<TaskActivity> TaskActivities => Set<TaskActivity>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

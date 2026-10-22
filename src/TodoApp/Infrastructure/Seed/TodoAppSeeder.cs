@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bogus;
 
 using Microsoft.EntityFrameworkCore;
@@ -51,28 +52,41 @@ public static class TodoAppSeeder
     }
 
     private static TaskItem CreateTask(
-        Faker f, TaskTemplate template, List<string> userIds, DateOnly today, DateTime nowUtc)
+    Faker f, TaskTemplate template, List<string> userIds, DateOnly today, DateTime nowUtc)
     {
+        // 0 = À faire, 1 = En cours, 2 = En validation, 3 = Résolue
         var steps = f.Random.WeightedRandom([0, 1, 2, 3], [0.35f, 0.30f, 0.15f, 0.20f]);
 
         var values = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["{n}"] = f.Random.Int(120, 980).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["{n}"] = f.Random.Int(120, 980).ToString(CultureInfo.InvariantCulture),
             ["{client}"] = f.Company.CompanyName(),
             ["{person}"] = f.Name.FirstName(),
             ["{version}"] = f.System.Semver(),
         };
 
+        var at = nowUtc.AddDays(-(steps + 2)).AddHours(-f.Random.Int(1, 8));
+        DateTime Next() => at = at.AddHours(f.Random.Int(2, 20));
+
+        var createdById = f.PickRandom(userIds);
+
         var task = TaskItem.Create(
-            createdBy: f.PickRandom(userIds),
-            title: Fill(template.Title, values),
-            description: template.Description is null ? null : Fill(template.Description, values),
-            priority: f.Random.Bool(0.8f) ? template.Priority : f.PickRandom<TaskPriority>(),
-            dueDate: DueDate(f, today, steps));
+            createdById,
+            Fill(template.Title, values),
+            template.Description is null ? null : Fill(template.Description, values),
+            f.Random.Bool(0.8f) ? template.Priority : f.PickRandom<TaskPriority>(),
+            DueDate(f, today, steps),
+            createdAtUtc: at);
 
         AddChecklist(f, task, template.Checklist, steps);
-        AdvanceStatus(f, task, steps, nowUtc);
-        AssignTo(f, task, userIds, nowUtc, steps);
+
+        var others = userIds.Where(id => !string.Equals(id,createdById, StringComparison.Ordinal)).ToList();
+        if (others.Count > 0 && f.Random.Bool(0.6f)) // 60 %
+        {
+            task.AssignTo(f.PickRandom(others), createdById, Next());
+        }
+
+        AdvanceStatus(task, steps, Next);
 
         return task;
     }
@@ -108,21 +122,17 @@ public static class TodoAppSeeder
         }
     }
 
-    /// <summary>Fait avancer la tâche dans le workflow, étape par étape, comme le ferait un utilisateur.</summary>
-    private static void AdvanceStatus(Faker f, TaskItem task, int steps, DateTime nowUtc)
+    /// <summary>
+    /// Fait avancer la tâche dans le workflow, étape par étape.
+    /// C'est l'assigné qui fait avancer le ticket ; à défaut, le créateur.
+    /// </summary>
+    private static void AdvanceStatus(TaskItem task, int steps, Func<DateTime> next)
     {
+        var actorId = task.AssigneeId ?? task.CreatedById;
+
         for (var i = 0; i < steps; i++)
         {
-            var at = nowUtc.AddDays(-(steps - i)).AddHours(-f.Random.Int(0, 8));
-            task.ChangeStatus(WorkflowPath[i], task.CreatedById, at);
-        }
-    }
-
-    private static void AssignTo(Faker f, TaskItem task, List<string> userIds, DateTime nowUtc, int steps)
-    {
-        if (userIds.Count > 1 && f.Random.Bool(0.6f))
-        {
-            task.AssignTo(f.PickRandom(userIds), task.CreatedById, nowUtc.AddDays(-steps - 1));
+            task.ChangeStatus(WorkflowPath[i], actorId, next());
         }
     }
 }

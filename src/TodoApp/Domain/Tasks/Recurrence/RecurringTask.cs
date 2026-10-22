@@ -72,7 +72,7 @@ internal sealed class RecurringTask
     }
 
     public TaskItem CreateOccurrence(DateOnly dueDate) =>
-        TaskItem.CreateOccurrence(OwnerId, Title, Description, Priority, dueDate, Id);
+        TaskItem.CreateOccurrence(OwnerId, Title, Description, Priority, dueDate, Id, CreatedAtUtc);
 
     public void Stop()
     {

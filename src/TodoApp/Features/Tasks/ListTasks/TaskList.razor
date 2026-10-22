@@ -1,3 +1,4 @@
+@using TodoApp.Features.Tasks.Activity
 @using TodoApp.Features.Tasks.AssignTask
 @using TodoApp.Components.Shared
 @using TodoApp.Domain.Tasks
@@ -194,8 +195,10 @@ else
                           OnCancel="CloseEditModal" />
 
             <hr class="my-4" />
-
             <ChecklistEditor TaskId="_editingTask.Id" AutoFocus="_focusChecklist" />
+
+            <hr class="my-4" />
+            <TaskActivityFeed TaskId="_editingTask.Id" />
 
             @if (_editingTask.RecurringTaskId is { } seriesId)
             {

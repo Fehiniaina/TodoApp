@@ -26,6 +26,7 @@ public class AssignTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
             new TestDbContextFactory(fixture),
             new CreateTaskCommandValidator(),
             new FakeCurrentUser(ownerId),
+            _time,
             new TaskChangeNotifier());
 
     private AssignTaskHandler AssignHandler(string ownerId = OwnerA) => new(

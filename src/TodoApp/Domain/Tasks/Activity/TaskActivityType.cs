@@ -1,0 +1,8 @@
+namespace TodoApp.Domain.Tasks.Activity;
+
+public enum TaskActivityType
+{
+    Created,
+    Assigned,
+    StatusChanged,
+}

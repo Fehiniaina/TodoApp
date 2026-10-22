@@ -48,24 +48,12 @@ internal sealed class TaskItem : AggregateRoot
     public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
         [.. _checklist.OrderBy(i => i.Position)];
 
-    public static TaskItem Create(
-        string createdBy,
-        string title,
-        string? description,
-        TaskPriority priority,
-        DateOnly? dueDate)
+    public static TaskItem Create(string createdById, string title, string? description,
+                              TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(createdBy);
-        return new TaskItem
-        {
-            Id = Guid.CreateVersion7(),
-            CreatedById = createdBy,
-            Title = NormalizeTitle(title),
-            Description = NormalizeDescription(description),
-            Priority = EnsureDefined(priority),
-            CreatedAtUtc = DateTime.UtcNow,
-            DueDate = dueDate
-        };
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
+        task.Raise(new TaskCreated(task.Id, createdById, createdAtUtc));
+        return task;
     }
 
     public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate)
@@ -184,12 +172,13 @@ internal sealed class TaskItem : AggregateRoot
         Raise(new TaskAssigned(Id, actorId, previous, assigneeId, nowUtc));
     }
 
-    public static TaskItem CreateOccurrence(
-    string createdBy, string title, string? description, TaskPriority priority,
-    DateOnly dueDate, Guid recurringTaskId)
+    public static TaskItem CreateOccurrence(string createdById, string title, string? description,
+                                        TaskPriority priority, DateOnly dueDate, Guid recurringTaskId,
+                                        DateTime createdAtUtc)
     {
-        var task = Create(createdBy, title, description, priority, dueDate);
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
         task.RecurringTaskId = recurringTaskId;
+        task.Raise(new TaskCreated(task.Id, ActorId: null, createdAtUtc));
         return task;
     }
 
@@ -213,5 +202,23 @@ internal sealed class TaskItem : AggregateRoot
         {
             throw new ArgumentException("Timestamp must be in UTC.", nameof(value));
         }
+    }
+
+    private static TaskItem New(string createdById, string title, string? description,
+                            TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
+    {
+        EnsureUtc(createdAtUtc);
+
+        return new TaskItem
+        {
+            Id = Guid.CreateVersion7(),
+            CreatedById = createdById,
+            Title = NormalizeTitle(title),
+            Description = NormalizeDescription(description),
+            Priority = EnsureDefined(priority),
+            DueDate = dueDate,
+            Status = TaskItemStatus.ToDo,
+            CreatedAtUtc = createdAtUtc,
+        };
     }
 }

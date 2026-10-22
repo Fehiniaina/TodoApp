@@ -305,6 +305,50 @@ namespace TodoApp.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Tasks.Activity.TaskActivity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ActorId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("actor_id");
+
+                    b.Property<string>("NewValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("new_value");
+
+                    b.Property<DateTime>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.Property<string>("OldValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("old_value");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("task_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_task_activities");
+
+                    b.HasIndex("TaskId", "OccurredAtUtc")
+                        .HasDatabaseName("ix_task_activities_task_id_occurred_at_utc");
+
+                    b.ToTable("task_activities", (string)null);
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Tasks.Recurrence.RecurringTask", b =>
                 {
                     b.Property<Guid>("Id")
@@ -581,6 +625,18 @@ namespace TodoApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.Tasks.Activity.TaskActivity", b =>
+                {
+                    b.HasOne("TodoApp.Domain.Tasks.TaskItem", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_activities_tasks_task_id");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("TodoApp.Domain.Tasks.TaskItem", b =>
