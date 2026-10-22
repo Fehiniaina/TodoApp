@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks.Recurrence;
 
 namespace TodoApp.Infrastructure.Configurations;
 
@@ -9,37 +10,80 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
     public void Configure(EntityTypeBuilder<TaskItem> builder)
     {
+        ConfigureProperties(builder);
+        ConfigureSoftDelete(builder);
+        ConfigureChecklist(builder);
+        ConfigureRecurrence(builder);
+        ConfigureAssignment(builder);
+    }
+
+    private static void ConfigureProperties(EntityTypeBuilder<TaskItem> builder)
+    {
         builder.HasKey(task => task.Id);
 
-        builder.Property(task => task.OwnerId)
-            .IsRequired();
+        builder.Property(task => task.CreatedById).IsRequired();
+        builder.Property(task => task.Title).IsRequired().HasMaxLength(200);
+        builder.Property(task => task.Description).HasMaxLength(2000);
+        builder.Property(task => task.Priority).IsRequired();
+        builder.Property(task => task.CreatedAtUtc).IsRequired();
+        builder.Property(t => t.Status).IsRequired();
+        builder.Ignore(t => t.IsCompleted);
+        builder.Ignore(t => t.AllowedNextStatuses);
+        builder.Ignore(t => t.DomainEvents);
+    }
 
-        builder.Property(task => task.Title)
-            .IsRequired()
-            .HasMaxLength(200);
-
-        builder.Property(task => task.Description)
-            .HasMaxLength(2000);
-
-        builder.Property(task => task.Priority)
-            .IsRequired();
-
-        builder.Property(task => task.CreatedAtUtc)
-            .IsRequired();
-
-        builder.HasIndex(task => task.Id)
-            .IsUnique();
-        builder.HasIndex(task => new { task.OwnerId , task.Priority}); // composite index
-
-        // Filtre nommé (EF Core 10) : on peut le désactiver seul, sans toucher à d'éventuels autres filtres.
+    private static void ConfigureSoftDelete(EntityTypeBuilder<TaskItem> builder)
+    {
         builder.HasQueryFilter(QueryFilters.SoftDelete, task => !task.IsDeleted);
 
-        // Les requêtes courantes ne portent que sur les tâches actives : index partiel, plus petit et plus rapide.
-        builder.HasIndex(task => new { task.OwnerId, task.Priority })
+        builder.HasIndex(task => new { task.CreatedById, task.Priority })
                .HasFilter("is_deleted = false");
 
-        // Pour la corbeille et la purge.
-        builder.HasIndex(task => new { task.OwnerId, task.DeletedAt })
+        builder.HasIndex(task => new { task.CreatedById, task.DeletedAt })
                .HasFilter("is_deleted = true");
+    }
+
+    private static void ConfigureChecklist(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.OwnsMany(task => task.Checklist, item =>
+        {
+            item.ToTable("checklist_items");
+            item.WithOwner().HasForeignKey("TaskId");
+
+            item.HasKey(i => i.Id);
+            item.Property(i => i.Id).ValueGeneratedNever(); 
+
+            item.Property(i => i.Title).IsRequired().HasMaxLength(200);
+            item.Property(i => i.Position).IsRequired();
+
+            item.HasIndex("TaskId", nameof(ChecklistItem.Position));
+        });
+
+        builder.Navigation(task => task.Checklist)
+               .HasField("_checklist")
+               .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private static void ConfigureRecurrence(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.HasOne<RecurringTask>()
+               .WithMany()
+               .HasForeignKey(task => task.RecurringTaskId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(task => new { task.RecurringTaskId, task.DueDate })
+               .IsUnique()
+               .HasFilter("recurring_task_id IS NOT NULL");
+    }
+
+    private static void ConfigureAssignment(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.HasOne<ApplicationUser>()
+               .WithMany()
+               .HasForeignKey(t => t.AssigneeId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(t => t.AssigneeId)
+               .HasFilter("is_deleted = false AND assignee_id IS NOT NULL");
     }
 }

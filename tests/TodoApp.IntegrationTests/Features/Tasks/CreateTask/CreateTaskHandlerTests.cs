@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
@@ -13,14 +14,21 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 {
     private const string OwnerA = "owner-A";
     private const string OwnerB = "owner-B";
+    private readonly FakeTimeProvider _time = new(new DateTimeOffset(2026, 10, 21, 9, 0, 0, TimeSpan.Zero));
 
-    public Task InitializeAsync() => fixture.ResetAsync();
+    public async Task InitializeAsync()
+    {
+        await fixture.ResetAsync();
+        await fixture.CreateUsersAsync(OwnerA, OwnerB);
+    }
+
     public Task DisposeAsync() => Task.CompletedTask;
 
     private CreateTaskHandler CreateHandler(string ownerId = OwnerA) => new(
         new TestDbContextFactory(fixture),
         new CreateTaskCommandValidator(),
         new FakeCurrentUser(ownerId),
+        _time,
         new TaskChangeNotifier());
 
     // ── success path ────────────────────────────────────────────────────────
@@ -69,7 +77,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal("Write tests", persisted.Title);
         Assert.Equal("Important!", persisted.Description);
         Assert.Equal(TaskPriority.High, persisted.Priority);
-        Assert.Equal(OwnerA, persisted.OwnerId);
+        Assert.Equal(OwnerA, persisted.CreatedById);
     }
 
     // ── validation failure ───────────────────────────────────────────────────
@@ -108,7 +116,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         // Act: query database as ownerB
         await using var db = fixture.CreateDbContext();
         var ownerBTasks = await db.Tasks.AsNoTracking()
-            .Where(t => t.OwnerId == "owner-B")
+            .Where(t => t.CreatedById == "owner-B")
             .ToListAsync();
 
         // Assert: ownerB has no tasks
@@ -132,7 +140,7 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal("Write tests", persisted.Title);
         Assert.Equal("Important!", persisted.Description);
         Assert.Equal(TaskPriority.High, persisted.Priority);
-        Assert.Equal(OwnerA, persisted.OwnerId);
+        Assert.Equal(OwnerA, persisted.CreatedById);
     }
 
     [Fact]
@@ -146,8 +154,8 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
 
         // Act
         await using var db = fixture.CreateDbContext();
-        var ownerATasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerA).ToListAsync();
-        var ownerBTasks = await db.Tasks.AsNoTracking().Where(t => t.OwnerId == OwnerB).ToListAsync();
+        var ownerATasks = await db.Tasks.AsNoTracking().Where(t => t.CreatedById == OwnerA).ToListAsync();
+        var ownerBTasks = await db.Tasks.AsNoTracking().Where(t => t.CreatedById == OwnerB).ToListAsync();
 
         // Assert
         var task = Assert.Single(ownerBTasks);

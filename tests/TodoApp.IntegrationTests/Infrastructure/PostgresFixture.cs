@@ -67,7 +67,7 @@ public sealed class PostgresFixture : IAsyncLifetime
             TablesToIgnore = [new Table("__EFMigrationsHistory")],
         });
 
-        await _respawner.ResetAsync(connection); // start from an empty DB even after an aborted run
+        await _respawner.ResetAsync(connection);
     }
 
     public ApplicationDbContext CreateDbContext()
@@ -87,6 +87,27 @@ public sealed class PostgresFixture : IAsyncLifetime
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
         await _respawner.ResetAsync(connection);
+    }
+
+    public async Task CreateUsersAsync(params string[] userIds)
+    {
+        ArgumentNullException.ThrowIfNull(userIds);
+        await using var db = CreateDbContext();
+
+        foreach (var id in userIds)
+        {
+            db.Users.Add(new ApplicationUser
+            {
+                Id = id,
+                UserName = $"{id}@test.local",
+                NormalizedUserName = $"{id}@TEST.LOCAL".ToUpperInvariant(),
+                Email = $"{id}@test.local",
+                NormalizedEmail = $"{id}@TEST.LOCAL".ToUpperInvariant(),
+                FirstName = id,
+            });
+        }
+
+        await db.SaveChangesAsync();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

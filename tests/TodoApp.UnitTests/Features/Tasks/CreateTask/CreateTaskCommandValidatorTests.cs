@@ -1,4 +1,5 @@
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Shared.Errors;
 using TodoApp.Features.Tasks.CreateTask;
 
 namespace TodoApp.UnitTests.Features.Tasks.CreateTask;
@@ -54,7 +55,9 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(priority: (TaskPriority)999));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(nameof(CreateTaskCommand.Priority), error.PropertyName);
+        Assert.Equal(TaskErrors.InvalidPriority.Code, error.ErrorCode);
     }
 
     [Fact]
@@ -71,7 +74,8 @@ public class CreateTaskCommandValidatorTests
         var result = _validator.Validate(ValidCommand(description: new string('x', 2001)));
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => string.Equals(e.PropertyName, nameof(CreateTaskCommand.Title), StringComparison.Ordinal));
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(nameof(CreateTaskCommand.Description), error.PropertyName);
     }
 
     [Fact]

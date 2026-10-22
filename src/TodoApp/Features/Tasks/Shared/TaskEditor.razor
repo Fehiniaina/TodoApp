@@ -1,4 +1,4 @@
-﻿@using TodoApp.Domain.Tasks
+@using TodoApp.Domain.Tasks
 
 <EditForm Model="Model" OnValidSubmit="() => OnValidSubmit.InvokeAsync()">
     <div class="mb-3">
@@ -27,6 +27,8 @@
         <div class="form-text">Optionnelle. Laissez vide pour une tâche sans date limite.</div>
     </div>
 
+    @ExtraFields
+
     @if (ErrorMessage is not null)
     {
         <div class="alert alert-danger" role="alert">@ErrorMessage</div>
@@ -50,4 +52,7 @@
     [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public EventCallback OnValidSubmit { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
+
+    /// <summary>Champs additionnels rendus avant les boutons (optionnel).</summary>
+    [Parameter] public RenderFragment? ExtraFields { get; set; }
 }

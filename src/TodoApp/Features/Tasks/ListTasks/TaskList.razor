@@ -1,20 +1,45 @@
+@using TodoApp.Features.Tasks.Activity
+@using TodoApp.Features.Tasks.AssignTask
 @using TodoApp.Components.Shared
+@using TodoApp.Domain.Tasks
+@using TodoApp.Features.Tasks.Checklist
+@using TodoApp.Features.Tasks.Shared
+@using TodoApp.Features.Users
+@using Microsoft.Extensions.Logging
 
 <div class="issue-toolbar">
-    <span class="issue-count">
-        @{ var count = _result?.TotalCount ?? 0; }
-        @count @(count > 1 ? "tâches" : "tâche")
-    </span>
+    <div class="issue-toolbar-left">
+        <div class="issue-filters" role="group" aria-label="Filtrer les tâches">
+            @foreach (var (scope, label) in Scopes)
+            {
+                <button type="button"
+                        class="filter-chip @(_scope == scope ? "is-active" : null)"
+                        aria-pressed="@(_scope == scope)"
+                        @onclick="() => ChangeScopeAsync(scope)">
+                    @label
+                </button>
+            }
+        </div>
+
+        <span class="issue-count">
+            @{ var count = _result?.TotalCount ?? 0; }
+            @count @(count > 1 ? "tâches" : "tâche")
+        </span>
+    </div>
+
     <div class="issue-toolbar-actions">
         <a href="tasks/trash" class="btn-ghost">Corbeille</a>
-        <button type="button" class="btn-create" @onclick="OpenCreateModal">…</button>
+        <button type="button" class="btn-create" @onclick="OpenCreateModal">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" /></svg>
+            Créer
+        </button>
     </div>
 </div>
 
 @if (_isLoading)
 {
     <div class="task-list-empty">
-        <p class="text-secondary">Loading tasks…</p>
+        <p class="text-secondary">Chargement des tâches…</p>
     </div>
 }
 else if (_errorMessage is not null)
@@ -27,10 +52,11 @@ else if (_result is null || _result.TotalCount == 0)
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
              class="task-list-empty-icon" aria-hidden="true">
-            <path d="M9 11l3 3L22 4"/>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </svg>
-        <p class="task-list-empty-text">No tasks yet.<br />Create your first one above.</p>
+        <p class="task-list-empty-text">Aucune tâche pour le moment.</p>
+        <button type="button" class="btn-ghost" @onclick="OpenCreateModal">Créer ma première tâche</button>
     </div>
 }
 else
@@ -47,11 +73,10 @@ else
                              AriaLabel="Pagination des tâches">
             <ChildContentHeader>
                 <tr>
-                    <th scope="col" class="col-check"><span class="visually-hidden">Terminée</span></th>
                     <th scope="col" class="col-summary">Résumé</th>
-                    <th scope="col" class="col-description">Description</th>
                     <th scope="col" class="col-priority">Priorité</th>
                     <th scope="col" class="col-status">Statut</th>
+                    <th scope="col" class="col-assignee">Assigné</th>
                     <th scope="col" class="col-due">Échéance</th>
                     <th scope="col" class="col-date">Créée le</th>
                     <th scope="col" class="col-actions"><span class="visually-hidden">Actions</span></th>
@@ -60,81 +85,89 @@ else
 
             <ChildContentRow Context="task">
                 <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
-                    <td class="col-check">
-                        <input type="checkbox"
-                               class="issue-check"
-                               checked="@task.IsCompleted"
-                               disabled="@_togglingIds.Contains(task.Id)"
-                               aria-label="@($"Marquer « {task.Title} » comme {(task.IsCompleted ? "non terminée" : "terminée")}")"
-                               @onchange="e => ToggleCompletionAsync(task, (bool)e.Value!)" />
-                    </td>
 
                     <td class="col-summary">
                         <button type="button" class="issue-title" @onclick="() => OpenEditModal(task)">
                             @task.Title
                         </button>
-                        @if (!string.IsNullOrWhiteSpace(task.Description))
-                        {
-                            <span class="issue-desc">@task.Description</span>
-                        }
+                        <div class="issue-meta">
+                            @if (task.RecurringTaskId is not null)
+                            {
+                                <span class="recurring-badge" title="Tâche récurrente" aria-label="Tâche récurrente">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                                        <path d="M13 6.5A5 5 0 0 0 3.6 5M3 9.5A5 5 0 0 0 12.4 11M3.5 2.5V5h2.5M12.5 13.5V11H10" />
+                                    </svg>
+                                </span>
+                            }
+                            @if (task.ChecklistTotal > 0)
+                            {
+                                <span class="checklist-badge @(task.ChecklistDone == task.ChecklistTotal ? "is-complete" : null)"
+                                      title="Checklist : @task.ChecklistDone étape(s) terminée(s) sur @task.ChecklistTotal">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" /></svg>
+                                    @task.ChecklistDone/@task.ChecklistTotal
+                                </span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(task.Description))
+                            {
+                                <span class="issue-desc">@task.Description</span>
+                            }
+                        </div>
                     </td>
-
-                    <td class="col-description">@task.Description</td>
 
                     <td class="col-priority">
                         <PriorityIcon Priority="task.Priority" />
                     </td>
 
                     <td class="col-status">
-                        @if (task.CompletedAt is { } completedAt)
-                        {
-                            <span class="lozenge lozenge-done" title="Terminée le @FormatDateTime(completedAt)">Terminé</span>
-                        }
-                        else
-                        {
-                            <span class="lozenge lozenge-todo">À faire</span>
-                        }
+                        <select class="status-select @task.Status.ToLozengeCss()"
+                                aria-label="@($"Statut de « {task.Title} »")"
+                                title="@StatusTooltip(task)"
+                                disabled="@_changingIds.Contains(task.Id)"
+                                @onchange="e => OnStatusSelectedAsync(task, e)">
+                            <option value="@task.Status" selected>@task.Status.ToLabel()</option>
+                            @foreach (var next in TaskWorkflow.NextStatuses(task.Status))
+                            {
+                                <option value="@next">→ @next.ToLabel()</option>
+                            }
+                        </select>
                     </td>
 
-                    <td class="col-date"><DueDateBadge DueDate="task.DueDate" IsCompleted="task.IsCompleted" Today="_today" /></td>
+                    <td class="col-assignee">
+                         <UserAvatar UserId="@task.AssigneeId" Name="@task.AssigneeName" />
+                    </td>
+
+                    <td class="col-due">
+                        <DueDateBadge DueDate="task.DueDate" IsCompleted="task.IsCompleted" Today="_today" />
+                    </td>
+
                     <td class="col-date">@FormatDate(task.CreatedAtUtc)</td>
 
                     <td class="col-actions">
-                        @if (_pendingDeleteId == task.Id)
-                        {
-                            <div class="issue-confirm">
-                                <button type="button" class="btn-confirm-danger" disabled="@_isDeleting"
-                                        @onclick="() => ConfirmDeleteAsync(task.Id)">
-                                    @(_isDeleting ? "…" : "Supprimer")
-                                </button>
-                                <button type="button" class="btn-confirm-cancel" disabled="@_isDeleting"
-                                        @onclick="CancelDelete">
-                                    Annuler
-                                </button>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="issue-actions">
-                                <button type="button" class="icon-btn"
-                                        aria-label="@($"Modifier {task.Title}")" title="Modifier"
-                                        @onclick="() => OpenEditModal(task)">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-                                        <path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z" />
-                                    </svg>
-                                </button>
-                                <button type="button" class="icon-btn icon-btn-danger"
-                                        aria-label="@($"Supprimer {task.Title}")" title="Supprimer"
-                                        @onclick="() => RequestDelete(task.Id)">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-                                        <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5" />
-                                    </svg>
-                                </button>
-                            </div>
-                        }
-                        <button type="button" class="icon-btn icon-btn-danger"
-                            aria-label="@($"Mettre {task.Title} à la corbeille")" title="Mettre à la corbeille"
-                            @onclick="() => MoveToTrashAsync(task)">
+                        <div class="issue-actions">
+                            <button type="button" class="icon-btn"
+                                    aria-label="@($"Modifier {task.Title}")" title="Modifier"
+                                    @onclick="() => OpenEditModal(task)">
+                                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z" />
+                                </svg>
+                            </button>
+
+                            <button type="button" class="icon-btn"
+                                    aria-label="@($"Ajouter une étape à {task.Title}")" title="Ajouter une étape"
+                                    @onclick="() => OpenChecklist(task)">
+                                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M2.5 4.5l1.5 1.5 2.5-3M2.5 11l1.5 1.5 2.5-3M9 5h4.5M9 11.5h2M12.5 9.5v4M10.5 11.5h4" />
+                                </svg>
+                            </button>
+
+                            <button type="button" class="icon-btn icon-btn-danger"
+                                    aria-label="@($"Mettre {task.Title} à la corbeille")" title="Mettre à la corbeille"
+                                    @onclick="() => MoveToTrashAsync(task)">
+                                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.5 8.5h6l.5-8.5" />
+                                </svg>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             </ChildContentRow>
@@ -152,9 +185,28 @@ else
 @if (_editingTask is not null)
 {
     <Modal Title="Modifier la tâche" OnClose="CloseEditModal">
-        <EditTaskForm @key="_editingTask.Id"
-                      TaskToEdit="_editingTask"
-                      OnSaved="CloseEditModal"
-                      OnCancel="CloseEditModal" />
+        <AssigneePicker TaskId="_editingTask.Id" AssigneeId="@_editingTask.AssigneeId" />
+
+        @* Une seule @key, sur le conteneur : les deux composants sont recréés ensemble
+           quand on change de tâche, sans clé dupliquée entre frères. *@
+        <div @key="_editingTask.Id">
+            <EditTaskForm TaskToEdit="_editingTask"
+                          OnSaved="CloseEditModal"
+                          OnCancel="CloseEditModal" />
+
+            <hr class="my-4" />
+            <ChecklistEditor TaskId="_editingTask.Id" AutoFocus="_focusChecklist" />
+
+            <hr class="my-4" />
+            <TaskActivityFeed TaskId="_editingTask.Id" />
+
+            @if (_editingTask.RecurringTaskId is { } seriesId)
+            {
+                <hr class="my-4" />
+                <button type="button" class="btn-ghost" @onclick="() => StopRecurrenceAsync(seriesId)">
+                    Arrêter la récurrence
+                </button>
+            }
+        </div>
     </Modal>
 }

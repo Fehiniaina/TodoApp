@@ -2,63 +2,61 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TodoApp.Common;
+using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tasks.ChangeTaskStatus;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
-using TodoApp.Features.Tasks.ToggleTaskCompletion;
+using TodoApp.Features.Tasks.Recurrence;
+using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
 public sealed partial class TaskList : IDisposable
 {
-    private Guid? _pendingDeleteId;
-    private bool _isDeleting;
-
-    private void RequestDelete(Guid id) => _pendingDeleteId = id;
-    private void CancelDelete() => _pendingDeleteId = null;
+    private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
 
     [Inject] private ListTasksHandler Handler { get; set; } = null!;
-    [Inject] private TaskChangeNotifier Notifier { get; set; } = null!;
+    [Inject] private ChangeTaskStatusHandler ChangeStatusHandler { get; set; } = null!;
     [Inject] private DeleteTasksHandler DeleteTasksHandler { get; set; } = null!;
+    [Inject] private StopRecurringTaskHandler StopRecurringHandler { get; set; } = null!;
+    [Inject] private TaskChangeNotifier Notifier { get; set; } = null!;
     [Inject] private NotificationService Notification { get; set; } = null!;
-    [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
-    [Inject] private ToggleTaskCompletionHandler ToggleHandler { get; set; } = null!;
     [Inject] private IUserClock Clock { get; set; } = null!;
     [Inject] private UserTimeZone UserTimeZone { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
+    [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
+    [Inject] private ICurrentUser CurrentUser { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
-
-    private bool _showCreateModal;
-    private void OpenCreateModal() => _showCreateModal = true;
-    private void CloseCreateModal() => _showCreateModal = false;
-
 
     private PagedResult<TaskSummary>? _result;
     private int _currentPage = 1;
     private int _pageSize = 10;
     private bool _isLoading = true;
     private string? _errorMessage;
-    private string? _ownerId;
-
-    private TaskSummary? _editingTask;
-
-    private void OpenEditModal(TaskSummary task) => _editingTask = task;
-    private void CloseEditModal() => _editingTask = null;
-
-    private readonly HashSet<Guid> _togglingIds = [];
+    private string? _createdById;
     private DateOnly _today;
-    protected override void OnParametersSet() => _today = Clock.Today;
+
+    private readonly HashSet<Guid> _changingIds = [];
+
+    private bool _showCreateModal;
+    private TaskSummary? _editingTask;
+    private bool _focusChecklist;
+
+    private TaskScope _scope = TaskScope.All;
 
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthenticationState;
-        _ownerId = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _createdById = auth.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        _today = Clock.Today;
 
         Notifier.Changed += OnTasksChanged;
 
@@ -67,32 +65,45 @@ public sealed partial class TaskList : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Le fuseau du navigateur n'est accessible qu'une fois le circuit interactif établi.
-        if (firstRender && !UserTimeZone.IsDetected)
+        if (!firstRender || UserTimeZone.IsDetected) return;
+
+        try
         {
-            var ianaId = await JS.InvokeAsync<string>("todoApp.getTimeZone");
-            if (UserTimeZone.TrySet(ianaId))
+            await using var module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Features/Tasks/ListTasks/TaskList.razor.js");
+
+            if (UserTimeZone.TrySet(await module.InvokeAsync<string>("getTimeZone")))
             {
                 _today = Clock.Today;
                 StateHasChanged();
             }
         }
+        catch (JSException ex)
+        {
+            LogTimeZoneDetectionFailed(Logger, ex);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit fermé pendant l'appel : rien à faire.
+        }
     }
+
+    public void Dispose() => Notifier.Changed -= OnTasksChanged;
 
     private async Task LoadTasksAsync()
     {
-        if (string.IsNullOrEmpty(_ownerId))
+        if (string.IsNullOrEmpty(_createdById))
         {
-            _errorMessage = "Unable to identify the current user.";
+            _errorMessage = "Impossible d'identifier l'utilisateur courant.";
             _isLoading = false;
             return;
         }
 
         _isLoading = true;
-        var result = await Handler.HandleAsync(new ListTasksQuery(_ownerId, Page: _currentPage, PageSize: _pageSize));
+        var result = await Handler.HandleAsync(new ListTasksQuery(_scope, Page: _currentPage, PageSize: _pageSize));
         _isLoading = false;
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
         {
             _errorMessage = result.Error.Message;
             return;
@@ -100,7 +111,6 @@ public sealed partial class TaskList : IDisposable
 
         _result = result.Value;
 
-        // La page courante peut ne plus exister (par exemple après la suppression de la dernière tâche de la page)
         if (_result.Items.Count == 0 && _result.TotalCount > 0)
         {
             _currentPage = _result.TotalPages;
@@ -108,81 +118,96 @@ public sealed partial class TaskList : IDisposable
         }
     }
 
-    private async Task OnTaskCreatedAsync()
-    {
-        _showCreateModal = false;
-        _currentPage = 1;          // la nouvelle tâche apparaît en tête si le tri est par date desc
-        await LoadTasksAsync();    // adaptez au nom de votre méthode de chargement
-    }
-
-    private async Task OnPageChangedAsync(int page)
+    private Task OnPageChangedAsync(int page)
     {
         _currentPage = page;
-        await LoadTasksAsync();
+        return LoadTasksAsync();
     }
 
-    private async Task OnPageSizeChangedAsync(int pageSize)
+    private Task OnPageSizeChangedAsync(int pageSize)
     {
         _pageSize = pageSize;
-        _currentPage = 1;   // revenir à la première page
-        await LoadTasksAsync();
+        _currentPage = 1;
+        return LoadTasksAsync();
     }
-
-    // Called by TaskChangeNotifier on a background thread — must marshal to the circuit thread.
     private void OnTasksChanged(object? sender, EventArgs e) =>
         _ = InvokeAsync(async () =>
         {
             try
             {
-                await LoadTasksAsync(); // recharge la page courante, sans revenir à la première
+                await LoadTasksAsync();
                 StateHasChanged();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 await DispatchExceptionAsync(ex);
             }
         });
 
-    private async Task ToggleCompletionAsync(TaskSummary original, bool isCompleted)
-    {
-        if (!_togglingIds.Add(original.Id)) return; // déjà en cours pour cette ligne
+    private void OpenCreateModal() => _showCreateModal = true;
+    private void CloseCreateModal() => _showCreateModal = false;
 
-        // 1. Mise à jour optimiste : la ligne change tout de suite.
-        ReplaceItem(original with
+    private async Task OnTaskCreatedAsync()
+    {
+        _showCreateModal = false;
+        _currentPage = 1;
+        await LoadTasksAsync();
+    }
+
+    private void OpenEditModal(TaskSummary task)
+    {
+        _editingTask = task;
+        _focusChecklist = false;
+    }
+
+    private void OpenChecklist(TaskSummary task)
+    {
+        _editingTask = task;
+        _focusChecklist = true;
+    }
+
+    private void CloseEditModal() => _editingTask = null;
+
+    private async Task OnStatusSelectedAsync(TaskSummary task, ChangeEventArgs e)
+    {
+        if (Enum.TryParse<TaskItemStatus>(e.Value?.ToString(), out var newStatus) && newStatus != task.Status)
         {
-            IsCompleted = isCompleted,
-            CompletedAt = isCompleted ? DateTime.UtcNow : null,
-        });
+            await ChangeStatusAsync(task, newStatus);
+        }
+    }
+
+    private async Task ChangeStatusAsync(TaskSummary original, TaskItemStatus newStatus)
+    {
+        if (!_changingIds.Add(original.Id)) return;
+
+        ReplaceItem(original with { Status = newStatus });
 
         try
         {
-            var result = await ToggleHandler.HandleAsync(new ToggleTaskCompletionCommand(original.Id, isCompleted));
+            var result = await ChangeStatusHandler.HandleAsync(new ChangeTaskStatusCommand(original.Id, newStatus));
 
             if (result.IsFailure)
             {
-                ReplaceItem(original); // 2a. Rollback
-                Logger.OperationFailed(OperationsTask.ToggleTaskCompletion, result.Error.Code, result.Error.Message);
-                Notification.Warning(result.Error.Message, "Mise à jour impossible");
+                ReplaceItem(original);
+                Notification.Warning(result.Error.Message, "Changement de statut impossible");
                 return;
             }
 
-            // 2b. Confirmation : on garde la date réellement enregistrée par le serveur.
             ReplaceItem(original with
             {
-                IsCompleted = result.Value.IsCompleted,
+                Status = result.Value.Status,
                 CompletedAt = result.Value.CompletedAt,
             });
-            Notification.Success(message: "Tache mise a jour avec success");
         }
         catch (Exception ex)
         {
             ReplaceItem(original);
-            Logger.UnexpectedError(OperationsTask.ToggleTaskCompletion, ex);
+            Logger.UnexpectedError(OperationsTask.ChangeTaskStatus, ex);
             Notification.Error("Une erreur inattendue est survenue. Réessayez plus tard.", "Erreur");
         }
         finally
         {
-            _togglingIds.Remove(original.Id);
+            _changingIds.Remove(original.Id);
         }
     }
 
@@ -197,53 +222,11 @@ public sealed partial class TaskList : IDisposable
         };
     }
 
-    public async Task ConfirmDeleteAsync(Guid id)
-    {
-        if (string.IsNullOrEmpty(_ownerId))
-        {
-            Notification.Error("Impossible d'identifier l'utilisateur courant.", "Suppression impossible");
-            return;
-        }
-
-        _isDeleting = true;
-
-        var title = _result?.Items.FirstOrDefault(t => t.Id == id)?.Title ?? "La tâche";
-
-        try
-        {
-            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(id, _ownerId));
-
-            if (result.IsFailure)
-            {
-                Logger.OperationFailed(OperationsTask.DeleteTask, result.Error.Code, result.Error.Message);
-                Notification.Error(result.Error.Message, "Suppression impossible");
-                return;
-            }
-
-            Notification.Success($"« {title} » a été supprime avec success.", "Tache supprimée");
-        }
-        catch(Exception ex)
-        {
-            Logger.UnexpectedError(OperationsTask.DeleteTask, ex);
-            Notification.Error("Une erreur inattendue est survenue. Réessayez plus tard.", "Erreur");
-        }
-        finally
-        {
-            _isDeleting = false;
-            _pendingDeleteId = null;
-        }
-    }
-
-    private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
-
-    private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
-    private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
-
     private async Task MoveToTrashAsync(TaskSummary task)
     {
         try
         {
-            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(task.Id, _ownerId!));
+            var result = await DeleteTasksHandler.HandleAsync(new DeleteTasksCommand(task.Id));
 
             if (result.IsFailure)
             {
@@ -261,5 +244,42 @@ public sealed partial class TaskList : IDisposable
         }
     }
 
-    public void Dispose() => Notifier.Changed -= OnTasksChanged;
+    private async Task StopRecurrenceAsync(Guid seriesId)
+    {
+        var result = await StopRecurringHandler.HandleAsync(seriesId);
+
+        if (result.IsFailure)
+        {
+            Notification.Warning(result.Error.Message, "Récurrence");
+            return;
+        }
+
+        Notification.Info("Plus aucune nouvelle occurrence ne sera créée.", "Récurrence arrêtée");
+    }
+
+    private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
+
+    private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
+
+    private static readonly (TaskScope Scope, string Label)[] Scopes =
+    [
+        (TaskScope.All, "Toutes"),
+        (TaskScope.AssignedToMe, "Assignées à moi"),
+        (TaskScope.CreatedByMe, "Créées par moi"),
+    ];
+
+    private Task ChangeScopeAsync(TaskScope scope)
+    {
+        if (scope == _scope) return Task.CompletedTask;
+
+        _scope = scope;
+        _currentPage = 1;
+        return LoadTasksAsync();
+    }
+
+    private string? StatusTooltip(TaskSummary task) =>
+        task.CompletedAt is { } completedAt ? $"Résolue le {FormatDateTime(completedAt)}" : null;
+
+    [LoggerMessage(Level = LogLevel.Error, Message =$"Browser time zone detection failed; using the default time zone")]
+    private static partial void LogTimeZoneDetectionFailed(ILogger logger, Exception ex);
 }

@@ -1,0 +1,27 @@
+<section class="activity" aria-labelledby="activity-heading-@TaskId">
+    <h3 id="activity-heading-@TaskId" class="checklist-heading">Activité</h3>
+
+    @if (_items is null)
+    {
+        <p class="text-secondary small">Chargement…</p>
+    }
+    else if (_items.Count == 0)
+    {
+        <p class="text-secondary small">Aucune activité pour le moment.</p>
+    }
+    else
+    {
+        <ol class="activity-list">
+            @foreach (var item in _items)
+            {
+                <li @key="item.Id" class="activity-item">
+                    <span class="activity-dot activity-@item.Type.ToString().ToLowerInvariant()" aria-hidden="true"></span>
+                    <span class="activity-text">@TaskActivityFormatter.Describe(item)</span>
+                    <time class="activity-time" datetime="@item.OccurredAtUtc.ToString("O")">
+                        @FormatTime(item.OccurredAtUtc)
+                    </time>
+                </li>
+            }
+        </ol>
+    }
+</section>

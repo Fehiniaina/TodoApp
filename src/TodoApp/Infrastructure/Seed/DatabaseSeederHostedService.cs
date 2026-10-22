@@ -24,7 +24,7 @@ internal sealed partial class DatabaseSeederHostedService(
 
         try
         {
-            await TodoAppSeeder.SeedAsync(factory);
+            await TodoAppSeeder.SeedAsync(factory, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -34,6 +34,6 @@ internal sealed partial class DatabaseSeederHostedService(
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    [LoggerMessage(Level = LogLevel.Critical, Message = "An error occurred during database seeding.")]
+    [LoggerMessage(Level = LogLevel.Error, Message = "An error occurred during database seeding.")]
     private partial void LogOnException(Exception ex);
 }

@@ -1,3 +1,5 @@
-﻿namespace TodoApp.Features.Tasks.DeleteTasks;
+using TodoApp.Features.Shared;
 
-internal sealed record DeleteTasksCommand(Guid Id, string OwnerId);
+namespace TodoApp.Features.Tasks.DeleteTasks;
+
+internal sealed record DeleteTasksCommand(Guid Id);

@@ -1,0 +1,69 @@
+@using TodoApp.Domain.Tasks.Recurrence
+
+<fieldset class="mb-3">
+    <legend class="form-label fs-6">Répéter</legend>
+
+    <select class="form-select" @bind="Model.Repeat" aria-label="Fréquence de répétition">
+        <option value="@RepeatOption.None">Ne pas répéter</option>
+        <option value="@RepeatOption.Daily">Chaque jour</option>
+        <option value="@RepeatOption.Weekly">Chaque semaine</option>
+        <option value="@RepeatOption.Monthly">Chaque mois</option>
+    </select>
+
+    @if (Model.Repeat != RepeatOption.None)
+    {
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <label for="rec-interval" class="mb-0">Tous les</label>
+            <input id="rec-interval" type="number" min="1" max="365"
+                   class="form-control form-control-sm" style="width: 5rem" @bind="Model.Interval" />
+            <span>@UnitLabel</span>
+        </div>
+    }
+
+    @if (Model.Repeat == RepeatOption.Weekly)
+    {
+        <div class="weekday-picker mt-2" role="group" aria-label="Jours de la semaine">
+            @foreach (var (day, label, name) in Days)
+            {
+                <label class="weekday-chip @(Model.Days.HasFlag(day) ? "is-selected" : null)" title="@name">
+                    <input type="checkbox" class="visually-hidden"
+                           checked="@Model.Days.HasFlag(day)"
+                           @onchange="e => Toggle(day, (bool)e.Value!)" />
+                    @label
+                </label>
+            }
+        </div>
+    }
+
+    @if (Model.Repeat == RepeatOption.Monthly)
+    {
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <label for="rec-day" class="mb-0">Le</label>
+            <input id="rec-day" type="number" min="1" max="31"
+                   class="form-control form-control-sm" style="width: 5rem" @bind="Model.DayOfMonth" />
+            <span>du mois</span>
+        </div>
+        <div class="form-text">Si le mois est plus court, le dernier jour du mois est utilisé.</div>
+    }
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public RecurrenceFormModel Model { get; set; } = null!;
+
+    private static readonly (WeekDays Day, string Label, string Name)[] Days =
+    [
+        (WeekDays.Monday, "L", "Lundi"), (WeekDays.Tuesday, "M", "Mardi"), (WeekDays.Wednesday, "M", "Mercredi"),
+        (WeekDays.Thursday, "J", "Jeudi"), (WeekDays.Friday, "V", "Vendredi"),
+        (WeekDays.Saturday, "S", "Samedi"), (WeekDays.Sunday, "D", "Dimanche"),
+    ];
+
+    private string UnitLabel => Model.Repeat switch
+    {
+        RepeatOption.Daily => Model.Interval > 1 ? "jours" : "jour",
+        RepeatOption.Weekly => Model.Interval > 1 ? "semaines" : "semaine",
+        _ => "mois",
+    };
+
+    private void Toggle(WeekDays day, bool selected) =>
+        Model.Days = selected ? Model.Days | day : Model.Days & ~day;
+}

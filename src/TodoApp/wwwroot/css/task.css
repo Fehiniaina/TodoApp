@@ -1,4 +1,4 @@
-﻿body {
+body {
     /* ───────── En-tête de page ───────── */
     .page-header {
         margin-bottom: 1.25rem;
@@ -12,15 +12,15 @@
         margin-bottom: 0.25rem;
     }
 
-    .breadcrumbs a {
-        color: var(--issue-muted);
-        text-decoration: none;
-    }
+        .breadcrumbs a {
+            color: var(--issue-muted);
+            text-decoration: none;
+        }
 
-    .breadcrumbs a:hover {
-        color: var(--issue-primary);
-        text-decoration: underline;
-    }
+            .breadcrumbs a:hover {
+                color: var(--issue-primary);
+                text-decoration: underline;
+            }
 
     .page-title {
         font-size: 1.5rem;
@@ -62,16 +62,16 @@
         background: var(--issue-primary, #0c66e4);
     }
 
-    .btn-create:hover {
-        background: var(--issue-primary-hover, #0055cc);
-    }
+        .btn-create:hover {
+            background: var(--issue-primary-hover, #0055cc);
+        }
 
-    .btn-create svg {
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        fill: none;
-    }
+        .btn-create svg {
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            fill: none;
+        }
 
     .btn-ghost {
         color: var(--issue-text, #172b4d);
@@ -88,25 +88,25 @@
         color: var(--issue-text);
     }
 
-    .issue-table th {
-        padding: 0.5rem 0.625rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--issue-muted);
-        text-align: left;
-        border-bottom: 2px solid var(--issue-border);
-    }
+        .issue-table th {
+            padding: 0.5rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--issue-muted);
+            text-align: left;
+            border-bottom: 2px solid var(--issue-border);
+        }
 
-    .issue-table td {
-        height: 44px;
-        padding: 0.25rem 0.625rem;
-        vertical-align: middle;
-        border-bottom: 1px solid var(--issue-border);
-    }
+        .issue-table td {
+            height: 44px;
+            padding: 0.25rem 0.625rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--issue-border);
+        }
 
-    .issue-table .issue-row:hover td {
-        background: var(--issue-hover);
-    }
+        .issue-table .issue-row:hover td {
+            background: var(--issue-hover);
+        }
 
     .col-check {
         width: 44px;
@@ -159,16 +159,16 @@
         text-overflow: ellipsis;
     }
 
-    .issue-title:hover {
-        color: var(--issue-primary);
-        text-decoration: underline;
-    }
+        .issue-title:hover {
+            color: var(--issue-primary);
+            text-decoration: underline;
+        }
 
-    .issue-title:focus-visible {
-        outline: 2px solid var(--issue-primary);
-        outline-offset: 2px;
-        border-radius: 2px;
-    }
+        .issue-title:focus-visible {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
 
     .issue-desc {
         display: block;
@@ -190,14 +190,14 @@
         gap: 0.375rem;
     }
 
-    .priority svg {
-        flex: none;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .priority svg {
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
     .priority-label {
         color: var(--issue-text);
@@ -272,18 +272,18 @@
         cursor: pointer;
     }
 
-    .icon-btn svg {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .icon-btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .icon-btn:hover {
-        color: var(--issue-text);
-        background: #dcdfe4;
-    }
+        .icon-btn:hover {
+            color: var(--issue-text);
+            background: #dcdfe4;
+        }
 
     .icon-btn-danger:hover {
         color: var(--issue-danger);
@@ -311,7 +311,6 @@
     }
 
     .btn-confirm-danger {
-        color: #fff;
         background: var(--issue-danger);
         border: 0;
     }
@@ -378,35 +377,35 @@
         cursor: pointer;
     }
 
-    .pager-btn svg {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.75;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .pager-btn svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-    .pager-btn:hover:not(:disabled):not(.is-current) {
-        background: var(--issue-hover);
-    }
+        .pager-btn:hover:not(:disabled):not(.is-current) {
+            background: var(--issue-hover);
+        }
 
-    .pager-btn.is-current {
-        font-weight: 600;
-        color: var(--issue-primary);
-        background: #e9f2ff;
-        cursor: default;
-    }
+        .pager-btn.is-current {
+            font-weight: 600;
+            color: var(--issue-primary);
+            background: #e9f2ff;
+            cursor: default;
+        }
 
-    .pager-btn:disabled {
-        color: var(--issue-subtle);
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+        .pager-btn:disabled {
+            color: var(--issue-subtle);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-    .pager-btn:focus-visible {
-        outline: 2px solid var(--issue-primary);
-        outline-offset: 1px;
-    }
+        .pager-btn:focus-visible {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 1px;
+        }
 
     .pager-ellipsis {
         min-width: 24px;
@@ -433,15 +432,15 @@
         cursor: pointer;
     }
 
-    .pager-select:hover {
-        background-color: var(--issue-hover);
-    }
+        .pager-select:hover {
+            background-color: var(--issue-hover);
+        }
 
-    .pager-select:focus {
-        outline: none;
-        border-color: var(--issue-primary);
-        box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
-    }
+        .pager-select:focus {
+            outline: none;
+            border-color: var(--issue-primary);
+            box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.25);
+        }
 
     @media (max-width: 576px) {
         .pager {
@@ -470,14 +469,14 @@
         white-space: nowrap;
     }
 
-    .due svg {
-        flex: none;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+        .due svg {
+            flex: none;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
     .due-overdue {
         color: #ae2e24;
@@ -525,5 +524,365 @@
     .btn-ghost:focus-visible {
         outline: 2px solid var(--issue-primary, #0c66e4);
         outline-offset: 2px;
+    }
+    /* Liste : méta sous le titre */
+    .issue-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+        .issue-meta .issue-desc {
+            flex: 1;
+            min-width: 0;
+        }
+
+    .checklist-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        flex: none;
+        padding: 0 0.3rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--issue-muted);
+        background: #f1f2f4;
+        border-radius: 3px;
+    }
+
+        .checklist-badge.is-complete {
+            color: #216e4e;
+            background: #dcfff1;
+        }
+
+        .checklist-badge svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    /* Éditeur */
+    .checklist-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .checklist-heading {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--issue-text);
+    }
+
+    .checklist-count {
+        font-size: 0.8125rem;
+        color: var(--issue-muted);
+    }
+
+    .checklist-bar {
+        height: 6px;
+        background: #f1f2f4;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    .checklist-bar-fill {
+        height: 100%;
+        background: var(--issue-primary);
+        transition: width 0.2s;
+    }
+
+        .checklist-bar-fill.is-complete {
+            background: #22a06b;
+        }
+
+    .checklist-items {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 0.75rem;
+    }
+
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.25rem;
+        border-radius: var(--issue-radius);
+    }
+
+        .checklist-item:hover {
+            background: var(--issue-hover);
+        }
+
+        .checklist-item label {
+            flex: 1;
+            margin: 0;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .checklist-item.is-done label {
+            color: var(--issue-subtle);
+            text-decoration: line-through;
+        }
+
+        .checklist-item .icon-btn {
+            opacity: 0;
+        }
+
+        .checklist-item:hover .icon-btn,
+        .checklist-item:focus-within .icon-btn {
+            opacity: 1;
+        }
+
+    @media (hover: none) {
+        .checklist-item .icon-btn {
+            opacity: 1;
+        }
+    }
+
+    .checklist-add {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .checklist-bar-fill {
+            transition: none;
+        }
+    }
+
+    .recurring-badge {
+        display: inline-flex;
+        color: var(--issue-muted);
+    }
+
+        .recurring-badge svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+    .weekday-picker {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .weekday-chip {
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--issue-text);
+        background: #f1f2f4;
+        border-radius: 50%;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .weekday-chip.is-selected {
+            color: #fff;
+            background: var(--issue-primary);
+        }
+
+        .weekday-chip:focus-within {
+            outline: 2px solid var(--issue-primary);
+            outline-offset: 2px;
+        }
+
+    .col-status {
+        width: 150px;
+    }
+
+    .status-select {
+        appearance: none;
+        max-width: 100%;
+        padding: 0.125rem 1.25rem 0.125rem 0.5rem;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+        background-repeat: no-repeat;
+        background-position: right 0.3rem center;
+        background-size: 10px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    }
+
+        .status-select:focus-visible {
+            outline: 2px solid var(--issue-primary, #0c66e4);
+            outline-offset: 2px;
+        }
+
+        .status-select:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+        /* Les options s'affichent dans la liste native : texte normal, pas en majuscules colorées. */
+        .status-select option {
+            text-transform: none;
+            font-weight: 400;
+            color: #172b4d;
+            background: #fff;
+        }
+
+        .status-select.lozenge-todo {
+            color: #44546f;
+            background-color: #e9ebee;
+        }
+
+        .status-select.lozenge-progress {
+            color: #0055cc;
+            background-color: #e9f2ff;
+        }
+
+        .status-select.lozenge-review {
+            color: #5e4db2;
+            background-color: #f3f0ff;
+        }
+
+        .status-select.lozenge-done {
+            color: #216e4e;
+            background-color: #dcfff1;
+        }
+
+    .issue-toolbar-left {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .col-assignee {
+        width: 80px;
+        text-align: center !important;
+    }
+
+    .avatar {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: #fff;
+        border-radius: 50%;
+        user-select: none;
+    }
+
+    .avatar-empty {
+        color: var(--issue-subtle, #8590a2);
+        background: #f1f2f4;
+        border: 1px dashed #c1c7d0;
+    }
+
+        .avatar-empty svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+        }
+
+    .issue-filters {
+        display: inline-flex;
+        gap: 0.25rem;
+        margin-right: 0.75rem;
+    }
+
+    .filter-chip {
+        height: 28px;
+        padding: 0 0.625rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--issue-text, #172b4d);
+        background: transparent;
+        border: 1px solid var(--issue-border, #dfe1e6);
+        border-radius: 14px;
+        cursor: pointer;
+    }
+
+        .filter-chip:hover {
+            background: var(--issue-hover, #f4f5f7);
+        }
+
+        .filter-chip.is-active {
+            color: #fff;
+            background: var(--issue-primary, #0c66e4);
+            border-color: transparent;
+        }
+
+        .filter-chip:focus-visible {
+            outline: 2px solid var(--issue-primary, #0c66e4);
+            outline-offset: 2px;
+        }
+
+    .activity-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+        /* Fil vertical de la chronologie */
+        .activity-list::before {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 0.5rem;
+            bottom: 0.5rem;
+            width: 2px;
+            background: var(--issue-border, #dfe1e6);
+        }
+
+    .activity-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 12px 1fr auto;
+        gap: 0.75rem;
+        align-items: baseline;
+        padding: 0.375rem 0;
+        font-size: 0.875rem;
+    }
+
+    .activity-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        background: var(--issue-subtle, #8590a2);
+        position: relative;
+        top: 2px;
+    }
+
+    .activity-created {
+        background: #22a06b;
+    }
+
+    .activity-assigned {
+        background: #6e5dc6;
+    }
+
+    .activity-statuschanged {
+        background: var(--issue-primary, #0c66e4);
+    }
+
+    .activity-text {
+        color: var(--issue-text, #172b4d);
+    }
+
+    .activity-time {
+        color: var(--issue-muted, #626f86);
+        font-size: 0.8125rem;
+        white-space: nowrap;
     }
 }

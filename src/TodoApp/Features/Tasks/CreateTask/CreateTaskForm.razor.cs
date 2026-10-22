@@ -6,9 +6,12 @@ using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks.Recurrence;
 using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
+using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.CreateTask;
+using TodoApp.Features.Tasks.Recurrence;
 using TodoApp.Features.Tasks.Shared;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
@@ -19,18 +22,19 @@ namespace TodoApp.Features.Tasks.CreateTask;
 public partial class CreateTaskForm
 {
     [Inject] private CreateTaskHandler Handler { get; set; } = null!;
+    [Inject] private CreateRecurringTaskHandler RecurringHandler { get; set; } = null!;
     [Inject] private NotificationService Notification { get; set; } = null!;
     [Inject] private ILogger<CreateTaskForm> Logger { get; set; } = null!;
+    [Inject] private IUserClock Clock { get; set; } = null!;
 
     [Parameter] public EventCallback OnCreated { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
 
-    // Cascading auth state is provided by AddCascadingAuthenticationState() in Program.cs.
-
     private TaskFormModel Model { get; set; } = new();
+    private RecurrenceFormModel Recurrence { get; } = new();
+
     private bool IsSubmitting { get; set; }
     private string? ErrorMessage { get; set; }
-    private string? SuccessMessage { get; set; }
 
     private async Task SubmitAsync()
     {
@@ -38,31 +42,17 @@ public partial class CreateTaskForm
 
         IsSubmitting = true;
         ErrorMessage = null;
-        SuccessMessage = null;
 
         try
         {
-            var result = await Handler.HandleAsync(
-                new CreateTaskCommand(Model.Title, string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description, Model.Priority, Model.DueDate));
+            var created = Recurrence.Repeat == RepeatOption.None
+                ? await CreateSingleTaskAsync()
+                : await CreateRecurringTaskAsync();
 
-            if (result.IsFailure)
+            if (created)
             {
-                if (result.Error.Type == ErrorType.Validation)
-                {
-                    ErrorMessage = result.Error.Message;
-                    Notification.Warning(result.Error.Message, "Formulaire incomplet");
-                }
-                else
-                {
-                    Logger.OperationFailed(OperationsTask.CreateTask, result.Error.Code, result.Error.Message);
-                    Notification.Error(result.Error.Message, "Création impossible");
-                }
-
-                return;
+                await OnCreated.InvokeAsync();
             }
-
-            Notification.Success($"« {result.Value.Title} » a été créée.", "Tâche créée");
-            await OnCreated.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -72,6 +62,61 @@ public partial class CreateTaskForm
         finally
         {
             IsSubmitting = false;
-        }   
+        }
+    }
+
+    private async Task<bool> CreateSingleTaskAsync()
+    {
+        var result = await Handler.HandleAsync(
+            new CreateTaskCommand(Model.Title, Model.Description, Model.Priority, Model.DueDate));
+
+        if (result.IsFailure)
+        {
+            HandleFailure(result.Error, OperationsTask.CreateTask, "Création impossible");
+            return false;
+        }
+
+        Notification.Success($"« {result.Value.Title} » a été créée.", "Tâche créée");
+        return true;
+    }
+
+    private async Task<bool> CreateRecurringTaskAsync()
+    {
+        // L'échéance saisie devient la date de début de la série ; à défaut, aujourd'hui (fuseau de l'utilisateur).
+        var startDate = Model.DueDate ?? Clock.Today;
+
+        var result = await RecurringHandler.HandleAsync(new CreateRecurringTaskCommand(
+            Model.Title,
+            Model.Description,
+            Model.Priority,
+            Recurrence.ToFrequency(),
+            Recurrence.Interval,
+            Recurrence.Days,
+            Recurrence.DayOfMonth ?? startDate.Day,
+            startDate,
+            EndDate: null));
+
+        if (result.IsFailure)
+        {
+            HandleFailure(result.Error, OperationsTask.CreateRecurringTask, "Récurrence invalide");
+            return false;
+        }
+
+        Notification.Success($"« {Model.Title.Trim()} » se répétera automatiquement.", "Tâche récurrente créée");
+        return true;
+    }
+
+    private void HandleFailure(Error error, string operation, string title)
+    {
+        if (error.Type == ErrorType.Validation)
+        {
+            // Saisie à corriger : message dans le formulaire + toast, sans log (cas normal, pas un incident).
+            ErrorMessage = error.Message;
+            Notification.Warning(error.Message, "Formulaire incomplet");
+            return;
+        }
+
+        Logger.OperationFailed(operation, error.Code, error.Message);
+        Notification.Error(error.Message, title);
     }
 }

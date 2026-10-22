@@ -1,0 +1,44 @@
+<section class="checklist" aria-labelledby="checklist-heading-@TaskId">
+    <div class="checklist-header">
+        <h3 id="checklist-heading-@TaskId" class="checklist-heading">Checklist</h3>
+        @if (_items.Count > 0)
+        {
+            <span class="checklist-count">@Done/@_items.Count</span>
+        }
+    </div>
+
+    @if (_items.Count > 0)
+    {
+        <div class="checklist-bar" role="progressbar" aria-label="Progression de la checklist"
+             aria-valuemin="0" aria-valuemax="@_items.Count" aria-valuenow="@Done">
+            <div class="checklist-bar-fill @(Done == _items.Count ? "is-complete" : null)" style="width: @Percent%"></div>
+        </div>
+
+        <ul class="checklist-items">
+            @foreach (var item in _items)
+            {
+                <li @key="item.Id" class="checklist-item @(item.IsDone ? "is-done" : null)">
+                    <input type="checkbox" id="ci-@item.Id" class="issue-check"
+                           checked="@item.IsDone" disabled="@_busy"
+                           @onchange="e => SetDoneAsync(item, (bool)e.Value!)" />
+                    <label for="ci-@item.Id">@item.Title</label>
+                    <button type="button" class="icon-btn icon-btn-danger" disabled="@_busy"
+                            aria-label="@($"Supprimer l'étape {item.Title}")" title="Supprimer"
+                            @onclick="() => RemoveAsync(item)">
+                        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+
+    <form class="checklist-add" @onsubmit="AddAsync">
+        <input @ref="_newTitleInput"
+               class="form-control form-control-sm" placeholder="Ajouter une étape…"
+               aria-label="Nouvelle étape" maxlength="200" disabled="@_busy"
+               @bind="_newTitle" @bind:event="oninput" />
+        <button type="submit" class="btn-ghost" disabled="@(_busy || string.IsNullOrWhiteSpace(_newTitle))">
+            Ajouter
+        </button>
+    </form>
+</section>

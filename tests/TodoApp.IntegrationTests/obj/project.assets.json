@@ -717,6 +717,22 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Microsoft.Extensions.TimeProvider.Testing/10.11.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Microsoft.NET.Test.Sdk/17.14.1": {
         "type": "package",
         "dependencies": {
@@ -2505,6 +2521,29 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Microsoft.Extensions.TimeProvider.Testing/10.11.0": {
+      "sha512": "DTivKZ2Du0dJideTTa6vPj/eXKNRu+RxtjBX7NOOUXHBtHx1ehbE+lM+j3/5M3wU6BqzcZqEEyR4+FnPKs2rTA==",
+      "type": "package",
+      "path": "microsoft.extensions.timeprovider.testing/10.11.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "README.md",
+        "buildTransitive/net462/Microsoft.Extensions.TimeProvider.Testing.targets",
+        "buildTransitive/net8.0/_._",
+        "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net9.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net9.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "microsoft.extensions.timeprovider.testing.10.11.0.nupkg.sha512",
+        "microsoft.extensions.timeprovider.testing.nuspec"
+      ]
+    },
     "Microsoft.NET.Test.Sdk/17.14.1": {
       "sha512": "HJKqKOE+vshXra2aEHpi2TlxYX7Z9VFYkr+E5rwEvHC8eIXiyO+K9kNm8vmNom3e2rA56WqxU+/N9NJlLGXsJQ==",
       "type": "package",
@@ -3203,6 +3242,7 @@
       "Meziantou.Analyzer >= 2.0.257",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 10.0.13",
       "Microsoft.Extensions.Configuration.UserSecrets >= 10.0.13",
+      "Microsoft.Extensions.TimeProvider.Testing >= 10.11.0",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
       "Respawn >= 7.0.0",
       "Roslynator.Analyzers >= 4.14.1",
@@ -3283,6 +3323,10 @@
           "Microsoft.Extensions.Configuration.UserSecrets": {
             "target": "Package",
             "version": "[10.0.13, )"
+          },
+          "Microsoft.Extensions.TimeProvider.Testing": {
+            "target": "Package",
+            "version": "[10.11.0, )"
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
