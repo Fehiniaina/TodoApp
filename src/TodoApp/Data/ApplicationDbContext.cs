@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TodoApp.Domain.Notifications;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Domain.Tasks.Recurrence;
@@ -13,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     internal DbSet<TaskItem> Tasks => Set<TaskItem>();
     internal DbSet<RecurringTask> RecurringTasks => Set<RecurringTask>();
     internal DbSet<TaskActivity> TaskActivities => Set<TaskActivity>();
+    internal DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
