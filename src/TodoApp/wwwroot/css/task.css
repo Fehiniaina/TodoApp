@@ -885,4 +885,9 @@ body {
         font-size: 0.8125rem;
         white-space: nowrap;
     }
+
+    .issue-toolbar a.btn-subtle,
+    .issue-toolbar a.btn-subtle:hover {
+        text-decoration: none;
+    }
 }
