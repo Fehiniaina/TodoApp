@@ -1,9 +1,10 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @using TodoApp.Components.Shared
 
 <AuthorizeView>
     <Authorized>
-        <div class="page">
+        <TopBar />
+        <div class="page has-topbar">
             <div class="sidebar">
                 <NavMenu />
             </div>

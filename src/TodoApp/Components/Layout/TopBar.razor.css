@@ -1,0 +1,248 @@
+.topbar {
+    --topbar-bg: #1d2125;
+    --topbar-fg: #c7d1db;
+    --topbar-fg-strong: #ffffff;
+    --topbar-hover: rgba(255, 255, 255, 0.08);
+    --topbar-accent: #0c66e4;
+    --topbar-accent-hover: #0055cc;
+    position: sticky;
+    top: 0;
+    z-index: 1030; /* au-dessus du contenu, sous les modales (1055) et les toasts (1090) */
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+    padding: 0 0.75rem;
+    color: var(--topbar-fg);
+    background: var(--topbar-bg);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ───── Zones ───── */
+.topbar-left,
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.topbar-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+/* ───── Boutons icône ───── */
+.topbar-icon-btn {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: var(--topbar-fg);
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .topbar-icon-btn:hover {
+        color: var(--topbar-fg-strong);
+        background: var(--topbar-hover);
+    }
+
+    .topbar-icon-btn svg,
+    .topbar-search-icon,
+    .topbar-create svg,
+    .topbar-logo svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+/* ───── Marque ───── */
+.topbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    color: var(--topbar-fg-strong);
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+    .topbar-brand:hover {
+        background: var(--topbar-hover);
+    }
+
+.topbar-logo {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    color: var(--topbar-bg);
+    background: var(--topbar-fg-strong);
+    border-radius: 6px;
+}
+
+    .topbar-logo svg {
+        stroke-width: 2.6;
+    }
+
+/* ───── Recherche ───── */
+.topbar-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 760px;
+    margin: 0;
+}
+
+.topbar-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    color: #626f86;
+    pointer-events: none;
+}
+
+.topbar-search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 2.5rem 0 2.25rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    color: #172b4d;
+    background: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+}
+
+    .topbar-search input::placeholder {
+        color: #626f86;
+    }
+
+    .topbar-search input:focus {
+        outline: none;
+        border-color: var(--topbar-accent);
+        box-shadow: 0 0 0 2px rgba(12, 102, 228, 0.35);
+    }
+
+.topbar-search-hint {
+    position: absolute;
+    right: 0.6rem;
+    padding: 0 0.35rem;
+    font-size: 0.75rem;
+    color: #626f86;
+    background: #f1f2f4;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
+}
+
+/* ───── Créer ───── */
+.topbar-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex: none;
+    height: 36px;
+    padding: 0 0.875rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--topbar-accent);
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .topbar-create:hover {
+        background: var(--topbar-accent-hover);
+    }
+
+    .topbar-create svg {
+        stroke-width: 2.2;
+    }
+
+/* ───── Notifications ───── */
+.topbar-badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 16px;
+    color: #ffffff;
+    background: #c9372c;
+    border: 2px solid var(--topbar-bg);
+    border-radius: 8px;
+    box-sizing: content-box;
+}
+
+/* ───── Avatar ───── */
+.topbar-avatar {
+    width: 32px;
+    height: 32px;
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: #6e5dc6;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+    .topbar-avatar:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ───── Focus clavier ───── */
+    .topbar-icon-btn:focus-visible,
+    .topbar-brand:focus-visible,
+    .topbar-create:focus-visible,
+    .topbar-avatar:focus-visible {
+        outline: 2px solid #85b8ff;
+        outline-offset: 2px;
+    }
+
+/* ───── Écrans étroits ───── */
+@media (max-width: 960px) {
+    .topbar-brand-name,
+    .topbar-search-hint {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        gap: 0.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .topbar-create-label {
+        display: none;
+    }
+    /* ne garde que le « + » */
+    .topbar-create {
+        width: 36px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .topbar-right .topbar-icon-btn:not(.topbar-notifications) {
+        display: none;
+    }
+}
