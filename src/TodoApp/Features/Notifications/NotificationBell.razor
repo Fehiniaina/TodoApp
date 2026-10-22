@@ -1,0 +1,84 @@
+@using TodoApp.Features.Notifications.Shared
+@using System.Globalization
+
+<div class="notif" @onkeydown="OnKeyDown">
+    <button type="button"
+            class="topbar-icon-btn topbar-notifications"
+            aria-label="@AriaLabel"
+            aria-haspopup="dialog"
+            aria-expanded="@(_isOpen ? "true" : "false")"
+            title="Notifications"
+            @onclick="ToggleAsync">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 1.5 5.5h-13S5 12 5 8Z" />
+            <path d="M8.5 16.5a1.6 1.6 0 0 0 3 0" />
+        </svg>
+        @if (UnreadCount > 0)
+        {
+            <span class="topbar-badge">@BadgeText</span>
+        }
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="notif-backdrop" @onclick="Close"></div>
+
+        <section class="notif-panel" role="dialog" aria-label="Notifications">
+            <header class="notif-header">
+                <h2>Notifications</h2>
+                @if (UnreadCount > 0)
+                {
+                    <button type="button" class="notif-link" @onclick="MarkAllAsReadAsync">
+                        Tout marquer comme lu
+                    </button>
+                }
+            </header>
+
+            @if (_items is null)
+            {
+                <p class="notif-empty">Chargement…</p>
+            }
+            else if (_items.Count == 0)
+            {
+                <div class="notif-empty">
+                    <strong>Aucune notification</strong>
+                    <span>Vous serez prévenu ici quand on vous assignera une tâche.</span>
+                </div>
+            }
+            else
+            {
+                <ul class="notif-list">
+                    @foreach (var item in _items)
+                    {
+                        <li @key="item.Id">
+                            <button type="button"
+                                    class="notif-item @(item.IsRead ? null : "is-unread")"
+                                    @onclick="() => OpenAsync(item)">
+                                <span class="notif-avatar" aria-hidden="true">
+                                    @NotificationFormatter.Initials(item.ActorName)
+                                </span>
+
+                                <span class="notif-body">
+                                    <span class="notif-text">
+                                        <strong>@item.ActorName</strong>
+                                        @NotificationFormatter.Action(item.Type)
+                                        <span class="notif-task">« @item.TaskTitle »</span>
+                                    </span>
+                                    <time class="notif-time"
+                                          datetime="@item.CreatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">
+                                        @NotificationFormatter.Ago(item.CreatedAtUtc, _nowUtc)
+                                    </time>
+                                </span>
+
+                                @if (!item.IsRead)
+                                {
+                                    <span class="notif-dot" title="Non lue"></span>
+                                }
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+</div>

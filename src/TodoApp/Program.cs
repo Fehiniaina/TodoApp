@@ -68,6 +68,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+        options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment();
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
