@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
@@ -102,6 +103,21 @@ builder.Services.AddSingleton<RecurringTaskScheduler>();
 builder.Services.AddHostedService<RecurringTaskService>();
 builder.Services.AddHostedService<DatabaseSeederHostedService>();
 
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = builder.Environment.IsDevelopment()
+        ? StatusCodes.Status307TemporaryRedirect
+        : StatusCodes.Status308PermanentRedirect;
+});
+
+builder.Services.AddHsts(options =>
+{
+    options.Preload = true;
+    options.IncludeSubDomains = true;
+    options.MaxAge = TimeSpan.FromDays(60);
+    options.IncludeSubDomains = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -131,5 +147,8 @@ app.MapAdditionalIdentityEndpoints();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
+
+app.UseHsts();
+app.UseHttpsRedirection();
 
 await app.RunAsync();
