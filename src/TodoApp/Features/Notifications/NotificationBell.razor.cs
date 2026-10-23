@@ -6,11 +6,14 @@ using TodoApp.Features.Notifications.GetRecent;
 using TodoApp.Features.Notifications.GetUnreadCount;
 using TodoApp.Features.Notifications.MarkAllRead;
 using TodoApp.Features.Notifications.MarkRead;
+using TodoApp.Features.Notifications.Realtime;
 using TodoApp.Features.Notifications.Shared;
+using TodoApp.Features.Shared;
+using TodoApp.Features.Shared.Notifications;
 
 namespace TodoApp.Features.Notifications;
 
-public sealed partial class NotificationBell
+public sealed partial class NotificationBell : IDisposable
 {
     private const int PanelSize = 10;
 
@@ -21,6 +24,10 @@ public sealed partial class NotificationBell
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private TimeProvider Time { get; set; } = null!;
     [Inject] private ILogger<NotificationBell> Logger { get; set; } = null!;
+    [Inject] private INotificationBroadcaster Broadcaster { get; set; } = null!;
+    [Inject] private ICurrentUser CurrentUser { get; set; } = null!;
+    [Inject] private NotificationService Toasts { get; set; } = null!;
+
 
     [PersistentState]
     public int? UnreadCount { get; set; }
@@ -31,6 +38,10 @@ public sealed partial class NotificationBell
 
     private string BadgeText =>
         UnreadCount > 9 ? "9+" : (UnreadCount ?? 0).ToString(CultureInfo.InvariantCulture);
+
+    private IDisposable? _subscription;
+
+    public void Dispose() => _subscription?.Dispose();
 
     private string AriaLabel => UnreadCount switch
     {
@@ -43,7 +54,32 @@ public sealed partial class NotificationBell
     protected override async Task OnInitializedAsync()
     {
         UnreadCount ??= await CountHandler.HandleAsync();
+
+        if (RendererInfo.IsInteractive)
+        {
+            var userId = await CurrentUser.GetIdAsync();
+            _subscription = Broadcaster.Subscribe(userId, OnNotifiedAsync);
+        }
     }
+
+    private Task OnNotifiedAsync() => InvokeAsync(async () =>
+    {
+        var previous = UnreadCount ?? 0;
+        UnreadCount = await CountHandler.HandleAsync();
+
+        if (_isOpen)
+        {
+            _nowUtc = Time.GetUtcNow().UtcDateTime;
+            _items = await RecentHandler.HandleAsync(new GetRecentNotificationsQuery(PanelSize));
+        }
+
+        if (UnreadCount > previous)
+        {
+            Toasts.Info("Une tâche vient de vous être assignée.", "Notification");
+        }
+
+        StateHasChanged();
+    });
 
     private async Task ToggleAsync()
     {

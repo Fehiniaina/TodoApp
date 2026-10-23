@@ -9,12 +9,14 @@ using TodoApp.Components;
 using TodoApp.Components.Account;
 using TodoApp.Data;
 using TodoApp.Features;
+using TodoApp.Features.Notifications.Realtime;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
+using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,13 +45,17 @@ builder.Services.AddAuthentication(options =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options => {
+builder.Services.AddSingleton<INotificationBroadcaster, InMemoryNotificationBroadcaster>();
+builder.Services.AddSingleton<NotificationPublishingInterceptor>();
+
+builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, options) => {
     options.UseTodoAppNpgsql(connectionString, npgsql => npgsql
         .EnableRetryOnFailure(
             maxRetryCount: 3,
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorCodesToAdd: null
-        ));
+        ))
+    .AddInterceptors(sp.GetRequiredService<NotificationPublishingInterceptor>());
 
     if (builder.Environment.IsDevelopment())
     {

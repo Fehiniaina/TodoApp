@@ -6,6 +6,7 @@ using TodoApp.Features.Tasks.AssignTask;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
 using TodoApp.Features.Tasks.Shared;
+using TodoApp.Infrastructure.Persistence;
 using TodoApp.IntegrationTests.Infrastructure;
 
 namespace TodoApp.IntegrationTests.Features.Notifications;
@@ -102,5 +103,41 @@ public class TaskAssignedNotificationTests(PostgresFixture fixture) : IAsyncLife
         Assert.Equal(1, await db.Notifications
             .IgnoreQueryFilters([QueryFilters.SoftDelete])
             .CountAsync());
+    }
+
+    [Fact]
+    public async Task Assignment_publishes_to_the_new_assignee_after_commit()
+    {
+        var taskId = await Scenario.CreateTaskAsync(Alice);
+        var broadcaster = new RecordingBroadcaster();
+        var interceptor = new NotificationPublishingInterceptor(broadcaster);
+
+        var handler = new AssignTaskHandler(
+            new TestDbContextFactory(fixture, interceptor),
+            new FakeCurrentUser(Alice),
+            _time,
+            new TaskChangeNotifier());
+
+        var result = await handler.HandleAsync(new AssignTaskCommand(taskId, Bob));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(new[] { Bob }, broadcaster.Published);
+    }
+
+    [Fact]
+    public async Task Self_assignment_publishes_nothing()
+    {
+        var taskId = await Scenario.CreateTaskAsync(Alice);
+        var broadcaster = new RecordingBroadcaster();
+
+        var handler = new AssignTaskHandler(
+            new TestDbContextFactory(fixture, new NotificationPublishingInterceptor(broadcaster)),
+            new FakeCurrentUser(Alice),
+            _time,
+            new TaskChangeNotifier());
+
+        await handler.HandleAsync(new AssignTaskCommand(taskId, Alice));
+
+        Assert.Empty(broadcaster.Published);
     }
 }
