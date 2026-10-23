@@ -31,9 +31,9 @@ internal sealed partial class EmailDeliveryProcessor(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var deliveries = await db.EmailDeliveries
+            .TagWith("EmailDeliveryProcessor : lot à envoyer")
             .AsTracking()
             .Include(e => e.Notification)
-                .ThenInclude(n => n.Task)
             .Where(e => e.Status == EmailDeliveryStatus.Pending && e.NextAttemptAtUtc <= nowUtc)
             .OrderBy(e => e.NextAttemptAtUtc)
             .Take(settings.BatchSize)
@@ -45,10 +45,11 @@ internal sealed partial class EmailDeliveryProcessor(
         }
 
         var users = await LoadUsersAsync(db, deliveries, cancellationToken);
+        var taskTitles = await LoadTaskTitlesAsync(db, deliveries, cancellationToken);
 
         foreach (var delivery in deliveries)
         {
-            await ProcessAsync(delivery, users, settings, nowUtc, cancellationToken);
+            await ProcessAsync(delivery, users, taskTitles, settings, nowUtc, cancellationToken);
 
             // Sauvegarde après chaque email : un crash au milieu du lot ne renvoie pas ceux déjà partis.
             await db.SaveChangesAsync(cancellationToken);
@@ -60,6 +61,7 @@ internal sealed partial class EmailDeliveryProcessor(
     private async Task ProcessAsync(
         EmailDelivery delivery,
         Dictionary<string, ApplicationUser> users,
+        Dictionary<Guid, string> taskTitles,
         EmailDeliveryOptions settings,
         DateTime nowUtc,
         CancellationToken cancellationToken)
@@ -70,6 +72,12 @@ internal sealed partial class EmailDeliveryProcessor(
         {
             delivery.Expire();
             LogExpired(logger, delivery.Id);
+            return;
+        }
+
+        if (!taskTitles.TryGetValue(notification.TaskId, out var taskTitle))
+        {
+            // Tâche mise à la corbeille entre les deux requêtes : le prochain cycle l'exclura via le filtre.
             return;
         }
 
@@ -91,7 +99,7 @@ internal sealed partial class EmailDeliveryProcessor(
         EmailMessage message;
         try
         {
-            message = await BuildMessageAsync(delivery, recipient, users, composer, settings);
+            message = await BuildMessageAsync(delivery, taskTitle, recipient, users, composer, settings);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -116,6 +124,7 @@ internal sealed partial class EmailDeliveryProcessor(
 
     private async Task<EmailMessage> BuildMessageAsync(
         EmailDelivery delivery,
+        string taskTitle,
         ApplicationUser recipient,
         Dictionary<string, ApplicationUser> users,
         INotificationEmailComposer composer,
@@ -129,6 +138,7 @@ internal sealed partial class EmailDeliveryProcessor(
 
         var context = new NotificationEmailContext(
             notification,
+            taskTitle,
             DisplayName(recipient),
             actorName,
             settings.AppBaseUrl);
@@ -161,6 +171,23 @@ internal sealed partial class EmailDeliveryProcessor(
         return await db.Users
             .Where(u => ids.Contains(u.Id))
             .ToDictionaryAsync(u => u.Id, StringComparer.Ordinal, cancellationToken);
+    }
+
+    private static async Task<Dictionary<Guid, string>> LoadTaskTitlesAsync(
+        ApplicationDbContext db,
+        List<EmailDelivery> deliveries,
+        CancellationToken cancellationToken)
+    {
+        var taskIds = deliveries
+            .Select(d => d.Notification.TaskId)
+            .Distinct()
+            .ToList();
+
+        return await db.Tasks
+            .TagWith("EmailDeliveryProcessor : titres des tâches")
+            .Where(t => taskIds.Contains(t.Id))
+            .Select(t => new { t.Id, t.Title })
+            .ToDictionaryAsync(t => t.Id, t => t.Title, cancellationToken);
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Email {DeliveryId} envoyé (tentative {Attempts})")]

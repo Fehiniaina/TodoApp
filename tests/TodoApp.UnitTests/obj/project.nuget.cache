@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Jo6Xczu4y4k=",
+  "dgSpecHash": "BUCa5a7zEw4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\tests\\TodoApp.UnitTests\\TodoApp.UnitTests.csproj",
+  "projectFilePath": "C:\\dev\\TodoApp\\tests\\TodoApp.UnitTests\\TodoApp.UnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\anglesharp\\1.8.1\\anglesharp.1.8.1.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\anglesharp.css\\1.1.2\\anglesharp.css.1.1.2.nupkg.sha512",

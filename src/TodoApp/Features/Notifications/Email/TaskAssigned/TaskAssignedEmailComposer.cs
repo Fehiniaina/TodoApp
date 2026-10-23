@@ -10,6 +10,6 @@ internal sealed class TaskAssignedEmailComposer : INotificationEmailComposer
     public IEmailModel Compose(NotificationEmailContext context) => new TaskAssignedEmail(
         context.RecipientName,
         context.ActorName,
-        context.Notification.Task.Title,
+        context.TaskTitle,
         context.TaskUrl);
 }

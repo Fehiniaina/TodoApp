@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bl2oE+Yx3To=",
+  "dgSpecHash": "Z5nPECOAB5E=",
   "success": true,
-  "projectFilePath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
+  "projectFilePath": "C:\\dev\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\bogus\\35.6.5\\bogus.35.6.5.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\bouncycastle.cryptography\\2.7.0\\bouncycastle.cryptography.2.7.0.nupkg.sha512",

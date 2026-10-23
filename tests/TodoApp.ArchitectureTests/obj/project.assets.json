@@ -3184,11 +3184,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
+      "projectUniqueName": "C:\\dev\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
       "projectName": "TodoApp.ArchitectureTests",
-      "projectPath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
+      "projectPath": "C:\\dev\\TodoApp\\tests\\TodoApp.ArchitectureTests\\TodoApp.ArchitectureTests.csproj",
       "packagesPath": "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\tests\\TodoApp.ArchitectureTests\\obj\\",
+      "outputPath": "C:\\dev\\TodoApp\\tests\\TodoApp.ArchitectureTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3210,8 +3210,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\src\\TodoApp\\TodoApp.csproj": {
-              "projectPath": "C:\\Users\\FehiniainaRAHARINIVO\\OneDrive - Versusmind\\Documents\\versusmind\\workspace\\TodoApp\\src\\TodoApp\\TodoApp.csproj"
+            "C:\\dev\\TodoApp\\src\\TodoApp\\TodoApp.csproj": {
+              "projectPath": "C:\\dev\\TodoApp\\src\\TodoApp\\TodoApp.csproj"
             }
           }
         }
