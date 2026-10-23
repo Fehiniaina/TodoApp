@@ -36,6 +36,8 @@ internal sealed class Notification
 
     public bool IsRead => ReadAtUtc is not null;
 
+    public EmailDelivery? Email { get; private set; }
+
     public static Notification ForTaskAssignment(
         string recipientId,
         Guid taskId,
@@ -49,12 +51,16 @@ internal sealed class Notification
             throw new ArgumentException("L'identifiant de la tâche est requis.", nameof(taskId));
         }
 
-        return new Notification(
+        var notification = new Notification(
             recipientId,
             NotificationType.TaskAssigned,
             taskId,
             actorId,
             EnsureUtc(occurredAtUtc));
+
+        notification.Email = EmailDelivery.Schedule(notification.CreatedAtUtc);
+
+        return notification;
     }
 
     public void MarkAsRead(DateTime nowUtc)

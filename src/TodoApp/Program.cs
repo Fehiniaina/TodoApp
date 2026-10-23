@@ -7,8 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using TodoApp.Components;
 using TodoApp.Components.Account;
+using TodoApp.Components.Account.Email;
 using TodoApp.Data;
 using TodoApp.Features;
+using TodoApp.Features.Notifications;
+using TodoApp.Features.Notifications.Email;
+using TodoApp.Features.Notifications.Email.TaskAssigned;
 using TodoApp.Features.Notifications.Realtime;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
@@ -16,6 +20,8 @@ using TodoApp.Features.Shared.Time;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
+using TodoApp.Infrastructure.Email;
+using TodoApp.Infrastructure.Email.Templating;
 using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
 
@@ -44,9 +50,6 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-builder.Services.AddSingleton<INotificationBroadcaster, InMemoryNotificationBroadcaster>();
-builder.Services.AddSingleton<NotificationPublishingInterceptor>();
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, options) => {
     options.UseTodoAppNpgsql(connectionString, npgsql => npgsql
@@ -79,8 +82,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
-
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddTaskFeatures(builder.Configuration);
 builder.Services.AddHealthChecks()
@@ -124,6 +125,10 @@ builder.Services.AddHsts(options =>
     options.MaxAge = TimeSpan.FromDays(60);
     options.IncludeSubDomains = true;
 });
+
+builder.Services.AddEmailTemplating();
+builder.Services.AddNotificationFeatures(builder.Configuration);
+builder.Services.AddAccountEmails();
 
 var app = builder.Build();
 

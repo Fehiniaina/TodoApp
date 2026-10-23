@@ -15,6 +15,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     internal DbSet<RecurringTask> RecurringTasks => Set<RecurringTask>();
     internal DbSet<TaskActivity> TaskActivities => Set<TaskActivity>();
     internal DbSet<Notification> Notifications => Set<Notification>();
+    internal DbSet<EmailDelivery> EmailDeliveries => Set<EmailDelivery>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

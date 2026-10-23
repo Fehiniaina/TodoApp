@@ -1,0 +1,15 @@
+@inherits EmailTemplate<ConfirmEmailEmail>
+
+<EmailLayout Preheader="Activez votre compte TodoApp en un clic."
+             Footer="Si vous n'avez pas créé de compte sur TodoApp, ignorez cet email.">
+    <p>Bonjour @Model.RecipientName,</p>
+
+    <p>Bienvenue sur <strong>TodoApp</strong> ! Pour activer votre compte, confirmez votre adresse email :</p>
+
+    <EmailButton Href="@Model.ConfirmationUrl">Confirmer mon adresse email</EmailButton>
+
+    <p style="font-size:13px;color:#626f86">
+        Ce lien est valable 24 heures. Si le bouton ne fonctionne pas, copiez cette adresse dans votre navigateur :<br />
+        <span style="word-break:break-all">@Model.ConfirmationUrl.AbsoluteUri</span>
+    </p>
+</EmailLayout>

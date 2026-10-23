@@ -40,5 +40,10 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
         builder.HasIndex(n => n.RecipientId)
             .HasFilter("read_at_utc IS NULL")
             .HasDatabaseName("ix_notifications_recipient_id_unread");
+
+        builder.HasOne(n => n.Email)
+            .WithOne(e => e.Notification)
+            .HasForeignKey<EmailDelivery>(e => e.NotificationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

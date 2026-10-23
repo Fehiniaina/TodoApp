@@ -1,0 +1,7 @@
+<p style="padding:12px 16px;background:#f1f2f4;border-radius:6px;font-weight:600">
+    @ChildContent
+</p>
+
+@code {
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = null!;
+}
