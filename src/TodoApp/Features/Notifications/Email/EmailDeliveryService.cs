@@ -4,14 +4,15 @@ namespace TodoApp.Features.Notifications.Email;
 
 internal sealed partial class EmailDeliveryService(
     EmailDeliveryProcessor processor,
+    EmailDeliverySignal signal,
     IOptions<EmailDeliveryOptions> options,
     ILogger<EmailDeliveryService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var timer = new PeriodicTimer(options.Value.PollingInterval);
+        var interval = options.Value.PollingInterval;
 
-        do
+        while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
@@ -19,11 +20,12 @@ internal sealed partial class EmailDeliveryService(
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                // Base indisponible, etc. : on réessaie au cycle suivant sans arrêter le service.
                 LogCycleFailed(logger, ex);
             }
+
+            // Réveil immédiat sur nouvelle notification ; sinon cycle normal (nouvelles tentatives, redémarrage).
+            await signal.WaitAsync(interval, stoppingToken);
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Cycle d'envoi des emails en échec")]
