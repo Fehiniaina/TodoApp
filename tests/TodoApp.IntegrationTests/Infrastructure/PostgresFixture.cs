@@ -70,14 +70,21 @@ public sealed class PostgresFixture : IAsyncLifetime
         await _respawner.ResetAsync(connection);
     }
 
-    public ApplicationDbContext CreateDbContext()
+    public ApplicationDbContext CreateDbContext(params IInterceptor[] interceptors)
     {
+        ArgumentNullException.ThrowIfNull(interceptors);
+
         var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
         builder.UseTodoAppNpgsql(ConnectionString)
             // EF Core 10 raises PendingModelChangesWarning as an exception during MigrateAsync
             // even when all migrations are up to date. Safe to suppress in tests: MigrateAsync
             // applies the correct schema regardless of the model-hash check.
             .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+
+        if (interceptors.Length > 0)
+        {
+            builder.AddInterceptors(interceptors);
+        }
 
         return new ApplicationDbContext(builder.Options);
     }

@@ -1,5 +1,6 @@
-<header class="topbar" role="banner">
+@using TodoApp.Features.Notifications
 
+<header class="topbar" role="banner">
     @* ── Gauche : panneau latéral, applications, logo ── *@
     <div class="topbar-left">
         <button type="button" class="topbar-icon-btn" aria-label="Afficher ou masquer le menu latéral" title="Menu latéral">
@@ -46,13 +47,7 @@
 
     @* ── Droite : notifications, aide, paramètres, profil ── *@
     <nav class="topbar-right" aria-label="Actions utilisateur">
-        <button type="button" class="topbar-icon-btn topbar-notifications" aria-label="Notifications, plus de 9 non lues" title="Notifications">
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 1.5 5.5h-13S5 12 5 8Z" />
-                <path d="M8.5 16.5a1.75 1.75 0 0 0 3 0" />
-            </svg>
-            <span class="topbar-badge" aria-hidden="true">9+</span>
-        </button>
+        <NotificationBell @rendermode="InteractiveServer" />
 
         <button type="button" class="topbar-icon-btn" aria-label="Aide" title="Aide">
             <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">

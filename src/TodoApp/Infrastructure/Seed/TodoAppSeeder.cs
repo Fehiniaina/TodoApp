@@ -49,6 +49,13 @@ public static class TodoAppSeeder
 
         context.Tasks.AddRange(tasks);
         await context.SaveChangesAsync(cancellationToken);
+
+        await context.Notifications
+            .IgnoreQueryFilters()
+            .Where(n => n.CreatedAtUtc < nowUtc.AddDays(-2))
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(n => n.ReadAtUtc, n => (DateTime?)n.CreatedAtUtc.AddHours(1)),
+                cancellationToken);
     }
 
     private static TaskItem CreateTask(

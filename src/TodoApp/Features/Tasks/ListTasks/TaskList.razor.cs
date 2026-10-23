@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TodoApp.Common;
@@ -13,6 +14,7 @@ using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.ChangeTaskStatus;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
+using TodoApp.Features.Tasks.GetTaskSummary;
 using TodoApp.Features.Tasks.Recurrence;
 using TodoApp.Features.Tasks.Shared;
 
@@ -33,6 +35,12 @@ public sealed partial class TaskList : IDisposable
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
     [Inject] private ICurrentUser CurrentUser { get; set; } = null!;
+    [Inject] private GetTaskSummaryHandler GetSummaryHandler { get; set; } = null!;
+    [Inject] private NavigationManager Navigation {  get; set; } = null!;
+
+
+    [SupplyParameterFromQuery(Name = "task")]
+    private Guid? TaskIdToOpen { get; set; }
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -51,6 +59,7 @@ public sealed partial class TaskList : IDisposable
     private bool _focusChecklist;
 
     private TaskScope _scope = TaskScope.All;
+    private Guid? _openedFromQuery;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,6 +95,27 @@ public sealed partial class TaskList : IDisposable
         {
             // Circuit fermé pendant l'appel : rien à faire.
         }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (TaskIdToOpen is not { } id || id == _openedFromQuery)
+        {
+            return;
+        }
+
+        _openedFromQuery = id;
+
+        var summary = _result?.Items.FirstOrDefault(t => t.Id == id)
+            ?? await GetSummaryHandler.HandleAsync(id);
+
+        if (summary is null)
+        {
+            Notification.Warning("Cette tâche n'existe plus ou a été supprimée.", "Notification");
+            return;
+        }
+
+        OpenEditModal(summary);
     }
 
     public void Dispose() => Notifier.Changed -= OnTasksChanged;
@@ -166,7 +196,18 @@ public sealed partial class TaskList : IDisposable
         _focusChecklist = true;
     }
 
-    private void CloseEditModal() => _editingTask = null;
+    private void CloseEditModal()
+    {
+        _editingTask = null;
+
+        if (TaskIdToOpen is not null)
+        {
+            _openedFromQuery = null;
+            Navigation.NavigateTo(
+                Navigation.GetUriWithQueryParameter("task", (Guid?)null),
+                replace: true);
+        }
+    }
 
     private async Task OnStatusSelectedAsync(TaskSummary task, ChangeEventArgs e)
     {

@@ -305,6 +305,59 @@ namespace TodoApp.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ActorId")
+                        .HasColumnType("text")
+                        .HasColumnName("actor_id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime?>("ReadAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_at_utc");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("recipient_id");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("task_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_notifications");
+
+                    b.HasIndex("ActorId")
+                        .HasDatabaseName("ix_notifications_actor_id");
+
+                    b.HasIndex("RecipientId")
+                        .HasDatabaseName("ix_notifications_recipient_id_unread")
+                        .HasFilter("read_at_utc IS NULL");
+
+                    b.HasIndex("TaskId")
+                        .HasDatabaseName("ix_notifications_task_id");
+
+                    b.HasIndex("RecipientId", "CreatedAtUtc")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("ix_notifications_recipient_id_created_at_utc");
+
+                    b.ToTable("notifications", (string)null);
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Tasks.Activity.TaskActivity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -625,6 +678,31 @@ namespace TodoApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
+                {
+                    b.HasOne("TodoApp.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_notifications_asp_net_users_actor_id");
+
+                    b.HasOne("TodoApp.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_asp_net_users_recipient_id");
+
+                    b.HasOne("TodoApp.Domain.Tasks.TaskItem", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_tasks_task_id");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("TodoApp.Domain.Tasks.Activity.TaskActivity", b =>

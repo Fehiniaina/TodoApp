@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TodoApp.Domain.Common;
+using TodoApp.Domain.Notifications;
 using TodoApp.Domain.Tasks.Activity;
 
 namespace TodoApp.Infrastructure.Persistence;
@@ -47,6 +48,11 @@ internal sealed class DomainEventsInterceptor : SaveChangesInterceptor
                 if (TaskActivityMapper.ToActivity(domainEvent) is { } activity)
                 {
                     context.Add(activity);
+                }
+
+                if (NotificationMapper.ToNotification(domainEvent) is { } notification)
+                {
+                    context.Add(notification);
                 }
             }
 
