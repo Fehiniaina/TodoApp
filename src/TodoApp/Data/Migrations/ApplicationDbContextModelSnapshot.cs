@@ -305,6 +305,57 @@ namespace TodoApp.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Notifications.EmailDelivery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTime>("NextAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_attempt_at_utc");
+
+                    b.Property<Guid>("NotificationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("notification_id");
+
+                    b.Property<DateTime?>("SentAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at_utc");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id")
+                        .HasName("pk_email_deliveries");
+
+                    b.HasIndex("NextAttemptAtUtc")
+                        .HasDatabaseName("ix_email_deliveries_pending")
+                        .HasFilter("status = 'Pending'");
+
+                    b.HasIndex("NotificationId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_email_deliveries_notification_id");
+
+                    b.ToTable("email_deliveries", (string)null);
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -680,6 +731,18 @@ namespace TodoApp.Data.Migrations
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Notifications.EmailDelivery", b =>
+                {
+                    b.HasOne("TodoApp.Domain.Notifications.Notification", "Notification")
+                        .WithOne("Email")
+                        .HasForeignKey("TodoApp.Domain.Notifications.EmailDelivery", "NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_email_deliveries_notifications_notification_id");
+
+                    b.Navigation("Notification");
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
                 {
                     b.HasOne("TodoApp.Data.ApplicationUser", null)
@@ -769,6 +832,11 @@ namespace TodoApp.Data.Migrations
                         });
 
                     b.Navigation("Checklist");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
+                {
+                    b.Navigation("Email");
                 });
 #pragma warning restore 612, 618
         }

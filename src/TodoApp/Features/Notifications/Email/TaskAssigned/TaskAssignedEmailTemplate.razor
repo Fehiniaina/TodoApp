@@ -1,0 +1,12 @@
+@using TodoApp.Infrastructure.Email.Templating
+
+@inherits EmailTemplate<TaskAssignedEmail>
+
+<EmailLayout Preheader="@Model.Subject">
+    <p>Bonjour @Model.RecipientName,</p>
+    <p><strong>@Model.ActorName</strong> vous a assigné une tâche :</p>
+
+    <EmailCallout>@Model.TaskTitle</EmailCallout>
+
+    <EmailButton Href="@Model.TaskUrl">Ouvrir la tâche</EmailButton>
+</EmailLayout>
