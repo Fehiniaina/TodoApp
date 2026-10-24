@@ -87,9 +87,7 @@ else
                 <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
 
                     <td class="col-summary">
-                        <button type="button" class="issue-title" @onclick="() => OpenEditModal(task)">
-                            @task.Title
-                        </button>
+                        <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">
                             @if (task.RecurringTaskId is not null)
                             {

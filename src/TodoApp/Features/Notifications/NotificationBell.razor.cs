@@ -117,7 +117,7 @@ public sealed partial class NotificationBell : IDisposable
         }
 
         Close();
-        Navigation.NavigateTo($"/tasks?task={item.TaskId}");
+        Navigation.NavigateTo($"/tasks/{item.TaskId}");
     }
 
     private async Task MarkAllAsReadAsync()
