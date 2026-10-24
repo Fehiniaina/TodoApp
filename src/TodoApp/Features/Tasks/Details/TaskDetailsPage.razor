@@ -1,0 +1,197 @@
+@page "/tasks/{TaskId:guid}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@using TodoApp.Features.Tasks.Activity
+@using TodoApp.Features.Tasks.Checklist
+@using TodoApp.Features.Users
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>@(_task?.Title ?? "Tâche") · TodoApp</PageTitle>
+
+@if (_notFound)
+{
+    <div class="td-not-found">
+        <h1>Tâche introuvable</h1>
+        <p>Elle a peut-être été supprimée, ou vous n'y avez pas accès.</p>
+        <a href="tasks" class="td-btn td-btn-primary">Retour à mes tâches</a>
+    </div>
+}
+else if (_task is null)
+{
+    <p class="td-loading">Chargement…</p>
+}
+else
+{
+    <div class="td-page">
+        <nav class="td-breadcrumb" aria-label="Fil d'Ariane">
+            <a href="">Accueil</a>
+            <span aria-hidden="true">/</span>
+            <a href="tasks">Mes tâches</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@_task.Key</span>
+        </nav>
+
+        <div class="td-layout">
+
+            @* ───── Colonne principale ───── *@
+            <article class="td-main">
+                <h1 class="td-title">@_task.Title</h1>
+
+                <div class="td-actions">
+                    <button type="button" class="td-icon-btn" title="Joindre un fichier (bientôt)" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5" /></svg>
+                        <span>Joindre</span>
+                    </button>
+                    <button type="button" class="td-icon-btn" title="Ajouter une étape (bientôt)" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 11 3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                        <span>Étape</span>
+                    </button>
+                    <button type="button" class="td-icon-btn" title="Modifier (bientôt)" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                        <span>Modifier</span>
+                    </button>
+                </div>
+
+                <section class="td-section">
+                    <h2 class="td-section-title">Description</h2>
+                    @if (string.IsNullOrWhiteSpace(_task.Description))
+                    {
+                        <p class="td-empty">Aucune description.</p>
+                    }
+                    else
+                    {
+                        <div class="td-description">@_task.Description</div>
+                    }
+                </section>
+
+                <details class="td-section td-collapsible" open>
+                    <summary>
+                        <h2 class="td-section-title">Pièces jointes</h2>
+                        <span class="td-count">0</span>
+                    </summary>
+                    <div class="td-dropzone" aria-disabled="true">
+                        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" /></svg>
+                        <p>Glissez des fichiers ici ou <span class="td-link">parcourez</span></p>
+                        <small>Bientôt disponible</small>
+                    </div>
+                </details>
+
+                <details class="td-section td-collapsible" open>
+                    <summary>
+                        <h2 class="td-section-title">Étapes</h2>
+                        <span class="td-count">@_task.ChecklistDone/@_task.ChecklistTotal</span>
+                    </summary>
+                    <ChecklistEditor TaskId="_task.Id" />
+                </details>
+
+                <section class="td-section">
+                    <h2 class="td-section-title">Activité</h2>
+
+                    <div class="td-tabs" role="tablist" aria-label="Filtrer l'activité">
+                        @foreach (var tab in Tabs)
+                        {
+                            <button type="button" role="tab"
+                                    class="td-tab @(tab.Value == _activeTab ? "is-active" : null)"
+                                    aria-selected="@(tab.Value == _activeTab ? "true" : "false")"
+                                    @onclick="() => _activeTab = tab.Value">
+                                @tab.Label
+                            </button>
+                        }
+                    </div>
+
+                    <div role="tabpanel" class="td-tabpanel">
+                        @if (_activeTab is ActivityTab.All or ActivityTab.Comments)
+                        {
+                            <div class="td-comment-composer">
+                                <span class="td-avatar" aria-hidden="true">@CurrentUserInitials</span>
+                                <textarea class="td-comment-input" rows="2" disabled
+                                          placeholder="Ajouter un commentaire… (bientôt disponible)"></textarea>
+                            </div>
+                        }
+
+                        @if (_activeTab == ActivityTab.Comments)
+                        {
+                            <p class="td-empty">Aucun commentaire pour le moment.</p>
+                        }
+                        else
+                        {
+                            <TaskActivityFeed TaskId="_task.Id" />
+                        }
+                    </div>
+                </section>
+            </article>
+
+            @* ───── Panneau latéral ───── *@
+            <aside class="td-sidebar">
+                <div class="td-status">
+                    <span class="lozenge @_task.Status.ToLozengeCss()">@_task.Status.ToLabel()</span>
+                </div>
+
+                <div class="td-panel">
+                    <h2 class="td-panel-title">Détails</h2>
+                    <dl class="td-fields">
+                        <dt>Assigné</dt>
+                        <dd>
+                            @if (_task.AssigneeId is not null)
+                            {
+                                <UserAvatar UserId="@_task.AssigneeId" Name="@_task.AssigneeName" />
+                                <span>@_task.AssigneeName</span>
+                            }
+                            else
+                            {
+                                <span class="td-muted">Non assignée</span>
+                            }
+                        </dd>
+
+                        <dt>Créée par</dt>
+                        <dd>
+                            <UserAvatar UserId="@_task.CreatedById" Name="@_task.CreatedByName" />
+                            <span>@_task.CreatedByName</span>
+                        </dd>
+
+                        <dt>Priorité</dt>
+                        <dd>
+                            <PriorityIcon Priority="_task.Priority" />
+                            <span>@_task.Priority.ToLabel()</span>
+                        </dd>
+
+                        <dt>Échéance</dt>
+                        <dd>
+                            @if (_task.DueDate is not null)
+                            {
+                                <DueDateBadge DueDate="_task.DueDate" IsCompleted="_task.IsCompleted" Today="_today" />
+                            }
+                            else
+                            {
+                                <span class="td-muted">Aucune</span>
+                            }
+                        </dd>
+
+                        <dt>Récurrence</dt>
+                        <dd>
+                            @if (_task.RecurringTaskId is not null)
+                            {
+                                <span>Tâche récurrente</span>
+                            }
+                            else
+                            {
+                                <span class="td-muted">—</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <p class="td-meta">
+                    Créée le @_task.CreatedAtUtc.ToString("d MMM yyyy", French)
+                    @if (_task.CompletedAt is { } completedAt)
+                    {
+                        <br />
+                        <span>Résolue le @completedAt.ToString("d MMM yyyy", French)</span>
+                    }
+                </p>
+            </aside>
+        </div>
+    </div>
+}

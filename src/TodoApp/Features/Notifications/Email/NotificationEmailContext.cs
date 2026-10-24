@@ -9,5 +9,5 @@ internal sealed record NotificationEmailContext(
     string ActorName,
     Uri AppBaseUrl)
 {
-    public Uri TaskUrl => new(AppBaseUrl, $"tasks?task={Notification.TaskId}");
+    public Uri TaskUrl => new(AppBaseUrl, $"tasks/{Notification.TaskId}");
 }
