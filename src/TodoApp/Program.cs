@@ -54,7 +54,9 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, options) => {
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorCodesToAdd: null
         ))
-    .AddInterceptors(sp.GetRequiredService<NotificationPublishingInterceptor>());
+    .AddInterceptors(
+        sp.GetRequiredService<NotificationPublishingInterceptor>(),
+        sp.GetRequiredService<EmailDeliveryWakeUpInterceptor>());
 
     if (builder.Environment.IsDevelopment())
     {

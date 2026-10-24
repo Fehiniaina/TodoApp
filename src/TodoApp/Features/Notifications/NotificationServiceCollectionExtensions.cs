@@ -2,6 +2,7 @@ using TodoApp.Features.Notifications.Email;
 using TodoApp.Features.Notifications.Email.TaskAssigned;
 using TodoApp.Features.Notifications.Realtime;
 using TodoApp.Infrastructure.Email;
+using TodoApp.Infrastructure.Email.Resilience;
 using TodoApp.Infrastructure.Email.Templating;
 using TodoApp.Infrastructure.Persistence;
 
@@ -28,12 +29,19 @@ internal static class NotificationServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddSingleton<IEmailTransport, MailKitEmailTransport>();
-        services.AddSingleton<EmailDeliveryProcessor>();
-        services.AddHostedService<EmailDeliveryService>();
-
         services.AddEmailTemplate<TaskAssignedEmail, TaskAssignedEmailTemplate>();
         services.AddSingleton<INotificationEmailComposer, TaskAssignedEmailComposer>();
+
+        // Transport : MailKit décoré par le pipeline de résilience
+        services.AddSmtpResilience();
+        services.AddSingleton<MailKitEmailTransport>();
+        services.AddSingleton<IEmailTransport, ResilientEmailTransport>();
+
+        // Job d'envoi et son réveil
+        services.AddSingleton<EmailDeliverySignal>();
+        services.AddSingleton<EmailDeliveryWakeUpInterceptor>();
+        services.AddSingleton<EmailDeliveryProcessor>();
+        services.AddHostedService<EmailDeliveryService>();
 
         return services;
     }

@@ -1,0 +1,58 @@
+<div class="auth-wrapper">
+
+    @* Panneau gauche : marque (décoratif) *@
+    <aside class="auth-brand-panel" aria-hidden="true">
+        <div class="auth-brand-content">
+            <div class="auth-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+            </div>
+
+            <p class="auth-brand-title">TodoApp</p>
+            <p class="auth-brand-subtitle">Organisez vos tâches,<br />avancez un peu plus chaque jour.</p>
+
+            <ul class="auth-brand-features">
+                <li>Priorités de « Basse » à « Urgente »</li>
+                <li>Suivi des tâches terminées</li>
+                <li>Une liste toujours à jour</li>
+            </ul>
+        </div>
+
+        <p class="auth-brand-footer">© @DateTime.UtcNow.Year TodoApp</p>
+    </aside>
+
+    @* Panneau droit : contenu propre à chaque page *@
+    <main class="auth-form-panel">
+        <div class="auth-form-container">
+
+            <div class="auth-mobile-logo" aria-hidden="true">
+                <span class="auth-logo auth-logo-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                </span>
+                <span>TodoApp</span>
+            </div>
+
+            <header class="auth-form-header">
+                <h1 class="auth-form-title">@Title</h1>
+                @if (Lead is not null)
+                {
+                    <p class="auth-form-lead">@Lead</p>
+                }
+            </header>
+
+            @ChildContent
+
+            @if (Footer is not null)
+            {
+                <footer class="auth-footer">@Footer</footer>
+            }
+        </div>
+    </main>
+</div>

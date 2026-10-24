@@ -1,10 +1,12 @@
 using System.Collections.Frozen;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Polly.CircuitBreaker;
 using TodoApp.Data;
 using TodoApp.Domain.Notifications;
 using TodoApp.Features.Users;
 using TodoApp.Infrastructure.Email;
+using TodoApp.Infrastructure.Email.Resilience;
 using TodoApp.Infrastructure.Email.Templating;
 
 namespace TodoApp.Features.Notifications.Email;
@@ -31,9 +33,9 @@ internal sealed partial class EmailDeliveryProcessor(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var deliveries = await db.EmailDeliveries
+            .TagWith("EmailDeliveryProcessor : lot à envoyer")
             .AsTracking()
             .Include(e => e.Notification)
-                .ThenInclude(n => n.Task)
             .Where(e => e.Status == EmailDeliveryStatus.Pending && e.NextAttemptAtUtc <= nowUtc)
             .OrderBy(e => e.NextAttemptAtUtc)
             .Take(settings.BatchSize)
@@ -45,21 +47,30 @@ internal sealed partial class EmailDeliveryProcessor(
         }
 
         var users = await LoadUsersAsync(db, deliveries, cancellationToken);
+        var taskTitles = await LoadTaskTitlesAsync(db, deliveries, cancellationToken);
+        var processed = 0;
 
         foreach (var delivery in deliveries)
         {
-            await ProcessAsync(delivery, users, settings, nowUtc, cancellationToken);
+            var decision = await ProcessAsync(delivery, users, taskTitles, settings, nowUtc, cancellationToken);
 
             // Sauvegarde après chaque email : un crash au milieu du lot ne renvoie pas ceux déjà partis.
             await db.SaveChangesAsync(cancellationToken);
+            processed++;
+
+            if (decision == BatchDecision.Stop)
+            {
+                break; // SMTP indisponible ou mal configuré : inutile de tenter les suivants
+            }
         }
 
-        return deliveries.Count;
+        return processed;
     }
 
-    private async Task ProcessAsync(
+    private async Task<BatchDecision> ProcessAsync(
         EmailDelivery delivery,
         Dictionary<string, ApplicationUser> users,
+        Dictionary<Guid, string> taskTitles,
         EmailDeliveryOptions settings,
         DateTime nowUtc,
         CancellationToken cancellationToken)
@@ -70,7 +81,13 @@ internal sealed partial class EmailDeliveryProcessor(
         {
             delivery.Expire();
             LogExpired(logger, delivery.Id);
-            return;
+            return BatchDecision.Continue;
+        }
+
+        if (!taskTitles.TryGetValue(notification.TaskId, out var taskTitle))
+        {
+            // Tâche mise à la corbeille entre les deux requêtes : le prochain cycle l'exclura via le filtre.
+            return BatchDecision.Continue;
         }
 
         if (!users.TryGetValue(notification.RecipientId, out var recipient)
@@ -78,44 +95,77 @@ internal sealed partial class EmailDeliveryProcessor(
         {
             delivery.MarkFailed("Le destinataire n'a pas d'adresse email.");
             LogNoAddress(logger, delivery.Id, notification.RecipientId);
-            return;
+            return BatchDecision.Continue;
         }
 
         if (!_composers.TryGetValue(notification.Type, out var composer))
         {
             delivery.MarkFailed($"Aucun email défini pour le type {notification.Type}.");
             LogNoComposer(logger, delivery.Id, notification.Type);
-            return;
+            return BatchDecision.Continue;
         }
 
         EmailMessage message;
         try
         {
-            message = await BuildMessageAsync(delivery, recipient, users, composer, settings);
+            message = await BuildMessageAsync(delivery, taskTitle, recipient, users, composer, settings);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // Erreur de template : réessayer ne la corrigera pas, l'envoi est abandonné.
             delivery.MarkFailed($"Rendu impossible : {ex.Message}");
             LogRenderFailed(logger, ex, delivery.Id);
-            return;
+            return BatchDecision.Continue;
         }
 
+        return await SendAsync(delivery, message, settings, nowUtc, cancellationToken);
+    }
+
+    private async Task<BatchDecision> SendAsync(
+        EmailDelivery delivery,
+        EmailMessage message,
+        EmailDeliveryOptions settings,
+        DateTime nowUtc,
+        CancellationToken cancellationToken)
+    {
         try
         {
             await transport.SendAsync(message, cancellationToken);
             delivery.MarkSent(nowUtc);
             LogSent(logger, delivery.Id, delivery.Attempts);
+            return BatchDecision.Continue;
+        }
+        catch (BrokenCircuitException)
+        {
+            // Aucune tentative réelle : on ne pénalise pas l'email, il reste Pending tel quel.
+            LogSmtpUnavailable(logger);
+            return BatchDecision.Stop;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            delivery.ScheduleRetry(nowUtc, ex.Message, settings.MaxAttempts, settings.MaxBackoff);
-            LogSendFailed(logger, ex, delivery.Id, delivery.Attempts, delivery.Status);
+            switch (SmtpErrorClassifier.Classify(ex))
+            {
+                case SmtpFailureKind.Permanent:
+                    delivery.MarkFailed(ex.Message);
+                    LogPermanentFailure(logger, ex, delivery.Id);
+                    return BatchDecision.Continue;
+
+                case SmtpFailureKind.Configuration:
+                    // L'email n'y est pour rien : pas de tentative comptée, alerte critique.
+                    LogSmtpMisconfigured(logger, ex);
+                    return BatchDecision.Stop;
+
+                default:
+                    delivery.ScheduleRetry(nowUtc, ex.Message, settings.MaxAttempts, settings.MaxBackoff);
+                    LogSendFailed(logger, ex, delivery.Id, delivery.Attempts, delivery.Status);
+                    return BatchDecision.Continue;
+            }
         }
     }
 
     private async Task<EmailMessage> BuildMessageAsync(
         EmailDelivery delivery,
+        string taskTitle,
         ApplicationUser recipient,
         Dictionary<string, ApplicationUser> users,
         INotificationEmailComposer composer,
@@ -129,6 +179,7 @@ internal sealed partial class EmailDeliveryProcessor(
 
         var context = new NotificationEmailContext(
             notification,
+            taskTitle,
             DisplayName(recipient),
             actorName,
             settings.AppBaseUrl);
@@ -163,11 +214,37 @@ internal sealed partial class EmailDeliveryProcessor(
             .ToDictionaryAsync(u => u.Id, StringComparer.Ordinal, cancellationToken);
     }
 
+    private static async Task<Dictionary<Guid, string>> LoadTaskTitlesAsync(
+        ApplicationDbContext db,
+        List<EmailDelivery> deliveries,
+        CancellationToken cancellationToken)
+    {
+        var taskIds = deliveries
+            .Select(d => d.Notification.TaskId)
+            .Distinct()
+            .ToList();
+
+        return await db.Tasks
+            .TagWith("EmailDeliveryProcessor : titres des tâches")
+            .Where(t => taskIds.Contains(t.Id))
+            .Select(t => new { t.Id, t.Title })
+            .ToDictionaryAsync(t => t.Id, t => t.Title, cancellationToken);
+    }
+
     [LoggerMessage(Level = LogLevel.Information, Message = "Email {DeliveryId} envoyé (tentative {Attempts})")]
     private static partial void LogSent(ILogger logger, Guid deliveryId, int attempts);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Échec d'envoi de l'email {DeliveryId} (tentative {Attempts}, statut {Status})")]
     private static partial void LogSendFailed(ILogger logger, Exception exception, Guid deliveryId, int attempts, EmailDeliveryStatus status);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Email {DeliveryId} refusé définitivement par le serveur")]
+    private static partial void LogPermanentFailure(ILogger logger, Exception exception, Guid deliveryId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "SMTP indisponible (circuit ouvert) : lot interrompu, nouvel essai plus tard")]
+    private static partial void LogSmtpUnavailable(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Critical, Message = "Configuration SMTP invalide (identifiants ou TLS) : aucun email ne peut partir")]
+    private static partial void LogSmtpMisconfigured(ILogger logger, Exception exception);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Email {DeliveryId} expiré, non envoyé")]
     private static partial void LogExpired(ILogger logger, Guid deliveryId);
