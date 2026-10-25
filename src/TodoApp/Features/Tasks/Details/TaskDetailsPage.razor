@@ -7,6 +7,7 @@
 @using TodoApp.Features.Users
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
+@using TodoApp.Features.Tasks.Attachments
 
 <PageTitle>@(_task?.Title ?? "Tâche") · TodoApp</PageTitle>
 
@@ -40,10 +41,10 @@ else
                 <h1 class="td-title">@_task.Title</h1>
 
                 <div class="td-actions">
-                    <button type="button" class="td-icon-btn" title="Joindre un fichier (bientôt)" disabled>
+                    <label for="@TaskAttachmentsPanel.InputId" class="td-icon-btn" title="Joindre un fichier">
                         <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5" /></svg>
                         <span>Joindre</span>
-                    </button>
+                    </label>
                     <button type="button" class="td-icon-btn" title="Ajouter une étape (bientôt)" disabled>
                         <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 11 3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
                         <span>Étape</span>
@@ -66,17 +67,10 @@ else
                     }
                 </section>
 
-                <details class="td-section td-collapsible" open>
-                    <summary>
-                        <h2 class="td-section-title">Pièces jointes</h2>
-                        <span class="td-count">0</span>
-                    </summary>
-                    <div class="td-dropzone" aria-disabled="true">
-                        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" /></svg>
-                        <p>Glissez des fichiers ici ou <span class="td-link">parcourez</span></p>
-                        <small>Bientôt disponible</small>
-                    </div>
-                </details>
+                <TaskAttachmentsPanel @key="_task.Id"
+                      TaskId="_task.Id"
+                      TaskCreatorId="@_task.CreatedById"
+                      OnChanged="OnAttachmentsChanged" />
 
                 <details class="td-section td-collapsible" open>
                     <summary>
@@ -117,7 +111,7 @@ else
                         }
                         else
                         {
-                            <TaskActivityFeed TaskId="_task.Id" />
+                            <TaskActivityFeed @key="_activityVersion" TaskId="_task.Id" />
                         }
                     </div>
                 </section>

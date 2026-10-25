@@ -1,0 +1,108 @@
+@using TodoApp.Domain.Tasks
+@using TodoApp.Features.Notifications.Shared
+@using TodoApp.Features.Shared.Formatting
+@using TodoApp.Features.Tasks.Attachments.Download
+@using TodoApp.Features.Tasks.Attachments.List
+@using TodoApp.Features.Tasks.Attachments
+
+<details class="td-section td-collapsible" open>
+    <summary>
+        <h2 class="td-section-title">Pièces jointes</h2>
+        <span class="td-count">@(_items?.Length ?? 0)</span>
+    </summary>
+
+    <label class="att-dropzone @(_isDragOver ? "is-dragover" : null) @(IsFull ? "is-disabled" : null)"
+           @ondragenter="() => _isDragOver = true"
+           @ondragleave="() => _isDragOver = false"
+           @ondrop="() => _isDragOver = false">
+
+        <InputFile id="@InputId" multiple accept="@Accept" class="att-file-input"
+                   OnChange="OnFilesSelectedAsync" disabled="@(IsFull || _isUploading)" />
+
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" />
+        </svg>
+
+        @if (IsFull)
+        {
+            <p>Limite de @TaskItem.MaxAttachments pièces jointes atteinte.</p>
+        }
+        else if (_isUploading)
+        {
+            <p>Envoi en cours…</p>
+        }
+        else
+        {
+            <p>Glissez des fichiers ici ou <span class="td-link">parcourez</span></p>
+            <small>PDF, images, Office, texte, ZIP · 10 Mo maximum par fichier</small>
+        }
+    </label>
+
+    @if (_uploads.Count > 0)
+    {
+        <ul class="att-uploads" aria-live="polite">
+            @foreach (var upload in _uploads)
+            {
+                <li class="att-upload @upload.CssClass" @key="upload.Id">
+                    <span class="att-upload-name">@upload.FileName</span>
+                    <span class="att-upload-status">@upload.StatusText</span>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (_items is null)
+    {
+        <p class="td-empty">Chargement…</p>
+    }
+    else if (_items.Length == 0)
+    {
+        <p class="td-empty">Aucune pièce jointe.</p>
+    }
+    else
+    {
+        <ul class="att-list">
+            @foreach (var attachment in _items)
+            {
+                <li class="att-item" @key="attachment.Id">
+                    <span class="att-icon att-icon-@Kind(attachment)" aria-hidden="true">@Badge(attachment)</span>
+
+                    <div class="att-body">
+                        @* « download » : le routeur Blazor laisse le navigateur appeler l'endpoint. *@
+                        <a class="att-name" href="@AttachmentEndpoints.DownloadUrl(TaskId, attachment.Id)"
+                           download="@attachment.FileName" title="Télécharger @attachment.FileName">
+                            @attachment.FileName
+                        </a>
+                        <span class="att-meta">
+                            @FileSize.Format(attachment.SizeBytes)
+                            · @attachment.UploadedByName
+                            · @NotificationFormatter.Ago(attachment.UploadedAtUtc, _nowUtc)
+                        </span>
+                    </div>
+
+                    @if (CanDelete(attachment))
+                    {
+                        @if (_confirmDeleteId == attachment.Id)
+                        {
+                            <span class="att-confirm">
+                                Supprimer ?
+                                <button type="button" class="att-confirm-yes" @onclick="() => DeleteAsync(attachment)">Oui</button>
+                                <button type="button" class="att-confirm-no" @onclick="() => _confirmDeleteId = null">Non</button>
+                            </span>
+                        }
+                        else
+                        {
+                            <button type="button" class="att-delete" title="Supprimer"
+                                    aria-label="@($"Supprimer {attachment.FileName}")"
+                                    @onclick="() => _confirmDeleteId = attachment.Id">
+                                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" />
+                                </svg>
+                            </button>
+                        }
+                    }
+                </li>
+            }
+        </ul>
+    }
+</details>

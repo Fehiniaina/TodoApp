@@ -8,6 +8,7 @@ namespace TodoApp.Features.Tasks.Details;
 public sealed partial class TaskDetailsPage
 {
     private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
+    private int _activityVersion;
 
     private static readonly (ActivityTab Value, string Label)[] Tabs =
     [
@@ -62,4 +63,6 @@ public sealed partial class TaskDetailsPage
             .Split([' ', '@', '.'], StringSplitOptions.RemoveEmptyEntries)
             .Take(2)
             .Select(part => char.ToUpperInvariant(part[0])));
+
+    private void OnAttachmentsChanged() => _activityVersion++;
 }
