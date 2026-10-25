@@ -453,6 +453,62 @@ namespace TodoApp.Data.Migrations
                     b.ToTable("task_activities", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Tasks.Attachments.TaskAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("storage_key");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("task_id");
+
+                    b.Property<DateTime>("UploadedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("uploaded_at_utc");
+
+                    b.Property<string>("UploadedById")
+                        .HasColumnType("text")
+                        .HasColumnName("uploaded_by_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_task_attachments");
+
+                    b.HasIndex("StorageKey")
+                        .IsUnique()
+                        .HasDatabaseName("ix_task_attachments_storage_key");
+
+                    b.HasIndex("UploadedById")
+                        .HasDatabaseName("ix_task_attachments_uploaded_by_id");
+
+                    b.HasIndex("TaskId", "UploadedAtUtc")
+                        .HasDatabaseName("ix_task_attachments_task_id_uploaded_at_utc");
+
+                    b.ToTable("task_attachments", (string)null);
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Tasks.Recurrence.RecurringTask", b =>
                 {
                     b.Property<Guid>("Id")
@@ -780,6 +836,24 @@ namespace TodoApp.Data.Migrations
                     b.Navigation("Task");
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Tasks.Attachments.TaskAttachment", b =>
+                {
+                    b.HasOne("TodoApp.Domain.Tasks.TaskItem", "Task")
+                        .WithMany("Attachments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_task_attachments_tasks_task_id");
+
+                    b.HasOne("TodoApp.Data.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UploadedById")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_task_attachments_asp_net_users_uploaded_by_id");
+
+                    b.Navigation("Task");
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Tasks.TaskItem", b =>
                 {
                     b.HasOne("TodoApp.Data.ApplicationUser", null)
@@ -837,6 +911,11 @@ namespace TodoApp.Data.Migrations
             modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>
                 {
                     b.Navigation("Email");
+                });
+
+            modelBuilder.Entity("TodoApp.Domain.Tasks.TaskItem", b =>
+                {
+                    b.Navigation("Attachments");
                 });
 #pragma warning restore 612, 618
         }

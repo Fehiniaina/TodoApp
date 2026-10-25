@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TodoApp.Domain.Notifications;
+using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Events;
 
 namespace TodoApp.IntegrationTests.Domain.Notifications;
@@ -55,5 +56,16 @@ public sealed class NotificationMapperTests
         notification.MarkAsRead(Now.AddMinutes(10));
 
         Assert.Equal(Now.AddMinutes(5), notification.ReadAtUtc);
+    }
+
+    [Fact]
+    public void Imported_assignment_creates_notification_without_email()
+    {
+        var evt = new TaskAssigned(TaskId, "alice", null, "bob", Now, AssignmentOrigin.Import);
+
+        var notification = NotificationMapper.ToNotification(evt);
+
+        Assert.NotNull(notification);
+        Assert.Null(notification.Email);
     }
 }

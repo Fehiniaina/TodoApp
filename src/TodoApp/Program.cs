@@ -14,12 +14,15 @@ using TodoApp.Features.Notifications;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tasks.Import;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
 using TodoApp.Infrastructure.Email.Templating;
 using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
+using TodoApp.Features.Tasks.Attachments;
+using TodoApp.Features.Tasks.Attachments.Download;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -127,6 +130,7 @@ builder.Services.AddHsts(options =>
 builder.Services.AddEmailTemplating();
 builder.Services.AddNotificationFeatures(builder.Configuration);
 builder.Services.AddAccountEmails();
+builder.Services.AddAttachmentFeatures(builder.Configuration);
 
 var app = builder.Build();
 
@@ -152,13 +156,17 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
-
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
 app.UseHsts();
 app.UseHttpsRedirection();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.MapAdditionalIdentityEndpoints();
+app.MapTaskImportEndpoints();
+app.MapAttachmentEndpoints();
 
 await app.RunAsync();

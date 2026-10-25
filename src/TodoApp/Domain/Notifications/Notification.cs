@@ -42,7 +42,8 @@ internal sealed class Notification
         string recipientId,
         Guid taskId,
         string? actorId,
-        DateTime occurredAtUtc)
+        DateTime occurredAtUtc,
+        bool sendEmail = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(recipientId);
 
@@ -58,7 +59,10 @@ internal sealed class Notification
             actorId,
             EnsureUtc(occurredAtUtc));
 
-        notification.Email = EmailDelivery.Schedule(notification.CreatedAtUtc);
+        if (sendEmail)
+        {
+            notification.Email = EmailDelivery.Schedule(notification.CreatedAtUtc);
+        }
 
         return notification;
     }

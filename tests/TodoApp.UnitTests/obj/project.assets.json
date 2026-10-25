@@ -123,6 +123,19 @@
           "build/netstandard2.0/coverlet.collector.targets": {}
         }
       },
+      "CsvHelper/33.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/net9.0/CsvHelper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/CsvHelper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "EFCore.NamingConventions/10.0.1": {
         "type": "package",
         "dependencies": {
@@ -1056,6 +1069,22 @@
           "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets": {}
         }
       },
+      "Microsoft.Extensions.TimeProvider.Testing/10.11.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "Microsoft.Extensions.Validation/10.0.10": {
         "type": "package",
         "dependencies": {
@@ -1821,6 +1850,7 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "Bogus": "35.6.5",
+          "CsvHelper": "33.1.0",
           "EFCore.NamingConventions": "10.0.1",
           "FluentValidation.DependencyInjectionExtensions": "12.2.0",
           "MailKit": "4.18.1",
@@ -2064,6 +2094,32 @@
         "coverlet-icon.png",
         "coverlet.collector.6.0.4.nupkg.sha512",
         "coverlet.collector.nuspec"
+      ]
+    },
+    "CsvHelper/33.1.0": {
+      "sha512": "kqfTOZGrn7NarNeXgjh86JcpTHUoeQDMB8t9NVa/ZtlSYiV1rxfRnQ49WaJsob4AiGrbK0XDzpyKkBwai4F8eg==",
+      "type": "package",
+      "path": "csvhelper/33.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "csvhelper.33.1.0.nupkg.sha512",
+        "csvhelper.nuspec",
+        "lib/net462/CsvHelper.dll",
+        "lib/net462/CsvHelper.xml",
+        "lib/net47/CsvHelper.dll",
+        "lib/net47/CsvHelper.xml",
+        "lib/net48/CsvHelper.dll",
+        "lib/net48/CsvHelper.xml",
+        "lib/net8.0/CsvHelper.dll",
+        "lib/net8.0/CsvHelper.xml",
+        "lib/net9.0/CsvHelper.dll",
+        "lib/net9.0/CsvHelper.xml",
+        "lib/netstandard2.0/CsvHelper.dll",
+        "lib/netstandard2.0/CsvHelper.xml",
+        "lib/netstandard2.1/CsvHelper.dll",
+        "lib/netstandard2.1/CsvHelper.xml"
       ]
     },
     "EFCore.NamingConventions/10.0.1": {
@@ -3422,6 +3478,29 @@
         "microsoft.extensions.telemetry.abstractions.nuspec"
       ]
     },
+    "Microsoft.Extensions.TimeProvider.Testing/10.11.0": {
+      "sha512": "DTivKZ2Du0dJideTTa6vPj/eXKNRu+RxtjBX7NOOUXHBtHx1ehbE+lM+j3/5M3wU6BqzcZqEEyR4+FnPKs2rTA==",
+      "type": "package",
+      "path": "microsoft.extensions.timeprovider.testing/10.11.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "README.md",
+        "buildTransitive/net462/Microsoft.Extensions.TimeProvider.Testing.targets",
+        "buildTransitive/net8.0/_._",
+        "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net10.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net9.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net9.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "microsoft.extensions.timeprovider.testing.10.11.0.nupkg.sha512",
+        "microsoft.extensions.timeprovider.testing.nuspec"
+      ]
+    },
     "Microsoft.Extensions.Validation/10.0.10": {
       "sha512": "d77zBZk+Z4uo6hEuLvMY+yMjLkn2T/vX5c2sB0sdoSxQVZk7qvec6SuORp2/uZp7UchX4hNp+VJm4GsoSE0waA==",
       "type": "package",
@@ -4386,6 +4465,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "Meziantou.Analyzer >= 2.0.257",
+      "Microsoft.Extensions.TimeProvider.Testing >= 10.11.0",
       "Microsoft.NET.Test.Sdk >= 17.14.1",
       "Moq >= 4.21.0",
       "Roslynator.Analyzers >= 4.14.1",
@@ -4459,6 +4539,10 @@
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "target": "Package",
             "version": "[2.0.257, )"
+          },
+          "Microsoft.Extensions.TimeProvider.Testing": {
+            "target": "Package",
+            "version": "[10.11.0, )"
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",

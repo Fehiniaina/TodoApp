@@ -335,3 +335,236 @@
     color: #fff;
     background: var(--td-accent);
 }
+
+a.td-icon-btn {
+    text-decoration: none;
+}
+
+
+/* ───── Pièces jointes ───── */
+.att-dropzone {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+    padding: 1.25rem;
+    text-align: center;
+    color: var(--td-muted);
+    border: 2px dashed var(--td-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+    .att-dropzone:hover,
+    .att-dropzone:focus-within,
+    .att-dropzone.is-dragover {
+        border-color: var(--td-accent);
+        background: var(--td-accent-subtle);
+    }
+
+    .att-dropzone.is-disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .att-dropzone p {
+        margin: 0;
+    }
+
+    .att-dropzone svg,
+    .att-delete svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+/* L'input couvre toute la zone : clic et dépôt natifs du navigateur. */
+.att-file-input {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: inherit;
+}
+
+/* Envois en cours */
+.att-uploads {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+}
+
+.att-upload {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 6px;
+}
+
+.att-upload-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.att-upload.is-pending {
+    color: var(--td-muted);
+    background: var(--td-subtle);
+}
+
+.att-upload.is-done {
+    color: #216e4e;
+    background: #dcfff1;
+}
+
+.att-upload.is-error {
+    color: #ae2e24;
+    background: #ffeceb;
+}
+
+/* Liste */
+.att-list {
+    display: grid;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.att-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--td-border);
+    border-radius: 8px;
+}
+
+    .att-item:hover {
+        background: var(--td-subtle);
+    }
+
+.att-icon {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    color: #fff;
+    border-radius: 6px;
+}
+
+.att-icon-pdf {
+    background: #c9372c;
+}
+
+.att-icon-image {
+    background: #6e5dc6;
+}
+
+.att-icon-doc {
+    background: #0c66e4;
+}
+
+.att-icon-sheet {
+    background: #22a06b;
+}
+
+.att-icon-slide {
+    background: #e56910;
+}
+
+.att-icon-zip {
+    background: #626f86;
+}
+
+.att-icon-text {
+    background: #44546f;
+}
+
+.att-body {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+}
+
+.att-name {
+    overflow: hidden;
+    font-weight: 600;
+    color: var(--td-text);
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .att-name:hover {
+        color: var(--td-accent);
+        text-decoration: underline;
+    }
+
+.att-meta {
+    font-size: 0.75rem;
+    color: var(--td-muted);
+}
+
+.att-delete {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    color: var(--td-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .att-delete:hover {
+        color: #ae2e24;
+        background: #ffeceb;
+    }
+
+.att-confirm {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+}
+
+    .att-confirm button {
+        padding: 0.125rem 0.5rem;
+        font: inherit;
+        font-weight: 600;
+        border: 1px solid var(--td-border);
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+.att-confirm-yes {
+    color: #fff;
+    background: #c9372c;
+    border-color: #c9372c !important;
+}
+
+.att-confirm-no {
+    background: var(--td-surface);
+}
+
+/* Le bouton « Joindre » est un label : même apparence que les autres boutons. */
+label.td-icon-btn {
+    margin: 0;
+}

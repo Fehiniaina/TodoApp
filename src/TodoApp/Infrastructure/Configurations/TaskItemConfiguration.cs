@@ -15,6 +15,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         ConfigureChecklist(builder);
         ConfigureRecurrence(builder);
         ConfigureAssignment(builder);
+        ConfigureAttachments(builder);
     }
 
     private static void ConfigureProperties(EntityTypeBuilder<TaskItem> builder)
@@ -85,5 +86,17 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 
         builder.HasIndex(t => t.AssigneeId)
                .HasFilter("is_deleted = false AND assignee_id IS NOT NULL");
+    }
+
+    private static void ConfigureAttachments(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.HasMany(t => t.Attachments)
+            .WithOne(a => a.Task)
+            .HasForeignKey(a => a.TaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(t => t.Attachments)
+            .HasField("_attachments")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

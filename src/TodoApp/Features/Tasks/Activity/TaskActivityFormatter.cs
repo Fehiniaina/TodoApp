@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Features.Tasks.Shared;
@@ -28,6 +29,8 @@ public static class TaskActivityFormatter
 
             TaskActivityType.StatusChanged
                 => $"{a.ActorName} a déplacé la tâche de « {StatusLabel(a.OldValue)} » à « {StatusLabel(a.NewValue)} »",
+            TaskActivityType.AttachmentAdded => $"{a.ActorName} a ajouté la pièce jointe « {a.NewValue} »",
+            TaskActivityType.AttachmentRemoved => $"{a.ActorName} a supprimé la pièce jointe « {a.OldValue} »",
 
             _ => $"{a.ActorName} a modifié la tâche",
         };
