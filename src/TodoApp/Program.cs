@@ -22,6 +22,7 @@ using TodoApp.Infrastructure.Email.Templating;
 using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
 using TodoApp.Features.Tasks.Attachments;
+using TodoApp.Features.Tasks.Attachments.Download;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -155,9 +156,6 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
-
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
@@ -169,5 +167,6 @@ app.MapRazorComponents<App>()
 
 app.MapAdditionalIdentityEndpoints();
 app.MapTaskImportEndpoints();
+app.MapAttachmentEndpoints();
 
 await app.RunAsync();
