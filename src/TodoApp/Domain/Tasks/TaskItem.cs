@@ -1,4 +1,5 @@
 using TodoApp.Domain.Common;
+using TodoApp.Domain.Tasks.Attachments;
 using TodoApp.Domain.Tasks.Events;
 using TodoApp.Domain.Tasks.Exceptions;
 
@@ -47,6 +48,12 @@ internal sealed class TaskItem : AggregateRoot
     /// <summary>Étapes triées par position (alloue une nouvelle liste).</summary>
     public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
         [.. _checklist.OrderBy(i => i.Position)];
+
+    public const int MaxAttachments = 10;
+
+    private readonly List<TaskAttachment> _attachments = [];
+
+    public IReadOnlyCollection<TaskAttachment> Attachments => _attachments.AsReadOnly();
 
     public static TaskItem Create(string createdById, string title, string? description,
                               TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
@@ -186,6 +193,38 @@ internal sealed class TaskItem : AggregateRoot
         return task;
     }
 
+    public TaskAttachment AddAttachment(
+        string fileName,
+        string contentType,
+        long sizeBytes,
+        string storageKey,
+        string actorId,
+        DateTime nowUtc)
+    {
+        if (_attachments.Count >= MaxAttachments)
+        {
+            throw new InvalidOperationException($"Une tâche ne peut pas avoir plus de {MaxAttachments} pièces jointes.");
+        }
+
+        var attachment = TaskAttachment.Create(Id, fileName, contentType, sizeBytes, storageKey, actorId, EnsureUtc(nowUtc));
+        _attachments.Add(attachment);
+
+        Raise(new TaskAttachmentAdded(Id, actorId, attachment.Id, attachment.FileName, nowUtc));
+        return attachment;
+    }
+
+    /// <summary>Retire la pièce jointe. L'appelant supprime le fichier <b>après</b> le commit.</summary>
+    public TaskAttachment RemoveAttachment(Guid attachmentId, string actorId, DateTime nowUtc)
+    {
+        var attachment = _attachments.Find(a => a.Id == attachmentId)
+            ?? throw new InvalidOperationException($"La pièce jointe {attachmentId} n'appartient pas à cette tâche.");
+
+        _attachments.Remove(attachment);
+
+        Raise(new TaskAttachmentRemoved(Id, actorId, attachment.Id, attachment.FileName, EnsureUtc(nowUtc)));
+        return attachment;
+    }
+
     private static string NormalizeTitle(string title)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
@@ -200,12 +239,14 @@ internal sealed class TaskItem : AggregateRoot
         ? priority
         : throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown task priority.");
 
-    private static void EnsureUtc(DateTime value)
+    private static DateTime EnsureUtc(DateTime value)
     {
         if (value.Kind != DateTimeKind.Utc)
         {
             throw new ArgumentException("Timestamp must be in UTC.", nameof(value));
         }
+
+        return value;
     }
 
     private static TaskItem New(string createdById, string title, string? description,

@@ -5,4 +5,6 @@ public enum TaskActivityType
     Created,
     Assigned,
     StatusChanged,
+    AttachmentAdded,
+    AttachmentRemoved,
 }

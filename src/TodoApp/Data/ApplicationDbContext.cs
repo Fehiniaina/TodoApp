@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoApp.Domain.Notifications;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Activity;
+using TodoApp.Domain.Tasks.Attachments;
 using TodoApp.Domain.Tasks.Recurrence;
 using TodoApp.Infrastructure.Configurations;
 
@@ -16,6 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     internal DbSet<TaskActivity> TaskActivities => Set<TaskActivity>();
     internal DbSet<Notification> Notifications => Set<Notification>();
     internal DbSet<EmailDelivery> EmailDeliveries => Set<EmailDelivery>();
+    internal DbSet<TaskAttachment> TaskAttachments => Set<TaskAttachment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

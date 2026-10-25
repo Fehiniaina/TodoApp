@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2p4CAFi4oXw=",
+  "dgSpecHash": "IqeWGPjsoDA=",
   "success": true,
   "projectFilePath": "C:\\dev\\TodoApp\\tests\\TodoApp.UnitTests\\TodoApp.UnitTests.csproj",
   "expectedPackageFiles": [
@@ -66,6 +66,7 @@
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.13\\microsoft.extensions.primitives.10.0.13.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.extensions.resilience\\10.11.0\\microsoft.extensions.resilience.10.11.0.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.extensions.telemetry.abstractions\\10.11.0\\microsoft.extensions.telemetry.abstractions.10.11.0.nupkg.sha512",
+    "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.extensions.timeprovider.testing\\10.11.0\\microsoft.extensions.timeprovider.testing.10.11.0.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.extensions.validation\\10.0.10\\microsoft.extensions.validation.10.0.10.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.jsinterop\\10.0.10\\microsoft.jsinterop.10.0.10.nupkg.sha512",
     "C:\\Users\\FehiniainaRAHARINIVO\\.nuget\\packages\\microsoft.jsinterop.webassembly\\10.0.10\\microsoft.jsinterop.webassembly.10.0.10.nupkg.sha512",

@@ -21,6 +21,7 @@ using TodoApp.Infrastructure.Configurations;
 using TodoApp.Infrastructure.Email.Templating;
 using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
+using TodoApp.Features.Tasks.Attachments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,6 +129,7 @@ builder.Services.AddHsts(options =>
 builder.Services.AddEmailTemplating();
 builder.Services.AddNotificationFeatures(builder.Configuration);
 builder.Services.AddAccountEmails();
+builder.Services.AddAttachmentFeatures(builder.Configuration);
 
 var app = builder.Build();
 
