@@ -151,7 +151,11 @@ internal sealed class TaskItem : AggregateRoot
         Raise(new TaskStatusChanged(Id, actorId, previous, newStatus, nowUtc));
     }
 
-    public void AssignTo(string? assigneeId, string actorId, DateTime nowUtc)
+    public void AssignTo(
+        string? assigneeId,
+        string actorId,
+        DateTime nowUtc,
+        AssignmentOrigin origin = AssignmentOrigin.Manual)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
         EnsureUtc(nowUtc);
@@ -169,7 +173,7 @@ internal sealed class TaskItem : AggregateRoot
         var previous = AssigneeId;
         AssigneeId = assigneeId;
 
-        Raise(new TaskAssigned(Id, actorId, previous, assigneeId, nowUtc));
+        Raise(new TaskAssigned(Id, actorId, previous, assigneeId, nowUtc, origin));
     }
 
     public static TaskItem CreateOccurrence(string createdById, string title, string? description,

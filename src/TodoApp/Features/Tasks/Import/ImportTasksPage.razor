@@ -1,0 +1,140 @@
+@page "/tasks/import"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
+@using TodoApp.Features.Tasks.Shared
+
+<PageTitle>Importer des tâches · TodoApp</PageTitle>
+
+<div class="imp-page">
+    <nav class="td-breadcrumb" aria-label="Fil d'Ariane">
+        <a href="">Accueil</a>
+        <span aria-hidden="true">/</span>
+        <a href="tasks">Mes tâches</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Import</span>
+    </nav>
+
+    <h1 class="imp-title">Importer des tâches</h1>
+    <p class="imp-lead">
+        Chargez un fichier CSV : vous verrez un aperçu de chaque ligne avant de confirmer.
+        <a href="@TemplateUrl" download class="td-link">Télécharger le modèle</a>
+    </p>
+
+    @if (_preview is null)
+    {
+        <label class="imp-dropzone @(_isReading ? "is-busy" : null)">
+            <InputFile OnChange="OnFileSelectedAsync" accept=".csv,text/csv" class="imp-file-input" disabled="@_isReading" />
+
+            <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" />
+            </svg>
+
+            @if (_isReading)
+            {
+                <strong>Lecture du fichier…</strong>
+            }
+            else
+            {
+                <strong>Déposez votre fichier CSV ici <span class="td-link">ou parcourez</span></strong>
+                <small>2 Mo et @TaskCsvParser.MaxRows lignes maximum · séparateur « ; » ou « , » · encodage UTF-8</small>
+            }
+        </label>
+
+        @if (_fileError is not null)
+        {
+            <p class="imp-alert imp-alert-error" role="alert">@_fileError</p>
+        }
+    }
+    else
+    {
+        <div class="imp-summary">
+            <div>
+                <strong>@_fileName</strong>
+                <span class="imp-muted">· @_preview.Rows.Count ligne(s)</span>
+                @if (_preview.InvalidCount > 0)
+                {
+                    <span class="imp-badge imp-badge-error">@_preview.InvalidCount en erreur</span>
+                }
+                else if (_preview.CanImport)
+                {
+                    <span class="imp-badge imp-badge-ok">Prêt à importer</span>
+                }
+            </div>
+
+            <div class="imp-actions">
+                <button type="button" class="td-icon-btn" @onclick="Reset" disabled="@_isImporting">
+                    Choisir un autre fichier
+                </button>
+                <button type="button" class="imp-btn-primary" @onclick="ImportAsync"
+                        disabled="@(!_preview.CanImport || _isImporting)">
+                    @(_isImporting ? "Import en cours…" : $"Importer {_preview.Rows.Count} tâche(s)")
+                </button>
+            </div>
+        </div>
+
+        @foreach (var error in _preview.FileErrors)
+        {
+            <p class="imp-alert imp-alert-error" role="alert">@error</p>
+        }
+
+        @if (_preview.InvalidCount > 0)
+        {
+            <p class="imp-alert imp-alert-warning">
+                Corrigez les lignes en rouge dans votre fichier, puis rechargez-le. Rien n'est importé tant qu'une ligne est en erreur.
+            </p>
+        }
+
+        @if (_preview.Rows.Count > 0)
+        {
+            <div class="imp-table-wrapper">
+                <table class="imp-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ligne</th>
+                            <th scope="col">Titre</th>
+                            <th scope="col">Priorité</th>
+                            <th scope="col">Échéance</th>
+                            <th scope="col">Assigné</th>
+                            <th scope="col">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in _preview.Rows)
+                        {
+                            <tr class="@(row.IsValid ? null : "is-invalid")" @key="row.LineNumber">
+                                <td class="imp-muted">@row.LineNumber</td>
+                                <td>
+                                    <div class="imp-cell-title">@row.Title</div>
+                                    @if (row.Description is not null)
+                                    {
+                                        <div class="imp-cell-desc">@row.Description</div>
+                                    }
+                                </td>
+                                <td><PriorityIcon Priority="row.Priority" /> @row.Priority.ToLabel()</td>
+                                <td>@(row.DueDate?.ToString("d MMM yyyy", French) ?? "—")</td>
+                                <td>@(row.AssigneeName ?? row.AssigneeEmail ?? "—")</td>
+                                <td>
+                                    @if (row.IsValid)
+                                    {
+                                        <span class="imp-ok">✔ OK</span>
+                                    }
+                                    else
+                                    {
+                                        <ul class="imp-errors">
+                                            @foreach (var error in row.Errors)
+                                            {
+                                                <li>@error</li>
+                                            }
+                                        </ul>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+</div>

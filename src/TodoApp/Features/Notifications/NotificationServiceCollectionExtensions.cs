@@ -1,5 +1,5 @@
 using TodoApp.Features.Notifications.Email;
-using TodoApp.Features.Notifications.Email.TaskAssigned;
+using TodoApp.Features.Notifications.Email.Assignment;
 using TodoApp.Features.Notifications.Realtime;
 using TodoApp.Infrastructure.Email;
 using TodoApp.Infrastructure.Email.Resilience;

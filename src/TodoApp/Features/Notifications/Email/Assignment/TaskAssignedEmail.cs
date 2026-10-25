@@ -1,6 +1,6 @@
 using TodoApp.Infrastructure.Email.Templating;
 
-namespace TodoApp.Features.Notifications.Email.TaskAssigned;
+namespace TodoApp.Features.Notifications.Email.Assignment;
 
 public sealed record TaskAssignedEmail(
     string RecipientName,

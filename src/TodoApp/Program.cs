@@ -14,6 +14,7 @@ using TodoApp.Features.Notifications;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tasks.Import;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
@@ -160,5 +161,11 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check 
 
 app.UseHsts();
 app.UseHttpsRedirection();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.MapAdditionalIdentityEndpoints();
+app.MapTaskImportEndpoints();
 
 await app.RunAsync();
