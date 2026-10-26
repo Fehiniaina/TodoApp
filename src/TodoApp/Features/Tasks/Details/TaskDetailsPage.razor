@@ -38,7 +38,14 @@
 
                 @* ───── Colonne principale ───── *@
                 <article class="td-main">
-                    <h1 class="td-title">@_task.Title</h1>
+                    <h1 class="td-title">
+                        <InlineTextEditor Value="@_task.Title"
+                                          Label="Titre"
+                                          Required="true"
+                                          MaxLength="200"
+                                          InputCssClass="ie-input-title"
+                                          OnSave="SaveTitleAsync" />
+                    </h1>
 
                     <div class="td-actions">
                         <label for="@TaskAttachmentsPanel.InputId" class="td-icon-btn" title="Joindre un fichier">
@@ -57,14 +64,13 @@
 
                     <section class="td-section">
                         <h2 class="td-section-title">Description</h2>
-                        @if (string.IsNullOrWhiteSpace(_task.Description))
-                        {
-                            <p class="td-empty">Aucune description.</p>
-                        }
-                        else
-                        {
-                            <div class="td-description">@_task.Description</div>
-                        }
+                        <InlineTextEditor Value="@_task.Description"
+                                          Label="Description"
+                                          Multiline="true"
+                                          MaxLength="2000"
+                                          Placeholder="Ajouter une description…"
+                                          DisplayCssClass="td-description"
+                                          OnSave="SaveDescriptionAsync" />
                     </section>
 
                     <TaskAttachmentsPanel @key="_task.Id"

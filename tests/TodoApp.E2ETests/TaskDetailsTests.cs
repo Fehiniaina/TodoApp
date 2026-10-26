@@ -34,4 +34,43 @@ public sealed class TaskDetailsTests(E2EAppFixture app) : E2ETest(app)
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Tâche introuvable" })).ToBeVisibleAsync();
         await Expect(Page.GetByText("Tâche privée")).ToHaveCountAsync(0);
     }
+
+    [Fact]
+    public async Task User_renames_the_task_in_place()
+    {
+        var alice = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(alice, "Titre initial");
+        await SignInAsync(alice);
+        await Page.GotoAsync($"/tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        await Page.GetByRole(AriaRole.Heading, new() { Name = "Titre initial", Level = 1 }).ClickAsync();
+        var input = Page.GetByLabel("Titre", new() { Exact = true });
+        await input.FillAsync("Titre modifié");
+        await input.PressAsync("Enter");
+
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Titre modifié", Level = 1 })).ToBeVisibleAsync();
+
+        // Persisté : visible après rechargement complet de la page.
+        await Page.ReloadAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Titre modifié", Level = 1 })).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task Empty_title_is_refused_and_the_editor_stays_open()
+    {
+        var alice = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(alice, "Titre initial");
+        await SignInAsync(alice);
+        await Page.GotoAsync($"/tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        await Page.GetByRole(AriaRole.Heading, new() { Name = "Titre initial", Level = 1 }).ClickAsync();
+        var input = Page.GetByLabel("Titre", new() { Exact = true });
+        await input.FillAsync("   ");
+        await input.PressAsync("Enter");
+
+        await Expect(Page.GetByRole(AriaRole.Alert)).ToContainTextAsync("obligatoire");
+        await Expect(input).ToBeVisibleAsync();
+    }
 }

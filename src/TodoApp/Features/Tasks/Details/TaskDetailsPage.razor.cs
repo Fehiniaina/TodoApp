@@ -2,11 +2,14 @@ using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tasks.UpdateTask;
 
 namespace TodoApp.Features.Tasks.Details;
 
 public sealed partial class TaskDetailsPage
 {
+    [Inject] private UpdateTaskHandler UpdateHandler { get; set; } = null!;
+
     private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
     private int _activityVersion;
 
@@ -65,4 +68,38 @@ public sealed partial class TaskDetailsPage
             .Select(part => char.ToUpperInvariant(part[0])));
 
     private void OnAttachmentsChanged() => _activityVersion++;
+
+    private Task<string?> SaveTitleAsync(string? title) =>
+    UpdateContentAsync(title!, _task!.Description);
+
+    private Task<string?> SaveDescriptionAsync(string? description) =>
+        UpdateContentAsync(_task!.Title, description);
+
+    private async Task<string?> UpdateContentAsync(string title, string? description)
+    {
+        var task = _task!;
+        var result = await UpdateHandler.HandleAsync(
+            new UpdateTaskCommand(task.Id, title, description, task.Priority, task.DueDate));
+
+        if (result.IsFailure)
+        {
+            return result.Error.Message;
+        }
+
+        await ReloadAsync();
+        return null;
+    }
+
+    /// <summary>Recharge la tâche et l'historique après une modification.</summary>
+    private async Task ReloadAsync()
+    {
+        var result = await Handler.HandleAsync(TaskId);
+        if (result.IsSuccess)
+        {
+            _task = result.Value;
+        }
+
+        _activityVersion++;
+        StateHasChanged();
+    }
 }
