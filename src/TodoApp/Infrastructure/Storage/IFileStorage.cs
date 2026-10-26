@@ -11,4 +11,7 @@ internal interface IFileStorage
 
     /// <summary>Supprime le contenu. Sans effet s'il n'existe pas.</summary>
     Task DeleteAsync(string key, CancellationToken cancellationToken);
+
+    /// <summary>Énumère les fichiers stockés. Les fichiers temporaires ou étrangers sont ignorés.</summary>
+    IAsyncEnumerable<StoredFile> ListAsync(CancellationToken cancellationToken);
 }

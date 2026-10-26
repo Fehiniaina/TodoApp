@@ -11,6 +11,7 @@ using Npgsql;
 using Respawn;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tasks.Attachments.Cleanup;
 
 namespace TodoApp.E2ETests.Infrastructure;
 
@@ -141,5 +142,39 @@ public sealed class E2EAppFixture : IAsyncLifetime
         await db.SaveChangesAsync();
 
         return task.Id;
+    }
+
+    /// <summary>Simule le passage du temps sur les fichiers stockés (le délai de grâce compte sur leur date).</summary>
+    public void AgeStoredFiles(TimeSpan age)
+    {
+        if (!Directory.Exists(_storageRoot))
+        {
+            return;
+        }
+
+        foreach (var path in Directory.EnumerateFiles(_storageRoot, "*", SearchOption.AllDirectories))
+        {
+            File.SetLastWriteTimeUtc(path, DateTime.UtcNow - age);
+        }
+    }
+
+    public int StoredFileCount() =>
+        Directory.Exists(_storageRoot)
+            ? Directory.GetFiles(_storageRoot, "*", SearchOption.AllDirectories).Length
+            : 0;
+
+    public async Task PurgeTaskAsync(Guid taskId)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+        await using var db = await factory.CreateDbContextAsync();
+
+        await db.Tasks.IgnoreQueryFilters().Where(t => t.Id == taskId).ExecuteDeleteAsync();
+    }
+
+    public async Task<int> RunOrphanFileCleanupAsync()
+    {
+        var cleaner = _factory.Services.GetRequiredService<OrphanFileCleaner>();
+        return await cleaner.RunOnceAsync(CancellationToken.None);
     }
 }

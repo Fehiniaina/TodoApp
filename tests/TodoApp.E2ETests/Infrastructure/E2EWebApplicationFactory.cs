@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using TodoApp.Features.Notifications.Email;
+using TodoApp.Features.Tasks.Attachments.Cleanup;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
 using TodoApp.Infrastructure.Email;
@@ -20,6 +21,7 @@ internal sealed class E2EWebApplicationFactory(FakeEmailTransport emails) : WebA
         typeof(TrashPurgeService),
         typeof(RecurringTaskService),
         typeof(EmailDeliveryService),
+        typeof(OrphanFileCleanupService),
     ];
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

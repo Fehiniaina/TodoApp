@@ -23,6 +23,7 @@ using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
 using TodoApp.Features.Tasks.Attachments;
 using TodoApp.Features.Tasks.Attachments.Download;
+using TodoApp.Features.Tasks.Attachments.Cleanup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -131,6 +132,7 @@ builder.Services.AddEmailTemplating();
 builder.Services.AddNotificationFeatures(builder.Configuration);
 builder.Services.AddAccountEmails();
 builder.Services.AddAttachmentFeatures(builder.Configuration);
+builder.Services.AddOrphanFileCleanerOptions(builder.Configuration);
 
 var app = builder.Build();
 
