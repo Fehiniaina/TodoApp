@@ -12,6 +12,7 @@
     <InternalsVisibleTo Include="TodoApp.UnitTests" />
     <InternalsVisibleTo Include="TodoApp.IntegrationTests" />
     <InternalsVisibleTo Include="TodoApp.ArchitectureTests" />
+    <InternalsVisibleTo Include="TodoApp.E2ETests" />
   </ItemGroup>
   
   <ItemGroup>
