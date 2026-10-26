@@ -71,6 +71,9 @@ internal sealed partial class LocalFileStorage(
         return Task.CompletedTask;
     }
 
+    public IAsyncEnumerable<StoredFile> ListAsync(CancellationToken cancellationToken) =>
+        EnumerateFiles(cancellationToken).ToAsyncEnumerable();
+
     private string ResolvePath(string key)
     {
         if (!KeyPattern().IsMatch(key))
@@ -88,5 +91,27 @@ internal sealed partial class LocalFileStorage(
         }
 
         return path;
+    }
+
+    private IEnumerable<StoredFile> EnumerateFiles(CancellationToken cancellationToken)
+    {
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(options.Value.RootPath));
+        if (!Directory.Exists(root))
+        {
+            yield break;
+        }
+
+        foreach (var path in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var key = Path.GetRelativePath(root, path).Replace(Path.DirectorySeparatorChar, '/');
+
+            // Seulement les clés au format exact : on ne touche ni aux .uploading en cours, ni à un fichier étranger.
+            if (KeyPattern().IsMatch(key))
+            {
+                yield return new StoredFile(key, File.GetLastWriteTimeUtc(path));
+            }
+        }
     }
 }

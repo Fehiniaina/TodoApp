@@ -79,4 +79,31 @@ public sealed class AttachmentTests(E2EAppFixture app) : E2ETest(app)
 
         Assert.True(chooser.IsMultiple);
     }
+
+    [Fact]
+    public async Task Purged_task_leaves_no_file_on_disk()
+    {
+        var alice = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(alice, "Tâche à purger");
+        await SignInAsync(alice);
+        await Page.GotoAsync($"/tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        await Page.Locator("#task-attachment-input").SetInputFilesAsync(new FilePayload
+        {
+            Name = "devis.pdf",
+            MimeType = "application/pdf",
+            Buffer = Pdf,
+        });
+        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "devis.pdf" })).ToBeVisibleAsync();
+        Assert.Equal(1, App.StoredFileCount());
+
+        await App.PurgeTaskAsync(taskId);
+        App.AgeStoredFiles(TimeSpan.FromDays(1));
+
+        var deleted = await App.RunOrphanFileCleanupAsync();
+
+        Assert.Equal(1, deleted);
+        Assert.Equal(0, App.StoredFileCount());
+    }
 }

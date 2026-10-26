@@ -69,4 +69,26 @@ public sealed class LocalFileStorageTests : IDisposable
     {
         await Assert.ThrowsAsync<ArgumentException>(() => _storage.OpenReadAsync(key, CancellationToken.None));
     }
+
+    [Fact]
+    public async Task List_returns_saved_files_and_ignores_temporary_or_foreign_files()
+    {
+        var key = await _storage.SaveAsync(new MemoryStream([1, 2, 3]), CancellationToken.None);
+
+        Directory.CreateDirectory(Path.Combine(_root, "2026", "10"));
+        await File.WriteAllTextAsync(Path.Combine(_root, "2026", "10", $"{Guid.NewGuid():N}.uploading"), "en cours");
+        await File.WriteAllTextAsync(Path.Combine(_root, "notes.txt"), "étranger");
+
+        var files = await _storage.ListAsync(CancellationToken.None).ToListAsync();
+
+        var file = Assert.Single(files);
+        Assert.Equal(key, file.Key);
+        Assert.True(file.LastModifiedUtc > DateTime.UtcNow.AddMinutes(-1));
+    }
+
+    [Fact]
+    public async Task List_of_a_missing_root_is_empty()
+    {
+        Assert.Empty(await _storage.ListAsync(CancellationToken.None).ToListAsync());
+    }
 }
