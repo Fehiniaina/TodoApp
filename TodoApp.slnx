@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TodoApp.ArchitectureTests/TodoApp.ArchitectureTests.csproj" />
+    <Project Path="tests/TodoApp.E2ETests/TodoApp.E2ETests.csproj" />
     <Project Path="tests/TodoApp.IntegrationTests/TodoApp.IntegrationTests.csproj" />
     <Project Path="tests/TodoApp.UnitTests/TodoApp.UnitTests.csproj" />
   </Folder>
