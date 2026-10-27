@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Playwright;
 using TodoApp.E2ETests.Infrastructure;
 
@@ -73,4 +74,62 @@ public sealed class TaskDetailsTests(E2EAppFixture app) : E2ETest(app)
         await Expect(Page.GetByRole(AriaRole.Alert)).ToContainTextAsync("obligatoire");
         await Expect(input).ToBeVisibleAsync();
     }
+
+    [Fact]
+    public async Task Status_offers_only_allowed_transitions_and_is_saved()
+    {
+        var alice = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(alice, "Tâche à démarrer");
+        await SignInAsync(alice);
+        await Page.GotoAsync($"/tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        // Depuis « À faire », seul « En cours » est proposé (TaskWorkflow).
+        await Expect(Field("Statut").Locator("option")).ToHaveCountAsync(2);
+
+        await SaveFieldAsync(() => Field("Statut").SelectOptionAsync(new SelectOptionValue { Label = "En cours" }));
+
+        // Rendu par le serveur après l'enregistrement : couleur du badge et nouvelles transitions.
+        await Expect(Field("Statut")).ToHaveClassAsync(new Regex("lozenge-progress", RegexOptions.None, TimeSpan.FromSeconds(1)));
+        await Expect(Field("Statut").Locator("option")).ToHaveCountAsync(3); // En cours, En validation, À faire
+
+        await Page.ReloadAsync();
+        await WaitForInteractivityAsync();
+        await Expect(Field("Statut")).ToHaveValueAsync("InProgress");
+    }
+
+    [Fact]
+    public async Task User_assigns_the_task_to_himself_and_changes_priority_and_due_date()
+    {
+        var alice = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(alice, "Tâche à organiser");
+        await SignInAsync(alice);
+        await Page.GotoAsync($"/tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        await SaveFieldAsync(() => Page.GetByRole(AriaRole.Button, new() { Name = "M'assigner" }).ClickAsync());
+        await SaveFieldAsync(() => Field("Priorité").SelectOptionAsync(new SelectOptionValue { Label = "Haute" }));
+        await SaveFieldAsync(() => Field("Échéance").FillAsync("2026-12-15"));
+
+        await Page.ReloadAsync();
+        await WaitForInteractivityAsync();
+
+        await Expect(Field("Assigné")).ToHaveValueAsync(alice.Id);
+        await Expect(Field("Priorité")).ToHaveValueAsync("High");
+        await Expect(Field("Échéance")).ToHaveValueAsync("2026-12-15");
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "M'assigner" })).ToHaveCountAsync(0);
+    }
+
+    /// <summary>Fait une modification dans le panneau, puis attend que le serveur l'ait enregistrée et rechargée.</summary>
+    private async Task SaveFieldAsync(Func<Task> change)
+    {
+        var sidebar = Page.Locator("[data-fields-version]");
+        var before = await sidebar.GetAttributeAsync("data-fields-version");
+
+        await change();
+
+        await Expect(sidebar).Not.ToHaveAttributeAsync("data-fields-version", before!);
+    }
+
+    private ILocator Field(string label) => Page.GetByLabel(label, new() { Exact = true });
 }

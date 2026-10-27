@@ -124,24 +124,47 @@
                 </article>
 
                 @* ───── Panneau latéral ───── *@
-                <aside class="td-sidebar">
-                    <div class="td-status">
-                        <span class="lozenge @_task.Status.ToLozengeCss()">@_task.Status.ToLabel()</span>
+                <aside class="td-sidebar" data-fields-version="@_fieldsVersion">
+                    <div class="td-status" @key="_fieldsVersion">
+                        <label for="field-status" class="visually-hidden">Statut</label>
+                        <select id="field-status"
+                                class="status-select status-select-lg @_task.Status.ToLozengeCss()"
+                                disabled="@_isSavingField"
+                                @onchange="OnStatusChangedAsync">
+                            @foreach (var status in StatusOptions)
+                            {
+                                <option value="@status" selected="@(status == _task.Status)">@status.ToLabel()</option>
+                            }
+                        </select>
                     </div>
 
                     <div class="td-panel">
                         <h2 class="td-panel-title">Détails</h2>
-                        <dl class="td-fields">
-                            <dt>Assigné</dt>
-                            <dd>
-                                @if (_task.AssigneeId is not null)
+
+                        <dl class="td-fields" @key="_fieldsVersion">
+                            <dt><label for="field-assignee">Assigné</label></dt>
+                            <dd class="td-field-stack">
+                                <div class="td-field-row">
+                                    @if (_task.AssigneeId is not null)
+                                    {
+                                        <UserAvatar UserId="@_task.AssigneeId" Name="@_task.AssigneeName" />
+                                    }
+                                    <select id="field-assignee" class="td-select" disabled="@_isSavingField"
+                                            @onchange="OnAssigneeChangedAsync">
+                                        <option value="" selected="@(_task.AssigneeId is null)">Non assignée</option>
+                                        @foreach (var user in _assignableUsers)
+                                        {
+                                            <option value="@user.Id" selected="@(user.Id == _task.AssigneeId)">
+                                                @user.DisplayName@(user.Id == _currentUserId ? " (moi)" : null)
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                @if (_task.AssigneeId != _currentUserId)
                                 {
-                                    <UserAvatar UserId="@_task.AssigneeId" Name="@_task.AssigneeName" />
-                                    <span>@_task.AssigneeName</span>
-                                }
-                                else
-                                {
-                                    <span class="td-muted">Non assignée</span>
+                                    <button type="button" class="td-link-btn" disabled="@_isSavingField" @onclick="AssignToMeAsync">
+                                        M'assigner
+                                    </button>
                                 }
                             </dd>
 
@@ -151,21 +174,34 @@
                                 <span>@_task.CreatedByName</span>
                             </dd>
 
-                            <dt>Priorité</dt>
+                            <dt><label for="field-priority">Priorité</label></dt>
                             <dd>
                                 <PriorityIcon Priority="_task.Priority" />
-                                <span>@_task.Priority.ToLabel()</span>
+                                <select id="field-priority" class="td-select" disabled="@_isSavingField"
+                                        @onchange="OnPriorityChangedAsync">
+                                    @foreach (var priority in PriorityOptions)
+                                    {
+                                        <option value="@priority" selected="@(priority == _task.Priority)">@priority.ToLabel()</option>
+                                    }
+                                </select>
                             </dd>
 
-                            <dt>Échéance</dt>
-                            <dd>
+                            <dt><label for="field-due">Échéance</label></dt>
+                            <dd class="td-field-stack">
+                                <div class="td-field-row">
+                                    <input id="field-due" type="date" class="td-select" value="@DueDateValue"
+                                           disabled="@_isSavingField" @onchange="OnDueDateChangedAsync" />
+                                    @if (_task.DueDate is not null)
+                                    {
+                                        <button type="button" class="td-clear" aria-label="Retirer l'échéance" title="Retirer l'échéance"
+                                                disabled="@_isSavingField" @onclick="ClearDueDateAsync">
+                                            ×
+                                        </button>
+                                    }
+                                </div>
                                 @if (_task.DueDate is not null)
                                 {
                                     <DueDateBadge DueDate="_task.DueDate" IsCompleted="_task.IsCompleted" Today="_today" />
-                                }
-                                else
-                                {
-                                    <span class="td-muted">Aucune</span>
                                 }
                             </dd>
 

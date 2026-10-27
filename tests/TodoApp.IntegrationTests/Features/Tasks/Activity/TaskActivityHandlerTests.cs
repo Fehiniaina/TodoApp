@@ -101,7 +101,7 @@ public class TaskActivityHandlerTests(PostgresFixture fixture) : IAsyncLifetime
     [InlineData("Bob", null, "Alice a retiré l'assignation")]
     public void Describe_Assignment(string? oldValue, string? newValue, string expected)
     {
-        var dto = new TaskActivityDto(Guid.NewGuid(), TaskActivityType.Assigned, "Alice", oldValue, newValue, DateTime.UtcNow);
+        var dto = new TaskActivityDto(Guid.NewGuid(), TaskActivityType.Assigned, "Alice", oldValue, newValue, DateTime.UtcNow, null);
 
         Assert.Equal(expected, TaskActivityFormatter.Describe(dto));
     }

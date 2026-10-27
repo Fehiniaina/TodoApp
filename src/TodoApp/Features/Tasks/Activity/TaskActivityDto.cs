@@ -9,4 +9,5 @@ public sealed record TaskActivityDto(
     string ActorName,
     string? OldValue,
     string? NewValue,
-    DateTime OccurredAtUtc);
+    DateTime OccurredAtUtc,
+    string? ActorId);
