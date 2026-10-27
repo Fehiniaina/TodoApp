@@ -21,6 +21,73 @@
             }
         </div>
 
+        <div class="flt-bar" role="group" aria-label="Filtres">
+            <span class="flt-separator" aria-hidden="true"></span>
+
+            <FilterDropdown Label="Priorité"
+                            ActiveCount="CurrentFilter.Priorities.Count"
+                            OnClear="ClearPriorities">
+                @foreach (var priority in PriorityOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                               checked="@CurrentFilter.Priorities.Contains(priority)"
+                               @onchange="() => TogglePriority(priority)" />
+                        <PriorityIcon Priority="priority" />
+                        <span>@priority.ToLabel()</span>
+                    </label>
+                }
+            </FilterDropdown>
+
+            <FilterDropdown Label="Assigné"
+                            ActiveCount="CurrentFilter.AssigneeIds.Count + (CurrentFilter.IncludeUnassigned ? 1 : 0)"
+                            OnClear="ClearAssignees">
+                <label class="flt-option">
+                    <input type="checkbox"
+                           checked="@CurrentFilter.IncludeUnassigned"
+                           @onchange="ToggleUnassigned" />
+                    <span class="flt-unassigned" aria-hidden="true">?</span>
+                    <span>Non assignée</span>
+                </label>
+                @foreach (var user in _userOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                               checked="@CurrentFilter.AssigneeIds.Contains(user.Id)"
+                               @onchange="() => ToggleAssignee(user.Id)" />
+                        <UserAvatar UserId="@user.Id" Name="@user.DisplayName" Decorative="true" />
+                        <span>@user.DisplayName@(user.Id == _createdById ? " (moi)" : null)</span>
+                    </label>
+                }
+            </FilterDropdown>
+
+            <FilterDropdown Label="Échéance"
+                            ActiveCount="CurrentFilter.HasDueDateFilter ? 1 : 0"
+                            OnClear="() => SetDueDate(DueDateFilter.Any)">
+                @foreach (var (value, label) in DueOptions)
+                {
+                    <label class="flt-option">
+                        <input type="radio" name="due-filter"
+                               checked="@IsDueSelected(value)"
+                               @onchange="() => SetDueDate(value)" />
+                        <span>@label</span>
+                    </label>
+                }
+                @if (ShowRangeInputs)
+                {
+                    <div class="flt-range">
+                        <label>Du <input type="date" value="@FormatDateInput(RangeFrom)" @onchange="SetDueFrom" /></label>
+                        <label>Au <input type="date" value="@FormatDateInput(RangeTo)" @onchange="SetDueTo" /></label>
+                    </div>
+                }
+            </FilterDropdown>
+
+            @if (!CurrentFilter.IsEmpty)
+            {
+                <button type="button" class="flt-clear-all" @onclick="ClearFilters">Effacer les filtres</button>
+            }
+        </div>
+
         <span class="issue-count">
             @{ var count = _result?.TotalCount ?? 0; }
             @count @(count > 1 ? "tâches" : "tâche")
@@ -59,8 +126,17 @@ else if (_result is null || _result.TotalCount == 0)
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </svg>
-        <p class="task-list-empty-text">Aucune tâche pour le moment.</p>
-        <button type="button" class="btn-ghost" @onclick="OpenCreateModal">Créer ma première tâche</button>
+
+        @if (CurrentFilter.IsEmpty)
+        {
+            <p class="task-list-empty-text">Aucune tâche pour le moment.</p>
+            <button type="button" class="btn-ghost" @onclick="OpenCreateModal">Créer ma première tâche</button>
+        }
+        else
+        {
+            <p class="task-list-empty-text">Aucune tâche ne correspond aux filtres.</p>
+            <button type="button" class="btn-ghost" @onclick="ClearFilters">Effacer les filtres</button>
+        }
     </div>
 }
 else
@@ -135,7 +211,7 @@ else
                     </td>
 
                     <td class="col-assignee">
-                         <UserAvatar UserId="@task.AssigneeId" Name="@task.AssigneeName" />
+                        <UserAvatar UserId="@task.AssigneeId" Name="@task.AssigneeName" />
                     </td>
 
                     <td class="col-due">

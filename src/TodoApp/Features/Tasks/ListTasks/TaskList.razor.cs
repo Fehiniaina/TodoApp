@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TodoApp.Common;
@@ -36,8 +35,22 @@ public sealed partial class TaskList : IDisposable
     [Inject] private ILogger<TaskList> Logger { get; set; } = null!;
     [Inject] private ICurrentUser CurrentUser { get; set; } = null!;
     [Inject] private GetTaskSummaryHandler GetSummaryHandler { get; set; } = null!;
-    [Inject] private NavigationManager Navigation {  get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.PriorityParam)]
+    private string[]? PriorityQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.AssigneeParam)]
+    private string[]? AssigneeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.DueParam)]
+    private string? DueQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.DueFromParam)]
+    private string? DueFromQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.DueToParam)]
+    private string? DueToQuery { get; set; }
 
     [SupplyParameterFromQuery(Name = "task")]
     private Guid? TaskIdToOpen { get; set; }
@@ -59,7 +72,11 @@ public sealed partial class TaskList : IDisposable
     private bool _focusChecklist;
 
     private TaskScope _scope = TaskScope.All;
-    private Guid? _openedFromQuery;
+
+    // null = jamais chargé : garantit le premier chargement même sans filtre dans l'URL.
+    private TaskFilter? _filter;
+
+    private TaskFilter CurrentFilter => _filter ?? TaskFilter.None;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,6 +86,21 @@ public sealed partial class TaskList : IDisposable
 
         Notifier.Changed += OnTasksChanged;
 
+        await LoadFilterOptionsAsync();
+        // Pas de chargement des tâches ici : OnParametersSetAsync s'en charge.
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var filter = TaskFilterUrl.Parse(PriorityQuery, AssigneeQuery, DueQuery, DueFromQuery, DueToQuery);
+
+        if (filter == _filter)
+        {
+            return; // même filtre (égalité par valeur) : rien à recharger
+        }
+
+        _filter = filter;
+        _currentPage = 1;
         await LoadTasksAsync();
     }
 
@@ -83,7 +115,15 @@ public sealed partial class TaskList : IDisposable
 
             if (UserTimeZone.TrySet(await module.InvokeAsync<string>("getTimeZone")))
             {
+                var previousToday = _today;
                 _today = Clock.Today;
+
+                // « Aujourd'hui », « En retard »… dépendent du jour local : on recharge si besoin.
+                if (_today != previousToday && CurrentFilter.HasDueDateFilter)
+                {
+                    await LoadTasksAsync();
+                }
+
                 StateHasChanged();
             }
         }
@@ -95,27 +135,6 @@ public sealed partial class TaskList : IDisposable
         {
             // Circuit fermé pendant l'appel : rien à faire.
         }
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (TaskIdToOpen is not { } id || id == _openedFromQuery)
-        {
-            return;
-        }
-
-        _openedFromQuery = id;
-
-        var summary = _result?.Items.FirstOrDefault(t => t.Id == id)
-            ?? await GetSummaryHandler.HandleAsync(id);
-
-        if (summary is null)
-        {
-            Notification.Warning("Cette tâche n'existe plus ou a été supprimée.", "Notification");
-            return;
-        }
-
-        OpenEditModal(summary);
     }
 
     public void Dispose() => Notifier.Changed -= OnTasksChanged;
@@ -130,7 +149,15 @@ public sealed partial class TaskList : IDisposable
         }
 
         _isLoading = true;
-        var result = await Handler.HandleAsync(new ListTasksQuery(_scope, Page: _currentPage, PageSize: _pageSize));
+        _errorMessage = null;
+
+        var query = new ListTasksQuery(_scope, Page: _currentPage, PageSize: _pageSize)
+        {
+            Filter = CurrentFilter,
+            Today = _today,
+        };
+
+        var result = await Handler.HandleAsync(query);
         _isLoading = false;
 
         if (result.IsFailure)
@@ -160,6 +187,7 @@ public sealed partial class TaskList : IDisposable
         _currentPage = 1;
         return LoadTasksAsync();
     }
+
     private void OnTasksChanged(object? sender, EventArgs e) =>
         _ = InvokeAsync(async () =>
         {
@@ -196,18 +224,7 @@ public sealed partial class TaskList : IDisposable
         _focusChecklist = true;
     }
 
-    private void CloseEditModal()
-    {
-        _editingTask = null;
-
-        if (TaskIdToOpen is not null)
-        {
-            _openedFromQuery = null;
-            Navigation.NavigateTo(
-                Navigation.GetUriWithQueryParameter("task", (Guid?)null),
-                replace: true);
-        }
-    }
+    private void CloseEditModal() => _editingTask = null;
 
     private async Task OnStatusSelectedAsync(TaskSummary task, ChangeEventArgs e)
     {
@@ -262,7 +279,6 @@ public sealed partial class TaskList : IDisposable
             Items = _result.Items.Select(t => t.Id == updated.Id ? updated : t).ToList(),
         };
     }
-
     private async Task MoveToTrashAsync(TaskSummary task)
     {
         try
@@ -321,6 +337,6 @@ public sealed partial class TaskList : IDisposable
     private string? StatusTooltip(TaskSummary task) =>
         task.CompletedAt is { } completedAt ? $"Résolue le {FormatDateTime(completedAt)}" : null;
 
-    [LoggerMessage(Level = LogLevel.Error, Message =$"Browser time zone detection failed; using the default time zone")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Browser time zone detection failed; using the default time zone")]
     private static partial void LogTimeZoneDetectionFailed(ILogger logger, Exception ex);
 }

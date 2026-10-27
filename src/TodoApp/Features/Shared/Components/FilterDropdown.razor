@@ -1,0 +1,30 @@
+<div class="flt" @onkeydown="OnKeyDown">
+    <button type="button"
+            class="filter-chip flt-trigger @(ActiveCount > 0 ? "is-active" : null)"
+            aria-haspopup="true"
+            aria-expanded="@(_isOpen ? "true" : "false")"
+            @onclick="() => _isOpen = !_isOpen">
+        @Label
+        @if (ActiveCount > 0)
+        {
+            <span class="flt-count">@ActiveCount</span>
+        }
+        <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="flt-backdrop" @onclick="() => _isOpen = false"></div>
+
+        <div class="flt-panel" role="group" aria-label="@Label">
+            @ChildContent
+
+            @if (ActiveCount > 0)
+            {
+                <div class="flt-footer">
+                    <button type="button" class="flt-clear" @onclick="OnClear">Effacer</button>
+                </div>
+            }
+        </div>
+    }
+</div>
