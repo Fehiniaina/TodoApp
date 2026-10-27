@@ -1,3 +1,5 @@
+@using TodoApp.Features.Users
+
 <section class="activity" aria-labelledby="activity-heading-@TaskId">
     <h3 id="activity-heading-@TaskId" class="checklist-heading">Activité</h3>
 
@@ -15,11 +17,24 @@
             @foreach (var item in _items)
             {
                 <li @key="item.Id" class="activity-item">
-                    <span class="activity-dot activity-@item.Type.ToString().ToLowerInvariant()" aria-hidden="true"></span>
-                    <span class="activity-text">@TaskActivityFormatter.Describe(item)</span>
-                    <time class="activity-time" datetime="@item.OccurredAtUtc.ToString("O")">
-                        @FormatTime(item.OccurredAtUtc)
-                    </time>
+                    <span class="activity-avatar">
+                        @if (item.ActorId is not null)
+                        {
+                            <UserAvatar UserId="@item.ActorId" Name="@item.ActorName" Decorative="true" />
+                        }
+                        else
+                        {
+                            <span class="activity-system" aria-hidden="true">⚙</span>
+                        }
+                        <span class="activity-dot activity-@item.Type.ToString().ToLowerInvariant()" aria-hidden="true"></span>
+                    </span>
+
+                    <div class="activity-body">
+                        <span class="activity-text">@TaskActivityFormatter.Describe(item)</span>
+                        <time class="activity-time" datetime="@item.OccurredAtUtc.ToString("O")">
+                            @FormatTime(item.OccurredAtUtc)
+                        </time>
+                    </div>
                 </li>
             }
         </ol>

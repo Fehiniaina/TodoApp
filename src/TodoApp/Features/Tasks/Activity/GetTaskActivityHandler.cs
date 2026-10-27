@@ -27,7 +27,7 @@ internal sealed class GetTaskActivityHandler(
 
         var activities = await db.TaskActivities
             .Where(a => a.TaskId == taskId)
-            .OrderBy(a => a.OccurredAtUtc)
+            .OrderByDescending(a => a.OccurredAtUtc)
             .ThenBy(a => a.Id)
             .ToListAsync(cancellationToken);
 
@@ -45,7 +45,7 @@ internal sealed class GetTaskActivityHandler(
 
         var actor = a.ActorId is null ? SystemActor : names.GetValueOrDefault(a.ActorId, "Utilisateur supprimé");
 
-        return new TaskActivityDto(a.Id, a.Type, actor, Resolve(a.OldValue), Resolve(a.NewValue), a.OccurredAtUtc);
+        return new TaskActivityDto(a.Id, a.Type, actor, Resolve(a.OldValue), Resolve(a.NewValue), a.OccurredAtUtc, ActorId: a.ActorId);
     }
 
     /// <summary>Une seule requête pour tous les noms : acteurs + assignés anciens et nouveaux.</summary>

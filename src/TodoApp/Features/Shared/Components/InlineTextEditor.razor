@@ -1,0 +1,46 @@
+@if (_isEditing)
+{
+    <div class="ie-editor">
+        @if (Multiline)
+        {
+            <textarea @ref="_input" class="ie-input ie-textarea" rows="6"
+                      maxlength="@MaxLength" aria-label="@Label"
+                      @bind="_draft" @bind:event="oninput"
+                      @onkeydown="OnKeyDownAsync"></textarea>
+        }
+        else
+        {
+            <input @ref="_input" class="ie-input @InputCssClass"
+                   maxlength="@MaxLength" aria-label="@Label"
+                   @bind="_draft" @bind:event="oninput"
+                   @onkeydown="OnKeyDownAsync" />
+        }
+
+        @if (_error is not null)
+        {
+            <p class="ie-error" role="alert">@_error</p>
+        }
+
+        <div class="ie-actions">
+            <button type="button" class="ie-btn ie-btn-primary" @onclick="SaveAsync" disabled="@_isSaving">
+                @(_isSaving ? "Enregistrement…" : "Enregistrer")
+            </button>
+            <button type="button" class="ie-btn" @onclick="Cancel" disabled="@_isSaving">Annuler</button>
+            <span class="ie-hint">@(Multiline ? "Ctrl+Entrée pour enregistrer" : "Entrée pour enregistrer") · Échap pour annuler</span>
+        </div>
+    </div>
+}
+else
+{
+    @* Pas d'aria-label ici : dans un <h1>, il remplacerait le titre comme nom accessible. *@
+    <button type="button" class="ie-display @DisplayCssClass" title="Cliquer pour modifier" @onclick="StartEditing">
+        @if (string.IsNullOrWhiteSpace(Value))
+        {
+            <span class="ie-placeholder">@Placeholder</span>
+        }
+        else
+        {
+            @Value
+        }
+    </button>
+}
