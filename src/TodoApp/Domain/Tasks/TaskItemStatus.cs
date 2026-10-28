@@ -5,5 +5,6 @@ public enum TaskItemStatus
     ToDo,
     InProgress,
     InValidation,
-    Resolved
+    Resolved,
+    Done
 }

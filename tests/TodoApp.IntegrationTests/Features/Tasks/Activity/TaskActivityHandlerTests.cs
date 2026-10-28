@@ -65,11 +65,16 @@ public class TaskActivityHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         var history = await ActivityHandler(OwnerA).HandleAsync(taskId);
 
         Assert.Equal(
-            [TaskActivityType.Created, TaskActivityType.Assigned, TaskActivityType.StatusChanged,
-         TaskActivityType.StatusChanged, TaskActivityType.Assigned],
+            [
+                TaskActivityType.Assigned,
+                TaskActivityType.StatusChanged,
+                TaskActivityType.StatusChanged,
+                TaskActivityType.Assigned,
+                TaskActivityType.Created
+            ],
             history.Value.Select(a => a.Type));
 
-        var last = history.Value[^1];
+        var last = history.Value[0];
         Assert.Equal((OwnerB, OwnerB, OwnerA), (last.ActorName, last.OldValue, last.NewValue));
     }
 

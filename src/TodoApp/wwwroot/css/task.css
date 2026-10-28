@@ -946,3 +946,149 @@
     font-size: 0.75rem;
     color: var(--td-muted, #626f86);
 }
+
+/* ───── Filtres ───── */
+.flt {
+    position: relative;
+}
+
+.flt-separator {
+    width: 1px;
+    height: 24px;
+    margin: 0 0.25rem;
+    background: var(--issue-border, #dfe1e6);
+}
+
+.flt-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+    .flt-trigger svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .flt-trigger.is-active {
+        color: #0c66e4;
+        background: #e9f2ff;
+        border-color: #0c66e4;
+    }
+
+.flt-count {
+    min-width: 18px;
+    padding: 0 0.3rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    color: #fff;
+    background: #0c66e4;
+    border-radius: 9px;
+}
+
+.flt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+}
+
+.flt-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 21;
+    display: grid;
+    min-width: 240px;
+    max-height: 360px;
+    padding: 0.375rem;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #dfe1e6;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(9, 30, 66, 0.2);
+}
+
+.flt-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.875rem;
+    color: #172b4d;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .flt-option:hover {
+        background: #f1f2f4;
+    }
+
+    .flt-option input {
+        margin: 0;
+        accent-color: #0c66e4;
+    }
+
+.flt-unassigned {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #626f86;
+    border: 1px dashed #8590a2;
+    border-radius: 50%;
+}
+
+.flt-range {
+    display: grid;
+    gap: 0.375rem;
+    padding: 0.5rem;
+    font-size: 0.8125rem;
+    border-top: 1px solid #dfe1e6;
+}
+
+    .flt-range label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+.flt-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.375rem 0.25rem 0.125rem;
+    border-top: 1px solid #dfe1e6;
+}
+
+.flt-clear,
+.flt-clear-all {
+    padding: 0.25rem 0.5rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #0c66e4;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .flt-clear:hover,
+    .flt-clear-all:hover {
+        background: #e9f2ff;
+    }
+
+.flt-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem;
+    color: #626f86;
+}

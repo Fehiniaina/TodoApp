@@ -24,7 +24,8 @@ internal sealed class ListTasksHandler(
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
-        var tasks = ApplyScope(db.Tasks.VisibleTo(userId), query.Scope, userId);
+        var tasks = ApplyScope(db.Tasks.VisibleTo(userId), query.Scope, userId)
+            .ApplyFilter(query.Filter, query.Today);
 
         var totalCount = await tasks.CountAsync(cancellationToken);
         var items = await TaskSummaryProjection.ToSummaries(Paginate(tasks, page, pageSize), db.Users)

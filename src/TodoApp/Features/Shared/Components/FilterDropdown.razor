@@ -1,0 +1,42 @@
+<div class="flt-dropdown">
+    <button type="button"
+            class="flt-trigger @(ActiveCount > 0 ? "is-active" : null) @TriggerCssClass"
+            aria-haspopup="true"
+            aria-expanded="@(_open ? "true" : "false")"
+            aria-controls="@_panelId"
+            title="@Title"
+            @onclick="Toggle">
+        @if (Trigger is not null)
+        {
+            @Trigger
+        }
+        else
+        {
+            <span>@Label</span>
+            @if (ActiveCount > 0)
+            {
+                <span class="flt-count">@ActiveCount</span>
+            }
+            <svg class="flt-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M3 4.5l3 3 3-3" />
+            </svg>
+        }
+    </button>
+
+    @if (_open)
+    {
+        <div class="flt-backdrop" @onclick="Close"></div>
+        <div id="@_panelId" class="flt-panel" role="group" aria-label="@(AriaLabel ?? Label)"
+             @onkeydown="OnKeyDown">
+            <div class="flt-panel-body">
+                @ChildContent
+            </div>
+            @if (ActiveCount > 0 && OnClear.HasDelegate)
+            {
+                <div class="flt-panel-footer">
+                    <button type="button" class="flt-link" @onclick="OnClear">Effacer</button>
+                </div>
+            }
+        </div>
+    }
+</div>

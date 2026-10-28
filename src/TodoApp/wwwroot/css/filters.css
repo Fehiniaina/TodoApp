@@ -1,0 +1,270 @@
+/* ===== Barre de filtres façon Jira ===================================== */
+
+.flt-bar {
+    --flt-border: #dcdfe4;
+    --flt-text: #44546f;
+    --flt-text-strong: #172b4d;
+    --flt-hover: #f1f2f4;
+    --flt-active-bg: #e9f2ff;
+    --flt-accent: #0c66e4;
+    --flt-surface: #ffffff;
+    --flt-shadow: 0 8px 12px rgba(9, 30, 66, .15), 0 0 1px rgba(9, 30, 66, .31);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.flt-separator {
+    width: 1px;
+    height: 24px;
+    background: var(--flt-border);
+    margin: 0 4px;
+}
+
+/* --- Bouton de filtre --------------------------------------------------- */
+
+.flt-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
+.flt-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px 0 12px;
+    border: 1px solid var(--flt-border);
+    border-radius: 4px;
+    background: var(--flt-surface);
+    color: var(--flt-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .1s, border-color .1s;
+}
+
+    .flt-trigger:hover {
+        background: var(--flt-hover);
+    }
+
+    .flt-trigger:focus-visible {
+        outline: 2px solid var(--flt-accent);
+        outline-offset: 2px;
+    }
+
+    .flt-trigger[aria-expanded="true"],
+    .flt-trigger.is-active {
+        background: var(--flt-active-bg);
+        border-color: var(--flt-accent);
+        color: var(--flt-accent);
+    }
+
+.flt-chevron {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.flt-count {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--flt-accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+}
+
+/* --- Panneau ------------------------------------------------------------ */
+
+.flt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+.flt-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1000;
+    min-width: 220px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 4px 0;
+    border-radius: 4px;
+    background: var(--flt-surface);
+    box-shadow: var(--flt-shadow);
+}
+
+.flt-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    color: var(--flt-text-strong);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+    .flt-option:hover {
+        background: var(--flt-hover);
+    }
+
+    .flt-option input {
+        margin: 0;
+        accent-color: var(--flt-accent);
+    }
+
+.flt-panel-footer {
+    margin-top: 4px;
+    padding: 6px 12px 4px;
+    border-top: 1px solid var(--flt-border);
+}
+
+.flt-link,
+.flt-clear-all {
+    border: 0;
+    background: none;
+    color: var(--flt-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.flt-clear-all {
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 4px;
+}
+
+    .flt-link:hover,
+    .flt-clear-all:hover {
+        background: var(--flt-hover);
+        color: var(--flt-text-strong);
+    }
+
+.flt-range {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px 4px;
+    border-top: 1px solid var(--flt-border);
+    font-size: 13px;
+    color: var(--flt-text);
+}
+
+    .flt-range label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .flt-range input {
+        height: 28px;
+        padding: 0 6px;
+        border: 1px solid var(--flt-border);
+        border-radius: 3px;
+        font: inherit;
+    }
+
+.flt-unassigned {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px dashed var(--flt-text);
+    border-radius: 50%;
+    color: var(--flt-text);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* --- Pile d'avatars ----------------------------------------------------- */
+
+.flt-avatars {
+    display: flex;
+    align-items: center;
+    padding-left: 4px; /* compense le chevauchement du premier avatar */
+}
+
+    .flt-avatars .flt-avatar {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        margin-left: -4px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--flt-surface);
+        box-shadow: 0 0 0 2px var(--flt-surface);
+        cursor: pointer;
+        overflow: hidden;
+        transition: transform .1s;
+    }
+
+        .flt-avatars .flt-avatar:hover {
+            z-index: 1;
+            transform: translateY(-2px);
+        }
+
+        .flt-avatars .flt-avatar:focus-visible {
+            z-index: 1;
+            outline: 2px solid var(--flt-accent);
+            outline-offset: 2px;
+        }
+
+        .flt-avatars .flt-avatar.is-selected {
+            z-index: 1;
+            box-shadow: 0 0 0 2px var(--flt-surface), 0 0 0 4px var(--flt-accent);
+        }
+
+        /* L'avatar remplit le bouton, quelle que soit sa taille par défaut. */
+        .flt-avatars .flt-avatar > * {
+            width: 100%;
+            height: 100%;
+        }
+
+    /* Bouton « +N » : même forme que les avatars. */
+    .flt-avatars .flt-trigger.flt-avatar-more {
+        gap: 0;
+        padding: 0;
+        border: 0;
+        background: var(--flt-hover);
+        color: var(--flt-text);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+        .flt-avatars .flt-trigger.flt-avatar-more.is-active,
+        .flt-avatars .flt-trigger.flt-avatar-more[aria-expanded="true"] {
+            background: var(--flt-active-bg);
+            color: var(--flt-accent);
+            box-shadow: 0 0 0 2px var(--flt-surface), 0 0 0 4px var(--flt-accent);
+        }
+
+    /* Le panneau du « +N » ne doit pas être rogné par le bouton rond. */
+    .flt-avatars .flt-dropdown {
+        margin-left: -4px;
+    }
+
+        .flt-avatars .flt-dropdown .flt-avatar {
+            margin-left: 0;
+        }
