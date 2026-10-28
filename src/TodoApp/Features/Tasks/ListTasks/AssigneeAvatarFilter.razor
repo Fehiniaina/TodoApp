@@ -1,0 +1,50 @@
+@using TodoApp.Features.Users
+@using TodoApp.Components.Shared
+
+<div class="flt-avatars" role="group" aria-label="Filtrer par assigné">
+    @foreach (var user in Visible)
+    {
+        var selected = SelectedIds.Contains(user.Id);
+        <button type="button"
+                class="flt-avatar @(selected ? "is-selected" : null)"
+                aria-pressed="@(selected ? "true" : "false")"
+                title="@LabelFor(user)"
+                @onclick="() => OnToggle.InvokeAsync(user.Id)">
+            <UserAvatar UserId="@user.Id" Name="@user.DisplayName" Decorative="true" />
+            <span class="visually-hidden">@LabelFor(user)</span>
+        </button>
+    }
+
+    <FilterDropdown ActiveCount="HiddenActiveCount"
+                    AriaLabel="Autres assignés"
+                    Title="Autres assignés"
+                    TriggerCssClass="flt-avatar flt-avatar-more">
+        <Trigger>
+            @if (HiddenCount > 0)
+            {
+                <span>+@HiddenCount</span>
+            }
+            else
+            {
+                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" /></svg>
+            }
+        </Trigger>
+        <ChildContent>
+            <label class="flt-option">
+                <input type="checkbox" checked="@IncludeUnassigned" @onchange="() => OnToggleUnassigned.InvokeAsync()" />
+                <span class="flt-unassigned" aria-hidden="true">?</span>
+                <span>Non assignée</span>
+            </label>
+            @foreach (var user in Hidden)
+            {
+                <label class="flt-option">
+                    <input type="checkbox"
+                           checked="@SelectedIds.Contains(user.Id)"
+                           @onchange="() => OnToggle.InvokeAsync(user.Id)" />
+                    <UserAvatar UserId="@user.Id" Name="@user.DisplayName" Decorative="true" />
+                    <span>@LabelFor(user)</span>
+                </label>
+            }
+        </ChildContent>
+    </FilterDropdown>
+</div>

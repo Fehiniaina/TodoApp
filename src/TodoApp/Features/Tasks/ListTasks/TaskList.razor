@@ -5,7 +5,6 @@
 @using TodoApp.Features.Tasks.Checklist
 @using TodoApp.Features.Tasks.Shared
 @using TodoApp.Features.Users
-@using Microsoft.Extensions.Logging
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
@@ -24,6 +23,13 @@
         <div class="flt-bar" role="group" aria-label="Filtres">
             <span class="flt-separator" aria-hidden="true"></span>
 
+            <AssigneeAvatarFilter Users="_userOptions"
+                                    SelectedIds="CurrentFilter.AssigneeIds"
+                                    IncludeUnassigned="CurrentFilter.IncludeUnassigned"
+                                    CurrentUserId="_createdById"
+                                    OnToggle="ToggleAssignee"
+                                    OnToggleUnassigned="ToggleUnassigned" />
+
             <FilterDropdown Label="Priorité"
                             ActiveCount="CurrentFilter.Priorities.Count"
                             OnClear="ClearPriorities">
@@ -31,32 +37,10 @@
                 {
                     <label class="flt-option">
                         <input type="checkbox"
-                               checked="@CurrentFilter.Priorities.Contains(priority)"
-                               @onchange="() => TogglePriority(priority)" />
+                                checked="@CurrentFilter.Priorities.Contains(priority)"
+                                @onchange="() => TogglePriority(priority)" />
                         <PriorityIcon Priority="priority" />
                         <span>@priority.ToLabel()</span>
-                    </label>
-                }
-            </FilterDropdown>
-
-            <FilterDropdown Label="Assigné"
-                            ActiveCount="CurrentFilter.AssigneeIds.Count + (CurrentFilter.IncludeUnassigned ? 1 : 0)"
-                            OnClear="ClearAssignees">
-                <label class="flt-option">
-                    <input type="checkbox"
-                           checked="@CurrentFilter.IncludeUnassigned"
-                           @onchange="ToggleUnassigned" />
-                    <span class="flt-unassigned" aria-hidden="true">?</span>
-                    <span>Non assignée</span>
-                </label>
-                @foreach (var user in _userOptions)
-                {
-                    <label class="flt-option">
-                        <input type="checkbox"
-                               checked="@CurrentFilter.AssigneeIds.Contains(user.Id)"
-                               @onchange="() => ToggleAssignee(user.Id)" />
-                        <UserAvatar UserId="@user.Id" Name="@user.DisplayName" Decorative="true" />
-                        <span>@user.DisplayName@(user.Id == _createdById ? " (moi)" : null)</span>
                     </label>
                 }
             </FilterDropdown>
@@ -68,8 +52,8 @@
                 {
                     <label class="flt-option">
                         <input type="radio" name="due-filter"
-                               checked="@IsDueSelected(value)"
-                               @onchange="() => SetDueDate(value)" />
+                                checked="@IsDueSelected(value)"
+                                @onchange="() => SetDueDate(value)" />
                         <span>@label</span>
                     </label>
                 }

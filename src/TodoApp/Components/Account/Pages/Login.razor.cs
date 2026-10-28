@@ -18,8 +18,16 @@ public partial class Login
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = default!;
 
+    private const string RedirectUri = "/tasks";
+
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+
+    private string RedirectTarget =>
+        string.IsNullOrWhiteSpace(ReturnUrl) || string.Equals("/", ReturnUrl, StringComparison.Ordinal)
+        ? RedirectUri
+        : ReturnUrl;
+
     [Inject] private SignInManager<ApplicationUser> SignInManager { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IdentityRedirectManager RedirectManager { get; set; } = null!;
@@ -56,8 +64,8 @@ public partial class Login
 
         if (result.Succeeded)
         {
-            LogUserLoggedIn(Logger, ReturnUrl);
-            RedirectManager.RedirectTo(ReturnUrl);
+            LogUserLoggedIn(Logger, RedirectTarget);
+            RedirectManager.RedirectTo(RedirectTarget);
         }
         else if (result.RequiresTwoFactor)
         {

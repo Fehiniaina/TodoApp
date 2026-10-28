@@ -74,13 +74,6 @@ public sealed partial class TaskList
     private void ToggleUnassigned() =>
         ApplyFilter(CurrentFilter with { IncludeUnassigned = !CurrentFilter.IncludeUnassigned });
 
-    private void ClearAssignees() =>
-        ApplyFilter(CurrentFilter with
-        {
-            AssigneeIds = new HashSet<string>(StringComparer.Ordinal),
-            IncludeUnassigned = false,
-        });
-
     private bool IsDueSelected(DueDateFilter value) =>
         value == DueDateFilter.Range
             ? ShowRangeInputs
