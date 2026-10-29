@@ -8,7 +8,7 @@ public static class TaskTypeExtensions
     public static string ToLabel(this TaskType type) => type switch
     {
         TaskType.Bug => "Bug",
-        TaskType.Extracte => "Extracte",
+        TaskType.Extraction => "Extraction",
         TaskType.Story => "Story",
         TaskType.Analyse => "Analyse",
         TaskType.Task => "Tâche",

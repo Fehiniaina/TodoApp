@@ -25,7 +25,7 @@ internal static class TaskActivityMapper
             e.TaskId, e.ActorId, TaskActivityType.AttachmentRemoved, oldValue: e.FileName, newValue: null, e.OccurredAtUtc),
 
         TaskTypeChanged e => TaskActivity.Record(
-            e.TaskId, e.ActorId, TaskActivityType.TypeChanged, oldValue: e.Previous.ToString(), newValue: e.Current.ToString(),e.OccurredAtUtc),
+            e.TaskId, e.ActorId, TaskActivityType.TypeChanged, oldValue: TaskTypeStorage.ToStored(e.Previous), newValue: TaskTypeStorage.ToStored(e.Current), e.OccurredAtUtc),
 
         _ => null,
     };

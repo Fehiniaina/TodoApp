@@ -143,7 +143,7 @@ internal static class TaskCsvParser
         if (Field(Column.Type) is  { } typeText
             && !Types.TryGetValue(Normalize(typeText), out type))
         {
-            errors.Add($"Type de tache « {typeText} » inconnue (attendu : Bug, Extracte, Analyse, Task ou Story).");
+            errors.Add($"Type de tache « {typeText} » inconnue (attendu : Bug, Extraction, Analyse, Task ou Story).");
         }
 
 

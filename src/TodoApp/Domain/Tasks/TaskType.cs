@@ -10,7 +10,7 @@ namespace TodoApp.Domain.Tasks;
 public enum TaskType
 {
     Bug = 0,
-    Extracte = 1,
+    Extraction = 1,
     Analyse = 2,
     Task = 3,
     Story = 4,

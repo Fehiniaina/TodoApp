@@ -33,7 +33,7 @@ public static class TaskActivityFormatter
             TaskActivityType.AttachmentAdded => $"{a.ActorName} a ajouté la pièce jointe « {a.NewValue} »",
             TaskActivityType.AttachmentRemoved => $"{a.ActorName} a supprimé la pièce jointe « {a.OldValue} »",
             TaskActivityType.TypeChanged =>
-                $"{a.ActorName} a changé le type de {Enum.Parse<TaskType>(a.OldValue!).ToLabel()} à {Enum.Parse<TaskType>(a.NewValue!).ToLabel()}",
+                $"{a.ActorName} a changé le type de {TypeLabel(a.OldValue)} à {TypeLabel(a.NewValue)}",
 
             _ => $"{a.ActorName} a modifié la tâche",
         };
@@ -41,4 +41,8 @@ public static class TaskActivityFormatter
 
     private static string StatusLabel(string? value) =>
         Enum.TryParse<TaskItemStatus>(value, out var status) ? status.ToLabel() : value ?? "?";
+
+    /// <summary>Jamais d'exception : une valeur illisible s'affiche brute plutôt que de couper le circuit.</summary>
+    private static string TypeLabel(string? stored) =>
+        TaskTypeStorage.TryFromStored(stored, out var type) ? type.ToLabel() : stored ?? "?";
 }
