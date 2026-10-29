@@ -138,7 +138,7 @@ else
 
             <ChildContentRow Context="task">
                 <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
-                    <td class="col-type">@task.Type.ToLabel()</td>
+                    <td class="col-type"><TaskTypeIcon Type="task.Type" /></td>
                     <td class="col-summary">
                         <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">
