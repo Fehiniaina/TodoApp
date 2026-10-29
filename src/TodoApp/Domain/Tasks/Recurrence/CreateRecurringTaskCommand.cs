@@ -9,4 +9,5 @@ internal sealed record CreateRecurringTaskCommand(
     WeekDays DaysOfWeek,
     int? DayOfMonth,
     DateOnly StartDate,
-    DateOnly? EndDate);
+    DateOnly? EndDate,
+    TaskType Type);

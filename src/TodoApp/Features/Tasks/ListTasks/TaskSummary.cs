@@ -17,7 +17,7 @@ public sealed record TaskSummary(
     string CreatedById,
     string? AssigneeId,
     string? AssigneeName,
-    TaskType type)
+    TaskType Type)
 {
     public bool IsCompleted => Status == TaskItemStatus.Resolved;
 }

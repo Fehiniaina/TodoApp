@@ -77,7 +77,7 @@ public sealed partial class TaskDetailsPage
         }
 
         return SaveFieldAsync(
-            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, priority, t.DueDate)),
+            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, priority, Type: t.Type, t.DueDate)),
             "Changement de priorité impossible");
     }
 
@@ -95,7 +95,7 @@ public sealed partial class TaskDetailsPage
 
     private Task SaveDueDateAsync(DateOnly? dueDate) =>
         SaveFieldAsync(
-            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, t.Priority, dueDate)),
+            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, t.Priority, Type: t.Type, dueDate)),
             "Changement d'échéance impossible");
 
     private async Task SaveFieldAsync(Func<Task<string?>> save, string errorTitle)

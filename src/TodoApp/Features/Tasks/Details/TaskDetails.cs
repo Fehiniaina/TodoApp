@@ -17,7 +17,8 @@ internal sealed record TaskDetails(
     string? AssigneeId,
     string? AssigneeName,
     int ChecklistDone,
-    int ChecklistTotal)
+    int ChecklistTotal,
+    TaskType Type)
 {
     public bool IsCompleted => CompletedAt is not null;
 

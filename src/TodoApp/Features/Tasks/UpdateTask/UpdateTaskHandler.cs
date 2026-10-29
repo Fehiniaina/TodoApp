@@ -38,7 +38,7 @@ internal sealed class UpdateTaskHandler(
             return Error.NotFound("Task.NotFound", "Cette tâche n'existe pas ou a été supprimée.");
         }
 
-        task.Update(command.Title, command.Description, command.Priority, command.DueDate);
+        task.Update(command.Title, command.Description, command.Priority, command.DueDate, command.Type);
 
         await db.SaveChangesAsync(cancellationToken);
         notifier.NotifyChanged();

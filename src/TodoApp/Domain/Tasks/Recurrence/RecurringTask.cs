@@ -17,10 +17,12 @@ internal sealed class RecurringTask
     public bool IsStopped { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
 
+    public TaskType Type { get; private set; }
+
     public static RecurringTask Create(
         string ownerId, string title, string? description, TaskPriority priority,
         RecurrenceRule rule, DateOnly startDate, DateOnly? endDate,
-        string timeZoneId, DateTime createdAtUtc)
+        string timeZoneId, DateTime createdAtUtc, TaskType type)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
 
@@ -41,6 +43,7 @@ internal sealed class RecurringTask
             EndDate = endDate,
             TimeZoneId = timeZoneId,
             CreatedAtUtc = createdAtUtc,
+            Type = EnsureType(type),
         };
 
         series.NextOccurrence = series.WithinEnd(rule.NextAfter(startDate, startDate.AddDays(-1)));
@@ -72,7 +75,7 @@ internal sealed class RecurringTask
     }
 
     public TaskItem CreateOccurrence(DateOnly dueDate) =>
-        TaskItem.CreateOccurrence(OwnerId, Title, Description, Priority, dueDate, Id, CreatedAtUtc);
+        TaskItem.CreateOccurrence(OwnerId, Title, Description, Priority, dueDate, Id, CreatedAtUtc, Type);
 
     public void Stop()
     {
@@ -82,4 +85,9 @@ internal sealed class RecurringTask
 
     private DateOnly? WithinEnd(DateOnly date) =>
         EndDate is { } end && date > end ? null : date;
+
+    private static TaskType EnsureType(TaskType type) =>
+        Enum.IsDefined(type)
+        ? type
+        : throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown TaskType value.");
 }

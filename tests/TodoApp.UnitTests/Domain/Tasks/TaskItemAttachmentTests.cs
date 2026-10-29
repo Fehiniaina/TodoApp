@@ -59,7 +59,7 @@ public sealed class TaskItemAttachmentTests
     }
 
     private static TaskItem NewTask() =>
-        TaskItem.Create("alice", "Tâche", null, TaskPriority.Medium, null, Now);
+        TaskItem.Create("alice", "Tâche", null, TaskPriority.Medium, null, Now, TaskType.Task);
 
     private static string NewKey() => $"2026/10/{Guid.NewGuid():N}";
 }

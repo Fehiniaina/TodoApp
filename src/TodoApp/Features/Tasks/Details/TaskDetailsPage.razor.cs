@@ -87,10 +87,10 @@ public sealed partial class TaskDetailsPage
     }
 
     private async Task<string?> SaveTitleAsync(string? title) =>
-        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, title!, t.Description, t.Priority, t.DueDate));
+        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, title!, t.Description, t.Priority, t.Type, t.DueDate));
 
     private async Task<string?> SaveDescriptionAsync(string? description) =>
-        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, t.Title, description, t.Priority, t.DueDate));
+        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, t.Title, description, t.Priority, t.Type, t.DueDate));
 
     /// <summary>Édition sur place (titre, description) : l'erreur est affichée sous le champ.</summary>
     private async Task<string?> SaveContentAsync(Func<TaskDetails, UpdateTaskCommand> change)

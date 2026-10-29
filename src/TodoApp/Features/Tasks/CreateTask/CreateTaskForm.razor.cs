@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using TodoApp.Common;
@@ -13,7 +12,6 @@ using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.Recurrence;
 using TodoApp.Features.Tasks.Shared;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TodoApp.Features.Tasks.CreateTask;
 
@@ -68,7 +66,7 @@ public partial class CreateTaskForm
     private async Task<bool> CreateSingleTaskAsync()
     {
         var result = await Handler.HandleAsync(
-            new CreateTaskCommand(Model.Title, Model.Description, Model.Priority, Model.DueDate));
+            new CreateTaskCommand(Model.Title, Model.Description, Model.Priority, Model.DueDate, Model.Type));
 
         if (result.IsFailure)
         {
@@ -94,7 +92,8 @@ public partial class CreateTaskForm
             Recurrence.Days,
             Recurrence.DayOfMonth ?? startDate.Day,
             startDate,
-            EndDate: null));
+            EndDate: null,
+            Model.Type));
 
         if (result.IsFailure)
         {

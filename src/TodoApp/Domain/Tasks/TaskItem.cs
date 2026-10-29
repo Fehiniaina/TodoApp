@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using TodoApp.Domain.Common;
 using TodoApp.Domain.Tasks.Attachments;
 using TodoApp.Domain.Tasks.Events;
@@ -59,25 +60,26 @@ internal sealed class TaskItem : AggregateRoot
 
     public void ChangeType(TaskType type)
     {
-        Type = type;
+        Type = EnsureDefined(type);
     }
 
     public static TaskItem Create(string createdById, string title, string? description,
                               TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc,
-                              TaskType type = TaskType.Task)
+                              TaskType type)
     {
-        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc, type);
         task.Raise(new TaskCreated(task.Id, createdById, createdAtUtc));
 
         return task;
     }
 
-    public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate)
+    public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate, TaskType type)
     {
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
         Priority = EnsureDefined(priority);
         DueDate = dueDate;
+        Type = EnsureDefined(type);
     }
 
     public void MoveToTrash(DateTime deletedAtUtc)
@@ -194,9 +196,9 @@ internal sealed class TaskItem : AggregateRoot
 
     public static TaskItem CreateOccurrence(string createdById, string title, string? description,
                                         TaskPriority priority, DateOnly dueDate, Guid recurringTaskId,
-                                        DateTime createdAtUtc)
+                                        DateTime createdAtUtc, TaskType type)
     {
-        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc, type);
         task.RecurringTaskId = recurringTaskId;
         task.Raise(new TaskCreated(task.Id, ActorId: null, createdAtUtc));
         return task;
@@ -243,10 +245,13 @@ internal sealed class TaskItem : AggregateRoot
     private static string? NormalizeDescription(string? description) =>
         string.IsNullOrWhiteSpace(description) ? null : description.Trim();
 
-    private static TaskPriority EnsureDefined(TaskPriority priority) =>
-    Enum.IsDefined(priority)
-        ? priority
-        : throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown task priority.");
+    private static TEnum EnsureDefined<TEnum>(
+        TEnum value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where TEnum : struct, Enum =>
+        Enum.IsDefined(value)
+            ? value
+            : throw new ArgumentOutOfRangeException(paramName, value, $"Unknown {typeof(TEnum).Name} value.");
 
     private static DateTime EnsureUtc(DateTime value)
     {
@@ -259,7 +264,7 @@ internal sealed class TaskItem : AggregateRoot
     }
 
     private static TaskItem New(string createdById, string title, string? description,
-                            TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
+                            TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc, TaskType type)
     {
         EnsureUtc(createdAtUtc);
 
@@ -273,6 +278,7 @@ internal sealed class TaskItem : AggregateRoot
             DueDate = dueDate,
             Status = TaskItemStatus.ToDo,
             CreatedAtUtc = createdAtUtc,
+            Type = type
         };
     }
 }

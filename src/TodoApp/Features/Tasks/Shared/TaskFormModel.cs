@@ -1,4 +1,4 @@
-﻿using TodoApp.Domain.Tasks;
+using TodoApp.Domain.Tasks;
 
 namespace TodoApp.Features.Tasks.Shared;
 
@@ -10,4 +10,5 @@ public sealed class TaskFormModel
     public TaskPriority Priority { get; set; } = TaskPriority.Medium;
 
     public DateOnly? DueDate { get; set; }
+    public TaskType Type { get; set; }
 }

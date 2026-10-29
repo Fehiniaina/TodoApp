@@ -77,13 +77,19 @@ public static class TodoAppSeeder
 
         var createdById = f.PickRandom(userIds);
 
+        // 0 = Bug, Extracte = 1, Analyse = 2, Task = 3, Story = 4
+        var type = f.Random.WeightedRandom(
+            [TaskType.Task, TaskType.Bug, TaskType.Story, TaskType.Analyse, TaskType.Extracte],
+            [0.40f, 0.25f, 0.20f, 0.10f, 0.05f]);
+
         var task = TaskItem.Create(
             createdById,
             Fill(template.Title, values),
             template.Description is null ? null : Fill(template.Description, values),
             f.Random.Bool(0.8f) ? template.Priority : f.PickRandom<TaskPriority>(),
             DueDate(f, today, steps),
-            createdAtUtc: at);
+            createdAtUtc: at,
+            type: type);
 
         AddChecklist(f, task, template.Checklist, steps);
 

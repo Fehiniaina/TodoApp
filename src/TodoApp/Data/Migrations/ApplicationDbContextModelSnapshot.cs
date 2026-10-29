@@ -568,6 +568,10 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("title");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Rule", "TodoApp.Domain.Tasks.Recurrence.RecurringTask.Rule#RecurrenceRule", b1 =>
                         {
                             b1.IsRequired();

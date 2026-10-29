@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using TodoApp.Common;
 using TodoApp.Features.Shared.Logging;
@@ -31,6 +31,7 @@ public partial class EditTaskForm
             Description = TaskToEdit.Description,
             Priority = TaskToEdit.Priority,
             DueDate = TaskToEdit.DueDate,
+            Type = TaskToEdit.Type
         };
 
     private async Task SubmitAsync()
@@ -43,7 +44,7 @@ public partial class EditTaskForm
         try
         {
             var result = await Handler.HandleAsync(
-                new UpdateTaskCommand(TaskToEdit.Id, Model.Title, Model.Description, Model.Priority, Model.DueDate));
+                new UpdateTaskCommand(TaskToEdit.Id, Model.Title, Model.Description, Model.Priority, Model.Type, Model.DueDate));
 
             if (result.IsFailure)
             {
