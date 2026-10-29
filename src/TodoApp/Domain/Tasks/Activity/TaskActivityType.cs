@@ -7,4 +7,5 @@ public enum TaskActivityType
     StatusChanged,
     AttachmentAdded,
     AttachmentRemoved,
+    TypeChanged
 }

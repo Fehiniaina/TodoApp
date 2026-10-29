@@ -1,6 +1,8 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using TodoApp.Domain.Notifications;
+using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.UpdateTask;
 
@@ -22,6 +24,7 @@ public sealed partial class TaskDetailsPage
     [Inject] private GetTaskDetailsHandler Handler { get; set; } = null!;
     [Inject] private UpdateTaskHandler UpdateHandler { get; set; } = null!;
     [Inject] private IUserClock Clock { get; set; } = null!;
+    [Inject] private TaskChangeNotifier notifier { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -108,6 +111,9 @@ public sealed partial class TaskDetailsPage
     private async Task<string?> UpdateTaskAsync(Func<TaskDetails, UpdateTaskCommand> change)
     {
         var result = await UpdateHandler.HandleAsync(change(_task!));
+
+        notifier.NotifyChanged();
+
         return result.IsFailure ? result.Error.Message : null;
     }
 

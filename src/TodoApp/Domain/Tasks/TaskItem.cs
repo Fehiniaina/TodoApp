@@ -58,9 +58,21 @@ internal sealed class TaskItem : AggregateRoot
 
     public IReadOnlyCollection<TaskAttachment> Attachments => _attachments.AsReadOnly();
 
-    public void ChangeType(TaskType type)
+    public void ChangeType(TaskType type, string actorId, DateTime nowUtc)
     {
-        Type = EnsureDefined(type);
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
+        EnsureUtc(nowUtc);
+
+        var newType = EnsureDefined(type);
+        if (newType == Type)
+        {
+            return;
+        }
+
+        var previous = Type;
+        Type = newType;
+
+        Raise(new TaskTypeChanged(Id, actorId, previous, newType, nowUtc));
     }
 
     public static TaskItem Create(string createdById, string title, string? description,
@@ -73,13 +85,12 @@ internal sealed class TaskItem : AggregateRoot
         return task;
     }
 
-    public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate, TaskType type)
+    public void Update(string title, string? description, TaskPriority priority, DateOnly? dueDate)
     {
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
         Priority = EnsureDefined(priority);
         DueDate = dueDate;
-        Type = EnsureDefined(type);
     }
 
     public void MoveToTrash(DateTime deletedAtUtc)

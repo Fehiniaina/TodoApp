@@ -13,7 +13,7 @@ internal sealed class UpdateTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
     IValidator<UpdateTaskCommand> validator,
     ICurrentUser currentUser,
-    TaskChangeNotifier notifier) : IHandler
+    TimeProvider timeProvider) : IHandler
 {
     public async Task<Result> HandleAsync(UpdateTaskCommand command, CancellationToken cancellationToken = default)
     {
@@ -24,6 +24,7 @@ internal sealed class UpdateTaskHandler(
         }
 
         var createdById = await currentUser.GetIdAsync();
+        var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
@@ -38,10 +39,10 @@ internal sealed class UpdateTaskHandler(
             return Error.NotFound("Task.NotFound", "Cette tâche n'existe pas ou a été supprimée.");
         }
 
-        task.Update(command.Title, command.Description, command.Priority, command.DueDate, command.Type);
+        task.Update(command.Title, command.Description, command.Priority, command.DueDate);
+        task.ChangeType(command.Type, createdById, nowUtc);
 
         await db.SaveChangesAsync(cancellationToken);
-        notifier.NotifyChanged();
 
         return Result.Success();
     }
