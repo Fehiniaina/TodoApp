@@ -55,6 +55,9 @@ public sealed partial class TaskList : IDisposable
     [SupplyParameterFromQuery(Name = "task")]
     private Guid? TaskIdToOpen { get; set; }
 
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.TypeParam)]
+    private string[]? TypeQuery { get; set; }
+
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
     private PagedResult<TaskSummary>? _result;
@@ -92,7 +95,7 @@ public sealed partial class TaskList : IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        var filter = TaskFilterUrl.Parse(PriorityQuery, AssigneeQuery, DueQuery, DueFromQuery, DueToQuery);
+        var filter = TaskFilterUrl.Parse(PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery);
 
         if (filter == _filter)
         {

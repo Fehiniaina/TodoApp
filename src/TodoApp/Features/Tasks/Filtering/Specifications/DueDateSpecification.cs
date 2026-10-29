@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Linq.Expressions;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Tasks.ListTasks;
@@ -51,10 +52,11 @@ internal sealed class DueDateSpecification : Specification<TaskItem>
         var windowEnd = today.AddDays(UpcomingWindowDays - 1);
         var from = _from;
         var to = _to;
+        var closed = TaskWorkflow.ClosedStatuses.ToArray();
 
         return _mode switch
         {
-            DueDateFilter.Overdue => t => t.DueDate != null && t.DueDate < today && t.Status != TaskItemStatus.Done,
+            DueDateFilter.Overdue => t => t.DueDate != null && t.DueDate < today && !closed.Contains(t.Status),
             DueDateFilter.Today => t => t.DueDate == today,
             DueDateFilter.Next7Days => t => t.DueDate >= today && t.DueDate <= windowEnd,
             DueDateFilter.NoDueDate => t => t.DueDate == null,
@@ -71,4 +73,8 @@ internal sealed class DueDateSpecification : Specification<TaskItem>
             (null, { } e) => t => t.DueDate <= e,
             _ => throw new InvalidOperationException("Plage sans borne."),
         };
+
+    /// <summary>Statuts considérés comme terminés : ni en retard, ni à traiter.</summary>
+    private static IReadOnlySet<TaskItemStatus> ClosedStatuses { get; } =
+        FrozenSet.ToFrozenSet([TaskItemStatus.Resolved, TaskItemStatus.Done]);
 }

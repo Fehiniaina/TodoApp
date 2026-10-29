@@ -16,6 +16,7 @@ internal static class TaskFilterUrl
     public const string DueParam = "due";
     public const string DueFromParam = "from";
     public const string DueToParam = "to";
+    public const string TypeParam = "type";
 
     /// <summary>Valeur spéciale de <c>assignee</c> pour « non assignée » (les ids Identity sont des GUID).</summary>
     public const string UnassignedValue = "none";
@@ -43,9 +44,14 @@ internal static class TaskFilterUrl
         Enum.GetValues<TaskPriority>()
             .ToFrozenDictionary(p => p.ToString(), StringComparer.OrdinalIgnoreCase);
 
+    private static readonly FrozenDictionary<string, TaskType> TypeByName =
+        Enum.GetValues<TaskType>()
+            .ToFrozenDictionary(t => t.ToString(), StringComparer.OrdinalIgnoreCase);
+
     public static TaskFilter Parse(
         IEnumerable<string>? priorities,
         IEnumerable<string>? assignees,
+        IEnumerable<string>? types,
         string? due,
         string? dueFrom,
         string? dueTo)
@@ -73,6 +79,15 @@ internal static class TaskFilterUrl
             }
         }
 
+        var parsedTypes = new HashSet<TaskType>();
+        foreach(var value in Bounded(types))
+        {
+            if (TypeByName.TryGetValue(value, out var type))
+            {
+                parsedTypes.Add(type);
+            }
+        }
+
         var (mode, from, to) = ParseDueDate(due, dueFrom, dueTo);
 
         return new TaskFilter
@@ -83,6 +98,7 @@ internal static class TaskFilterUrl
             DueDate = mode,
             DueFrom = from,
             DueTo = to,
+            Types = parsedTypes
         };
     }
 
@@ -105,6 +121,10 @@ internal static class TaskFilterUrl
             assignees = filter.IncludeUnassigned ? [.. ids, UnassignedValue] : [.. ids];
         }
 
+        string[]? types = filter.FiltersType
+            ? [.. filter.Types.Order().Select(t => t.ToString())]
+            : null;
+
         var hasDue = filter.HasDueDateFilter;
         var isRange = hasDue && filter.DueDate == DueDateFilter.Range;
 
@@ -112,6 +132,7 @@ internal static class TaskFilterUrl
         {
             [PriorityParam] = priorities,
             [AssigneeParam] = assignees,
+            [TypeParam] = types,
             [DueParam] = hasDue ? SlugByDue[filter.DueDate] : null,
             [DueFromParam] = isRange ? FormatDate(filter.DueFrom) : null,
             [DueToParam] = isRange ? FormatDate(filter.DueTo) : null,

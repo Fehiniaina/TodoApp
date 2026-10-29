@@ -18,6 +18,21 @@
                                     OnToggle="ToggleAssignee"
                                     OnToggleUnassigned="ToggleUnassigned" />
 
+            <FilterDropdown Label="Type"
+                            ActiveCount="CurrentFilter.Types.Count"
+                            OnClear="ClearTypes">
+                @foreach (var type in TypeOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                                checked="@CurrentFilter.Types.Contains(type)"
+                                @onchange="() => ToogleType(type)" />
+                        <TaskTypeIcon Type="type" Decorative="true" />
+                        <span>@type.ToLabel()</span>
+                    </label>
+                }
+            </FilterDropdown>
+
             <FilterDropdown Label="Priorité"
                             ActiveCount="CurrentFilter.Priorities.Count"
                             OnClear="ClearPriorities">
