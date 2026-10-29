@@ -2,9 +2,9 @@ namespace TodoApp.Domain.Tasks;
 
 public enum TaskItemStatus
 {
-    ToDo,
-    InProgress,
-    InValidation,
-    Resolved,
-    Done
+    ToDo = 0,
+    InProgress = 1,
+    InValidation = 2,
+    Resolved = 3,
+    Done = 4
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Humanizer;
+using TodoApp.Domain.Common;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Features.Tasks.Shared;
@@ -29,20 +30,21 @@ public static class TaskActivityFormatter
                 => $"{a.ActorName} a réassigné la tâche de {a.OldValue} à {a.NewValue}",
 
             TaskActivityType.StatusChanged
-                => $"{a.ActorName} a déplacé la tâche de « {StatusLabel(a.OldValue)} » à « {StatusLabel(a.NewValue)} »",
+                => $"{a.ActorName} a déplacé la tâche de « {Label<TaskItemStatus>(a.OldValue, t => t.ToLabel())} » à « {Label<TaskItemStatus>(a.NewValue, t => t.ToLabel())} »",
             TaskActivityType.AttachmentAdded => $"{a.ActorName} a ajouté la pièce jointe « {a.NewValue} »",
             TaskActivityType.AttachmentRemoved => $"{a.ActorName} a supprimé la pièce jointe « {a.OldValue} »",
             TaskActivityType.TypeChanged =>
-                $"{a.ActorName} a changé le type de {TypeLabel(a.OldValue)} à {TypeLabel(a.NewValue)}",
+                $"{a.ActorName} a changé le type de {Label<TaskType>(a.OldValue, t => t.ToLabel())} à {Label<TaskType>(a.NewValue, t => t.ToLabel())}",
 
             _ => $"{a.ActorName} a modifié la tâche",
         };
     }
 
-    private static string StatusLabel(string? value) =>
-        Enum.TryParse<TaskItemStatus>(value, out var status) ? status.ToLabel() : value ?? "?";
-
-    /// <summary>Jamais d'exception : une valeur illisible s'affiche brute plutôt que de couper le circuit.</summary>
-    private static string TypeLabel(string? stored) =>
-        TaskTypeStorage.TryFromStored(stored, out var type) ? type.ToLabel() : stored ?? "?";
+    /// <summary>
+    /// Libellé d'une valeur d'enum stockée. Jamais d'exception : une valeur illisible
+    /// (ligne non migrée, valeur inconnue) s'affiche brute plutôt que de couper le circuit.
+    /// </summary>
+    private static string Label<TEnum>(string? stored, Func<TEnum, string> toLabel)
+        where TEnum : struct, Enum =>
+        EnumStorage.TryFromStored<TEnum>(stored, out var value) ? toLabel(value) : stored ?? "?";
 }
