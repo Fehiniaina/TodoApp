@@ -7,6 +7,9 @@ namespace TodoApp.Infrastructure.Configurations;
 
 internal sealed class TaskActivityConfiguration : IEntityTypeConfiguration<TaskActivity>
 {
+    /// <summary>Ordre d'insertion strict, pour départager les activités de même horodatage.</summary>
+    internal const string SequenceProperty = "Sequence";
+
     public void Configure(EntityTypeBuilder<TaskActivity> builder)
     {
         builder.ToTable("task_activities");
@@ -28,6 +31,10 @@ internal sealed class TaskActivityConfiguration : IEntityTypeConfiguration<TaskA
 
         builder.HasQueryFilter(QueryFilters.SoftDelete, a => !a.Task.IsDeleted);
 
-        builder.HasIndex(a => new { a.TaskId, a.OccurredAtUtc });
+        builder.Property<long>(SequenceProperty)
+            .UseIdentityByDefaultColumn();
+
+
+        builder.HasIndex(nameof(TaskActivity.TaskId), nameof(TaskActivity.OccurredAtUtc), SequenceProperty);
     }
 }

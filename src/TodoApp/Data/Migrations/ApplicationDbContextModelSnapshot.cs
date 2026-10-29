@@ -434,6 +434,13 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("old_value");
 
+                    b.Property<long>("Sequence")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Sequence"));
+
                     b.Property<Guid>("TaskId")
                         .HasColumnType("uuid")
                         .HasColumnName("task_id");
@@ -447,8 +454,8 @@ namespace TodoApp.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_task_activities");
 
-                    b.HasIndex("TaskId", "OccurredAtUtc")
-                        .HasDatabaseName("ix_task_activities_task_id_occurred_at_utc");
+                    b.HasIndex("TaskId", "OccurredAtUtc", "Sequence")
+                        .HasDatabaseName("ix_task_activities_task_id_occurred_at_utc_sequence");
 
                     b.ToTable("task_activities", (string)null);
                 });

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks;
@@ -57,23 +58,12 @@ public class TaskActivityHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         var created = await CreateHandler(OwnerA).HandleAsync(TaskCommands.Create("TASK-1"));
         var taskId = created.Value.Id;
 
-        await Step(AssignHandler(OwnerA).HandleAsync(new AssignTaskCommand(taskId, OwnerB)));
-        await Step(StatusHandler(OwnerB).HandleAsync(new ChangeTaskStatusCommand(taskId, TaskItemStatus.InProgress)));
-        await Step(StatusHandler(OwnerB).HandleAsync(new ChangeTaskStatusCommand(taskId, TaskItemStatus.InValidation)));
-        await Step(AssignHandler(OwnerB).HandleAsync(new AssignTaskCommand(taskId, OwnerA)));
+        await Step(() => AssignHandler(OwnerA).HandleAsync(new AssignTaskCommand(taskId, OwnerB)));
+        await Step(() => StatusHandler(OwnerB).HandleAsync(new ChangeTaskStatusCommand(taskId, TaskItemStatus.InProgress)));
+        await Step(() => StatusHandler(OwnerB).HandleAsync(new ChangeTaskStatusCommand(taskId, TaskItemStatus.InValidation)));
+        await Step(() => AssignHandler(OwnerB).HandleAsync(new AssignTaskCommand(taskId, OwnerA)));
 
         var history = await ActivityHandler(OwnerA).HandleAsync(taskId);
-
-        Assert.Equal(
-            [
-                TaskActivityType.Assigned,
-                TaskActivityType.StatusChanged,
-                TaskActivityType.StatusChanged,
-                TaskActivityType.Assigned,
-                TaskActivityType.Created
-            ],
-            history.Value.Select(a => a.Type));
-
         var last = history.Value[0];
         Assert.Equal((OwnerB, OwnerB, OwnerA), (last.ActorName, last.OldValue, last.NewValue));
     }
@@ -111,18 +101,43 @@ public class TaskActivityHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal(expected, TaskActivityFormatter.Describe(dto));
     }
 
-    /// <summary>Avance l'horloge (horodatages distincts) puis exécute une étape qui doit réussir.</summary>
-    private async Task Step(Task<Result> action)
+    [Fact]
+    public async Task History_SameTimestamp_IsOrderedByInsertion_NewestFirst()
+    {
+        // Pas d'Advance : les trois activités ont exactement le même horodatage.
+        // Seule la séquence d'insertion permet de les ordonner.
+        var created = await CreateHandler(OwnerA).HandleAsync(TaskCommands.Create("Same-time"));
+        var taskId = created.Value.Id;
+
+        var assigned = await AssignHandler(OwnerA).HandleAsync(new AssignTaskCommand(taskId, OwnerB));
+        Assert.True(assigned.IsSuccess);
+
+        var started = await StatusHandler(OwnerB).HandleAsync(new ChangeTaskStatusCommand(taskId, TaskItemStatus.InProgress));
+        Assert.True(started.IsSuccess);
+
+        var history = await ActivityHandler(OwnerA).HandleAsync(taskId);
+
+        Assert.Equal(
+            [TaskActivityType.StatusChanged, TaskActivityType.Assigned, TaskActivityType.Created],
+            history.Value.Select(a => a.Type));
+    }
+
+    /// <summary>
+    /// Avance l'horloge PUIS démarre l'étape (qui doit réussir).
+    /// Reçoit une fonction et non une Task : une Task passée en argument est déjà démarrée
+    /// avant l'Advance, et lit parfois l'ancienne heure (course).
+    /// </summary>
+    private async Task Step(Func<Task<Result>> action)
     {
         _time.Advance(TimeSpan.FromMinutes(1));
-        var result = await action;
+        var result = await action();
         Assert.True(result.IsSuccess, result.IsFailure ? result.Error.Message : null);
     }
 
-    private async Task Step<T>(Task<Result<T>> action)
+    private async Task Step<T>(Func<Task<Result<T>>> action)
     {
         _time.Advance(TimeSpan.FromMinutes(1));
-        var result = await action;
+        var result = await action();
         Assert.True(result.IsSuccess, result.IsFailure ? result.Error.Message : null);
     }
 }

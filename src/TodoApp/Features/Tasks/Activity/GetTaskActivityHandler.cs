@@ -5,6 +5,7 @@ using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Tasks.Shared;
 using TodoApp.Features.Users;
+using TodoApp.Infrastructure.Configurations;
 
 namespace TodoApp.Features.Tasks.Activity;
 
@@ -28,6 +29,7 @@ internal sealed class GetTaskActivityHandler(
         var activities = await db.TaskActivities
             .Where(a => a.TaskId == taskId)
             .OrderByDescending(a => a.OccurredAtUtc)
+            .ThenByDescending(a => EF.Property<long>(a, TaskActivityConfiguration.SequenceProperty))
             .ThenBy(a => a.Id)
             .ToListAsync(cancellationToken);
 
