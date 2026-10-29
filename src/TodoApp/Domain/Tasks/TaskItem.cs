@@ -45,6 +45,8 @@ internal sealed class TaskItem : AggregateRoot
 
     public string? AssigneeId { get; private set; }
 
+    public TaskType Type { get; private set; }
+
     /// <summary>Étapes triées par position (alloue une nouvelle liste).</summary>
     public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
         [.. _checklist.OrderBy(i => i.Position)];
@@ -55,11 +57,18 @@ internal sealed class TaskItem : AggregateRoot
 
     public IReadOnlyCollection<TaskAttachment> Attachments => _attachments.AsReadOnly();
 
+    public void ChangeType(TaskType type)
+    {
+        Type = type;
+    }
+
     public static TaskItem Create(string createdById, string title, string? description,
-                              TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
+                              TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc,
+                              TaskType type = TaskType.Task)
     {
         var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
         task.Raise(new TaskCreated(task.Id, createdById, createdAtUtc));
+
         return task;
     }
 

@@ -8,18 +8,6 @@
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
-        <div class="issue-filters" role="group" aria-label="Filtrer les tâches">
-            @foreach (var (scope, label) in Scopes)
-            {
-                <button type="button"
-                        class="filter-chip @(_scope == scope ? "is-active" : null)"
-                        aria-pressed="@(_scope == scope)"
-                        @onclick="() => ChangeScopeAsync(scope)">
-                    @label
-                </button>
-            }
-        </div>
-
         <div class="flt-bar" role="group" aria-label="Filtres">
             <span class="flt-separator" aria-hidden="true"></span>
 
@@ -137,6 +125,7 @@ else
                              AriaLabel="Pagination des tâches">
             <ChildContentHeader>
                 <tr>
+                    <th scope="col" class="col-type">Type</th>
                     <th scope="col" class="col-summary">Résumé</th>
                     <th scope="col" class="col-priority">Priorité</th>
                     <th scope="col" class="col-status">Statut</th>
@@ -149,7 +138,7 @@ else
 
             <ChildContentRow Context="task">
                 <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
-
+                    <td class="col-type">@task.type.ToLabel()</td>
                     <td class="col-summary">
                         <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">

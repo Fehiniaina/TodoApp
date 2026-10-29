@@ -654,6 +654,12 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("title");
 
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3)
+                        .HasColumnName("type");
+
                     b.HasKey("Id")
                         .HasName("pk_tasks");
 

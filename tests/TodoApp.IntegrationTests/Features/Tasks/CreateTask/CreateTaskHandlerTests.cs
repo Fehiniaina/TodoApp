@@ -31,8 +31,6 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         _time,
         new TaskChangeNotifier());
 
-    // ── success path ────────────────────────────────────────────────────────
-
     [Fact]
     public void Diagnostic_PriorityIsMappedToPostgresEnum()
     {
@@ -80,8 +78,6 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.Equal(OwnerA, persisted.CreatedById);
     }
 
-    // ── validation failure ───────────────────────────────────────────────────
-
     [Fact]
     public async Task HandleAsync_EmptyTitle_ReturnsValidationFailure()
     {
@@ -103,8 +99,6 @@ public class CreateTaskHandlerTests(PostgresFixture fixture) : IAsyncLifetime
         Assert.True(result.IsFailure);
         Assert.Equal(ErrorType.Validation, result.Error.Type);
     }
-
-    // ── owner isolation ──────────────────────────────────────────────────────
 
     [Fact]
     public async Task HandleAsync_TasksAreScopedByOwner_OtherOwnerSeesNoTasks()

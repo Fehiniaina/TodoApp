@@ -318,22 +318,6 @@ public sealed partial class TaskList : IDisposable
 
     private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
 
-    private static readonly (TaskScope Scope, string Label)[] Scopes =
-    [
-        (TaskScope.All, "Toutes"),
-        (TaskScope.AssignedToMe, "Assignées à moi"),
-        (TaskScope.CreatedByMe, "Créées par moi"),
-    ];
-
-    private Task ChangeScopeAsync(TaskScope scope)
-    {
-        if (scope == _scope) return Task.CompletedTask;
-
-        _scope = scope;
-        _currentPage = 1;
-        return LoadTasksAsync();
-    }
-
     private string? StatusTooltip(TaskSummary task) =>
         task.CompletedAt is { } completedAt ? $"Résolue le {FormatDateTime(completedAt)}" : null;
 
