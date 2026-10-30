@@ -289,7 +289,7 @@ internal sealed class TaskItem : AggregateRoot
             DueDate = dueDate,
             Status = TaskItemStatus.ToDo,
             CreatedAtUtc = createdAtUtc,
-            Type = type
+            Type = EnsureDefined(type),
         };
     }
 }

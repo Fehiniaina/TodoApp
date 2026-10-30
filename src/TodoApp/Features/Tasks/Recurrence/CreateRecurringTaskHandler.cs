@@ -2,10 +2,11 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Common;
 using TodoApp.Data;
+using TodoApp.Domain.Tasks.Recurrence;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Time;
 
-namespace TodoApp.Domain.Tasks.Recurrence;
+namespace TodoApp.Features.Tasks.Recurrence;
 
 internal sealed class CreateRecurringTaskHandler(
     IDbContextFactory<ApplicationDbContext> factory,
