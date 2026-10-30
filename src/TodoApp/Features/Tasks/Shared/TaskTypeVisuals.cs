@@ -19,7 +19,7 @@ internal static class TaskTypeVisuals
             [TaskType.Extraction] = "type-icon--extraction",
             [TaskType.Analyse] = "type-icon--analysis",
             [TaskType.Task] = "type-icon--task",
-            [TaskType.Story] = "type-icon--story",
+            [TaskType.UserStory] = "type-icon--story",
         }.ToFrozenDictionary();
 
     public static string CssFor(TaskType type) =>

@@ -79,7 +79,7 @@ public static class TodoAppSeeder
 
         // 0 = Bug, Extracte = 1, Analyse = 2, Task = 3, Story = 4
         var type = f.Random.WeightedRandom(
-            [TaskType.Task, TaskType.Bug, TaskType.Story, TaskType.Analyse, TaskType.Extraction],
+            [TaskType.Task, TaskType.Bug, TaskType.UserStory, TaskType.Analyse, TaskType.Extraction],
             [0.40f, 0.25f, 0.20f, 0.10f, 0.05f]);
 
         var task = TaskItem.Create(

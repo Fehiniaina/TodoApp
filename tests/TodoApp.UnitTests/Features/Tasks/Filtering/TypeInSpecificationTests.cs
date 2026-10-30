@@ -22,10 +22,10 @@ public sealed class TypeInSpecificationTests
     [Fact]
     public void Several_types_are_combined_with_or()
     {
-        var spec = new TypeInSpecification([TaskType.Bug, TaskType.Story]);
+        var spec = new TypeInSpecification([TaskType.Bug, TaskType.UserStory]);
 
         Assert.True(spec.IsSatisfiedBy(TestTasks.Create(type: TaskType.Bug)));
-        Assert.True(spec.IsSatisfiedBy(TestTasks.Create(type: TaskType.Story)));
+        Assert.True(spec.IsSatisfiedBy(TestTasks.Create(type: TaskType.UserStory)));
         Assert.False(spec.IsSatisfiedBy(TestTasks.Create(type: TaskType.Task)));
         Assert.False(spec.IsSatisfiedBy(TestTasks.Create(type: TaskType.Extraction)));
     }
@@ -47,8 +47,8 @@ public sealed class TypeInSpecificationTests
         var spec = new TypeInSpecification(source);
         var expression = spec.ToExpression().Compile();
 
-        source.Add(TaskType.Story);
+        source.Add(TaskType.UserStory);
 
-        Assert.False(expression(TestTasks.Create(type: TaskType.Story)));
+        Assert.False(expression(TestTasks.Create(type: TaskType.UserStory)));
     }
 }

@@ -63,8 +63,8 @@ public sealed class TaskFilterUrlTests
         {
             Priorities = new HashSet<TaskPriority> { TaskPriority.Low },
             AssigneeIds = new HashSet<string>(StringComparer.Ordinal) { "user-1" },
+            Types = new HashSet<TaskType> { TaskType.UserStory },
             IncludeUnassigned = true,
-            Types = new HashSet<TaskType> { TaskType.Story },
             DueDate = DueDateFilter.Next7Days,
         };
 
@@ -87,20 +87,20 @@ public sealed class TaskFilterUrlTests
     [Fact]
     public void Type_round_trip_keeps_types()
     {
-        var original = new TaskFilter { Types = new HashSet<TaskType> { TaskType.Story, TaskType.Bug } };
+        var original = new TaskFilter { Types = new HashSet<TaskType> { TaskType.UserStory, TaskType.Bug } };
 
         var parsed = RoundTrip(original);
 
         // Assertion directe : ne dépend pas du Equals du record (qui pourrait oublier les types).
-        Assert.True(parsed.Types.SetEquals([TaskType.Story, TaskType.Bug]));
+        Assert.True(parsed.Types.SetEquals([TaskType.UserStory, TaskType.Bug]));
         Assert.Equal(original, parsed);
     }
 
     [Fact]
     public void Types_are_written_sorted_for_a_canonical_url()
     {
-        var a = TaskFilterUrl.ToQueryParameters(new TaskFilter { Types = new HashSet<TaskType> { TaskType.Story, TaskType.Bug } });
-        var b = TaskFilterUrl.ToQueryParameters(new TaskFilter { Types = new HashSet<TaskType> { TaskType.Bug, TaskType.Story } });
+        var a = TaskFilterUrl.ToQueryParameters(new TaskFilter { Types = new HashSet<TaskType> { TaskType.UserStory, TaskType.Bug } });
+        var b = TaskFilterUrl.ToQueryParameters(new TaskFilter { Types = new HashSet<TaskType> { TaskType.Bug, TaskType.UserStory } });
 
         Assert.Equal((string[]?)a[TaskFilterUrl.TypeParam], (string[]?)b[TaskFilterUrl.TypeParam]);
     }
@@ -111,6 +111,43 @@ public sealed class TaskFilterUrlTests
         var parameters = TaskFilterUrl.ToQueryParameters(TaskFilter.None);
 
         Assert.All(parameters.Values, Assert.Null);
+    }
+
+    [Theory]
+    [InlineData("Story")]  // favori créé avant le renommage Story → UserStory
+    [InlineData("story")]
+    [InlineData("STORY")]
+    public void Legacy_type_link_still_works(string value)
+    {
+        var filter = TaskFilterUrl.Parse(null, null, [value], null, null, null);
+
+        Assert.True(filter.Types.SetEquals([TaskType.UserStory]));
+    }
+
+    [Fact]
+    public void Url_uses_slugs_not_member_names()
+    {
+        var parameters = TaskFilterUrl.ToQueryParameters(
+            new TaskFilter { Types = new HashSet<TaskType> { TaskType.UserStory } });
+
+        var types = Assert.IsType<string[]>(parameters[TaskFilterUrl.TypeParam]);
+        Assert.Equal(["story"], types);
+    }
+
+    [Fact]
+    public void Ignored_values_are_reported()
+    {
+        _ = TaskFilterUrl.Parse(["high", "Haute"], null, ["bug", "Epic"], "demain", null, null, out var ignored);
+
+        Assert.Equal(["Haute", "Epic", "demain"], ignored);
+    }
+
+    [Fact]
+    public void Valid_link_reports_nothing()
+    {
+        _ = TaskFilterUrl.Parse(["high"], ["none"], ["story"], "overdue", null, null, out var ignored);
+
+        Assert.Empty(ignored);
     }
 
     private static TaskFilter RoundTrip(TaskFilter filter)

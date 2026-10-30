@@ -9,7 +9,7 @@ public static class TaskTypeExtensions
     {
         TaskType.Bug => "Bug",
         TaskType.Extraction => "Extraction",
-        TaskType.Story => "Story",
+        TaskType.UserStory => "User story",
         TaskType.Analyse => "Analyse",
         TaskType.Task => "Tâche",
         _ => type.ToString(),

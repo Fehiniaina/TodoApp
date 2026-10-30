@@ -16,7 +16,7 @@ public sealed class TaskTypeContractTests
         [TaskType.Extraction] = 1,
         [TaskType.Analyse] = 2,
         [TaskType.Task] = 3,
-        [TaskType.Story] = 4,
+        [TaskType.UserStory] = 4,
     };
 
     /// <summary>
@@ -53,7 +53,7 @@ public sealed class TaskTypeContractTests
     public void Display_order_is_alphabetical_by_label()
     {
         Assert.Equal(
-            [TaskType.Analyse, TaskType.Bug, TaskType.Extraction, TaskType.Story, TaskType.Task],
+            [TaskType.Analyse, TaskType.Bug, TaskType.Extraction, TaskType.Task, TaskType.UserStory],
             TaskTypeExtensions.InDisplayOrder);
     }
 

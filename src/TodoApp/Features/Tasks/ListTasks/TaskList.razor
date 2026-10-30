@@ -9,6 +9,13 @@
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
         <div class="flt-bar" role="group" aria-label="Filtres">
+            @if (_ignoredFilterValues.Count > 0)
+            {
+                <div class="alert alert-warning" role="status">
+                    Certains filtres de ce lien ne sont plus reconnus et ont été ignorés :
+                    @string.Join(", ", _ignoredFilterValues.Take(5).Select(v => v.Length > 40 ? v[..40] + "…" : v))
+                </div>
+            }
             <span class="flt-separator" aria-hidden="true"></span>
 
             <AssigneeAvatarFilter Users="_userOptions"

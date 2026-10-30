@@ -103,11 +103,11 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
     public async Task Type_filter_returns_selected_types()
     {
         await SeedAsync("Un bug", type: TaskType.Bug);
-        await SeedAsync("Une story", type: TaskType.Story);
+        await SeedAsync("Une story", type: TaskType.UserStory);
         await SeedAsync("Une tâche", type: TaskType.Task);
         await SeedAsync("Une extraction", type: TaskType.Extraction);
 
-        var titles = await TitlesAsync(Types(TaskType.Story, TaskType.Extraction));
+        var titles = await TitlesAsync(Types(TaskType.UserStory, TaskType.Extraction));
 
         Assert.Equal(["Une extraction", "Une story"], titles);
     }
@@ -244,7 +244,7 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
         await SeedAsync("Mauvaise priorité",
             priority: TaskPriority.Low, type: TaskType.Bug, assigneeId: OwnerB, dueDate: Today.AddDays(-1));
         await SeedAsync("Mauvais type",
-            priority: TaskPriority.High, type: TaskType.Story, assigneeId: OwnerB, dueDate: Today.AddDays(-1));
+            priority: TaskPriority.High, type: TaskType.UserStory, assigneeId: OwnerB, dueDate: Today.AddDays(-1));
         await SeedAsync("Mauvais assigné",
             priority: TaskPriority.High, type: TaskType.Bug, assigneeId: OwnerC, dueDate: Today.AddDays(-1));
         await SeedAsync("Pas en retard",
@@ -309,12 +309,12 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
     [Fact]
     public async Task Summary_exposes_type_priority_and_assignee()
     {
-        await SeedAsync("Détail", priority: TaskPriority.Urgent, type: TaskType.Story, assigneeId: OwnerB);
+        await SeedAsync("Détail", priority: TaskPriority.Urgent, type: TaskType.UserStory, assigneeId: OwnerB);
 
         var result = await QueryAsync(TaskFilter.None);
 
         var summary = Assert.Single(result.Items);
-        Assert.Equal(TaskType.Story, summary.Type);
+        Assert.Equal(TaskType.UserStory, summary.Type);
         Assert.Equal(TaskPriority.Urgent, summary.Priority);
         Assert.Equal(OwnerB, summary.AssigneeId);
     }

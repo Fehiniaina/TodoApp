@@ -13,5 +13,5 @@ public enum TaskType
     Extraction = 1,
     Analyse = 2,
     Task = 3,
-    Story = 4,
+    UserStory = 4,
 }

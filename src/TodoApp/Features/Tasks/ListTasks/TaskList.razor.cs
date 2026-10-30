@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks;
@@ -15,7 +14,6 @@ using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
 using TodoApp.Features.Tasks.GetTaskSummary;
 using TodoApp.Features.Tasks.Recurrence;
-using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
@@ -80,6 +78,7 @@ public sealed partial class TaskList : IDisposable
     private TaskFilter? _filter;
 
     private TaskFilter CurrentFilter => _filter ?? TaskFilter.None;
+    private IReadOnlyList<string> _ignoredFilterValues = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,7 +94,10 @@ public sealed partial class TaskList : IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        var filter = TaskFilterUrl.Parse(PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery);
+        var filter = TaskFilterUrl.Parse(
+            PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery,
+            out _ignoredFilterValues
+            );
 
         if (filter == _filter)
         {
