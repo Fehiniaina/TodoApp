@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using TodoApp.Domain.Common;
+using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks.Attachments;
 using TodoApp.Domain.Tasks.Events;
 using TodoApp.Domain.Tasks.Exceptions;
@@ -58,6 +59,11 @@ internal sealed class TaskItem : AggregateRoot
 
     public IReadOnlyCollection<TaskAttachment> Attachments => _attachments.AsReadOnly();
 
+    public const int MaxTags = 10;
+
+    private readonly List<TaskTag> _tags = [];
+
+    public IReadOnlyCollection<TaskTag> Tags => _tags.AsReadOnly();
     public void ChangeType(TaskType type, string actorId, DateTime nowUtc)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
@@ -245,6 +251,44 @@ internal sealed class TaskItem : AggregateRoot
 
         Raise(new TaskAttachmentRemoved(Id, actorId, attachment.Id, attachment.FileName, EnsureUtc(nowUtc)));
         return attachment;
+    }
+
+    /// <summary>Idempotent : un tag déjà présent ne change rien (renvoie false, aucun historique).</summary>
+    public bool AddTag(Tag tag, string actorId, DateTime nowUtc)
+    {
+        ArgumentNullException.ThrowIfNull(tag);
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
+        EnsureUtc(nowUtc);
+
+        if (_tags.Exists(t => t.TagId == tag.Id))
+        {
+            return false;
+        }
+
+        if (_tags.Count >= MaxTags)
+        {
+            throw new InvalidOperationException($"A task cannot have more than {MaxTags} tags.");
+        }
+
+        _tags.Add(new TaskTag(tag.Id));
+        Raise(new TaskTagAdded(Id, actorId, tag.Id, tag.Name, nowUtc));
+        return true;
+    }
+
+    /// <summary>Idempotent : un tag absent ne change rien (renvoie false, aucun historique).</summary>
+    public bool RemoveTag(Tag tag, string actorId, DateTime nowUtc)
+    {
+        ArgumentNullException.ThrowIfNull(tag);
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
+        EnsureUtc(nowUtc);
+
+        var removed = _tags.RemoveAll(t => t.TagId == tag.Id) > 0;
+        if (removed)
+        {
+            Raise(new TaskTagRemoved(Id, actorId, tag.Id, tag.Name, nowUtc));
+        }
+
+        return removed;
     }
 
     private static string NormalizeTitle(string title)

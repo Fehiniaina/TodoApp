@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Domain.Notifications;
+using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Activity;
 using TodoApp.Domain.Tasks.Attachments;
@@ -18,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     internal DbSet<Notification> Notifications => Set<Notification>();
     internal DbSet<EmailDelivery> EmailDeliveries => Set<EmailDelivery>();
     internal DbSet<TaskAttachment> TaskAttachments => Set<TaskAttachment>();
+    internal DbSet<Tag> Tags => Set<Tag>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

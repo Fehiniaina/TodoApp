@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TodoApp.Data;
+using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks;
 using TodoApp.Domain.Tasks.Recurrence;
 
@@ -17,6 +18,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         ConfigureAssignment(builder);
         ConfigureAttachments(builder);
         ConfigureTaskType(builder);
+        ConfigureTags(builder);
     }
 
     private static void ConfigureProperties(EntityTypeBuilder<TaskItem> builder)
@@ -109,5 +111,30 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
             // Par défaut EF prend default(TaskType) = 0 = Bug : il n'enverrait donc jamais Bug à l'INSERT,
             // et la base le remplacerait par Task. -1 n'existe pas dans l'enum : EF envoie toujours la valeur.
             .HasSentinel((TaskType)(-1));
+    }
+
+    private static void ConfigureTags(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.OwnsMany(t => t.Tags, tag =>
+        {
+            tag.ToTable("task_tags");
+            tag.WithOwner().HasForeignKey("TaskId");
+
+            // Clé composite : une tâche ne peut pas porter deux fois le même tag (garanti par la base).
+            tag.HasKey("TaskId", nameof(TaskTag.TagId));
+
+            // Supprimer un tag le retire des tâches qui le portent.
+            tag.HasOne<Tag>()
+               .WithMany()
+               .HasForeignKey(x => x.TagId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            // Pour « quelles tâches portent ce tag ? » (filtre, suppression en cascade).
+            tag.HasIndex(x => x.TagId);
+        });
+
+        builder.Navigation(t => t.Tags)
+               .HasField("_tags")
+               .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

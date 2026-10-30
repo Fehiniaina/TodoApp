@@ -35,7 +35,8 @@ public static class TaskActivityFormatter
             TaskActivityType.AttachmentRemoved => $"{a.ActorName} a supprimé la pièce jointe « {a.OldValue} »",
             TaskActivityType.TypeChanged =>
                 $"{a.ActorName} a changé le type de {Label<TaskType>(a.OldValue, t => t.ToLabel())} à {Label<TaskType>(a.NewValue, t => t.ToLabel())}",
-
+            TaskActivityType.TagAdded => $"{a.ActorName} a ajouté le tag « {a.NewValue} »",
+            TaskActivityType.TagRemoved => $"{a.ActorName} a retiré le tag « {a.OldValue} »",
             _ => $"{a.ActorName} a modifié la tâche",
         };
     }
