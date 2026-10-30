@@ -1,4 +1,5 @@
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tags.Shared;
 
 namespace TodoApp.Features.Tasks.Details;
 
@@ -18,7 +19,8 @@ internal sealed record TaskDetails(
     string? AssigneeName,
     int ChecklistDone,
     int ChecklistTotal,
-    TaskType Type)
+    TaskType Type,
+    IReadOnlyList<TagDto> Tags)
 {
     public bool IsCompleted => CompletedAt is not null;
 

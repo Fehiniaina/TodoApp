@@ -53,6 +53,10 @@ internal sealed class Tag
         NormalizedName = clean.ToUpperInvariant();
     }
 
+    /// <summary>Vrai si le nom est acceptable (validateurs : message clair, sans exception).</summary>
+    public static bool IsValidName(string? name) =>
+        !string.IsNullOrWhiteSpace(name) && Collapse(name).Length <= MaxNameLength;
+
     /// <summary>Retire les espaces en trop (début, fin, et répétés au milieu), puis vérifie la longueur.</summary>
     private static string Clean(string name)
     {
@@ -69,4 +73,8 @@ internal sealed class Tag
         Enum.IsDefined(color)
             ? color
             : throw new ArgumentOutOfRangeException(nameof(color), color, "Unknown tag color.");
+
+    /// <summary>Retire les espaces en début et fin, et réduit les espaces répétés à un seul.</summary>
+    private static string Collapse(string name) =>
+        string.Join(' ', name.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
 }

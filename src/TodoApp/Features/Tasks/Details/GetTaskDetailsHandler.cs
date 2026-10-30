@@ -3,6 +3,7 @@ using TodoApp.Common;
 using TodoApp.Data;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared;
+using TodoApp.Features.Tags.Shared;
 using TodoApp.Features.Tasks.Shared;
 using TodoApp.Features.Users;
 
@@ -44,7 +45,12 @@ internal sealed class GetTaskDetailsHandler(
                     : UserSummary.ToDisplayName(x.Assignee.FirstName, x.Assignee.LastName, x.Assignee.Email),
                 x.Task.Checklist.Count(i => i.IsDone),
                 x.Task.Checklist.Count,
-                x.Task.Type))
+                x.Task.Type,
+                db.Tags
+                    .Where(tag => x.Task.Tags.Any(tt => tt.TagId == tag.Id))
+                    .OrderBy(tag => tag.Name)
+                    .Select(tag => new TagDto(tag.Id, tag.Name, tag.Color))
+                    .ToList()))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (details is null)
