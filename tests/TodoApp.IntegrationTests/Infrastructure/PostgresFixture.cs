@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Respawn;
 using Respawn.Graph;
 using TodoApp.Data;
-using Microsoft.Extensions.Configuration;
+using TodoApp.Infrastructure.Identity;
 
 namespace TodoApp.IntegrationTests.Infrastructure;
 
@@ -76,10 +79,8 @@ public sealed class PostgresFixture : IAsyncLifetime
 
         var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
         builder.UseTodoAppNpgsql(ConnectionString)
-            // EF Core 10 raises PendingModelChangesWarning as an exception during MigrateAsync
-            // even when all migrations are up to date. Safe to suppress in tests: MigrateAsync
-            // applies the correct schema regardless of the model-hash check.
-            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            // Identity lit ses options de schéma dans ce fournisseur : même modèle que l'application.
+            .UseApplicationServiceProvider(IdentityServices);
 
         if (interceptors.Length > 0)
         {
@@ -118,4 +119,8 @@ public sealed class PostgresFixture : IAsyncLifetime
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
+
+    private static readonly IServiceProvider IdentityServices = new ServiceCollection()
+        .Configure<IdentityOptions>(options => IdentityStoreConfiguration.Configure(options.Stores))
+        .BuildServiceProvider();
 }

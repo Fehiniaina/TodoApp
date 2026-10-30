@@ -9,6 +9,8 @@ namespace TodoApp.UnitTests.Domain.Tasks;
 
 public sealed class TaskItemStatusContractTests
 {
+    /// <summary>Valeurs retirées : une donnée historique pourrait encore les contenir.</summary>
+    private static readonly int[] ReservedValues = [4]; // ancien Done
 
     /// <summary>
     /// Valeurs persistées dans tasks.status ET dans l'historique (task_activities.old_value / new_value).
@@ -20,7 +22,6 @@ public sealed class TaskItemStatusContractTests
         [TaskItemStatus.InProgress] = 1,
         [TaskItemStatus.InValidation] = 2,
         [TaskItemStatus.Resolved] = 3,
-        [TaskItemStatus.Done] = 4,
     };
 
     [Fact]
@@ -43,5 +44,13 @@ public sealed class TaskItemStatusContractTests
 
         Assert.Contains(expectedOld, text, StringComparison.Ordinal);
         Assert.Contains(expectedNew, text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Reserved_values_are_never_reused()
+    {
+        var used = Enum.GetValues<TaskItemStatus>().Select(s => (int)s);
+
+        Assert.Empty(used.Intersect(ReservedValues));
     }
 }

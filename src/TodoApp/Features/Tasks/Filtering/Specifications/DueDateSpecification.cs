@@ -76,5 +76,5 @@ internal sealed class DueDateSpecification : Specification<TaskItem>
 
     /// <summary>Statuts considérés comme terminés : ni en retard, ni à traiter.</summary>
     private static IReadOnlySet<TaskItemStatus> ClosedStatuses { get; } =
-        FrozenSet.ToFrozenSet([TaskItemStatus.Resolved, TaskItemStatus.Done]);
+        FrozenSet.ToFrozenSet([TaskItemStatus.Resolved]);
 }
