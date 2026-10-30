@@ -1,4 +1,4 @@
-﻿namespace TodoApp.Domain.Tasks;
+namespace TodoApp.Domain.Tasks;
 
 internal enum DueStatus
 {
@@ -6,4 +6,5 @@ internal enum DueStatus
     Upcoming,
     DueToday,
     Overdue,
+    Later,
 }
