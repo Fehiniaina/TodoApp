@@ -6,6 +6,7 @@ using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Tasks.AssignTask;
 using TodoApp.Features.Tasks.ChangeTaskStatus;
+using TodoApp.Features.Tasks.Shared;
 using TodoApp.Features.Tasks.UpdateTask;
 using TodoApp.Features.Users;
 
@@ -30,6 +31,7 @@ public sealed partial class TaskDetailsPage
         [_task!.Status, .. TaskWorkflow.NextStatuses(_task.Status)];
 
     private static TaskPriority[] PriorityOptions { get; } = Enum.GetValues<TaskPriority>();
+    private static IReadOnlyList<TaskType> TypeOptions => TaskTypeExtensions.InDisplayOrder;
 
     private string? DueDateValue => _task!.DueDate?.ToString(DateFormat, CultureInfo.InvariantCulture);
 
@@ -77,8 +79,20 @@ public sealed partial class TaskDetailsPage
         }
 
         return SaveFieldAsync(
-            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, priority, t.DueDate)),
+            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, priority, Type: t.Type, t.DueDate)),
             "Changement de priorité impossible");
+    }
+
+    private Task OnTaskTypeChangedAsync(ChangeEventArgs e)
+    {
+        if(!Enum.TryParse<TaskType>(e.Value?.ToString(), out var type) || type == _task!.Type)
+        {
+            return Task.CompletedTask;
+        }
+
+        return SaveFieldAsync(
+           () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, t.Priority, Type: type, t.DueDate)),
+           "Changement de priorité impossible");
     }
 
     private Task OnDueDateChangedAsync(ChangeEventArgs e)
@@ -95,7 +109,7 @@ public sealed partial class TaskDetailsPage
 
     private Task SaveDueDateAsync(DateOnly? dueDate) =>
         SaveFieldAsync(
-            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, t.Priority, dueDate)),
+            () => UpdateTaskAsync(t => new UpdateTaskCommand(t.Id, t.Title, t.Description, t.Priority, Type: t.Type, dueDate)),
             "Changement d'échéance impossible");
 
     private async Task SaveFieldAsync(Func<Task<string?>> save, string errorTitle)

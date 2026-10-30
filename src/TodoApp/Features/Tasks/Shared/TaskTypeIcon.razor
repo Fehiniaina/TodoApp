@@ -1,0 +1,11 @@
+@using TodoApp.Domain.Tasks
+
+<span class="type-icon @TaskTypeVisuals.CssFor(Type)"
+      role="@(Decorative ? null : "img")"
+      aria-label="@(Decorative ? null : Type.ToLabel())"
+      aria-hidden="@(Decorative ? "true" : null)"
+      title="@Type.ToLabel()">
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+        @Glyph
+    </svg>
+</span>

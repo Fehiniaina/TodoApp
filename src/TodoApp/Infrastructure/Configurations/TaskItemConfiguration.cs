@@ -16,6 +16,7 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         ConfigureRecurrence(builder);
         ConfigureAssignment(builder);
         ConfigureAttachments(builder);
+        ConfigureTaskType(builder);
     }
 
     private static void ConfigureProperties(EntityTypeBuilder<TaskItem> builder)
@@ -98,5 +99,15 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Navigation(t => t.Attachments)
             .HasField("_attachments")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private static void ConfigureTaskType(EntityTypeBuilder<TaskItem> builder)
+    {
+        builder.Property(t => t.Type)
+            .HasDefaultValue(TaskType.Task)
+            // Sentinelle : valeur CLR qui signifie « non renseigné, laisse la base appliquer son défaut ».
+            // Par défaut EF prend default(TaskType) = 0 = Bug : il n'enverrait donc jamais Bug à l'INSERT,
+            // et la base le remplacerait par Task. -1 n'existe pas dans l'enum : EF envoie toujours la valeur.
+            .HasSentinel((TaskType)(-1));
     }
 }

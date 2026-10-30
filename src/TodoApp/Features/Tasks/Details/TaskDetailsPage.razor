@@ -186,6 +186,17 @@
                                 </select>
                             </dd>
 
+                            <dt><label for="field-task-type">Type</label></dt>
+                            <dd>
+                                <select id="field-task-type" class="td-select" disabled="@_isSavingField"
+                                        @onchange="OnTaskTypeChangedAsync">
+                                    @foreach (var type in TypeOptions)
+                                    {
+                                        <option value="@type" selected="@(type == _task.Type)">@type.ToLabel()</option>
+                                    }
+                                </select>
+                            </dd>
+
                             <dt><label for="field-due">Échéance</label></dt>
                             <dd class="td-field-stack">
                                 <div class="td-field-row">

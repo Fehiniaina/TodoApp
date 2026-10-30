@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using TodoApp.Domain.Common;
 using TodoApp.Domain.Tasks.Attachments;
 using TodoApp.Domain.Tasks.Events;
@@ -45,6 +46,8 @@ internal sealed class TaskItem : AggregateRoot
 
     public string? AssigneeId { get; private set; }
 
+    public TaskType Type { get; private set; }
+
     /// <summary>Étapes triées par position (alloue une nouvelle liste).</summary>
     public IReadOnlyList<ChecklistItem> GetOrderedChecklist() =>
         [.. _checklist.OrderBy(i => i.Position)];
@@ -55,11 +58,30 @@ internal sealed class TaskItem : AggregateRoot
 
     public IReadOnlyCollection<TaskAttachment> Attachments => _attachments.AsReadOnly();
 
-    public static TaskItem Create(string createdById, string title, string? description,
-                              TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
+    public void ChangeType(TaskType type, string actorId, DateTime nowUtc)
     {
-        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
+        ArgumentException.ThrowIfNullOrWhiteSpace(actorId);
+        EnsureUtc(nowUtc);
+
+        var newType = EnsureDefined(type);
+        if (newType == Type)
+        {
+            return;
+        }
+
+        var previous = Type;
+        Type = newType;
+
+        Raise(new TaskTypeChanged(Id, actorId, previous, newType, nowUtc));
+    }
+
+    public static TaskItem Create(string createdById, string title, string? description,
+                              TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc,
+                              TaskType type)
+    {
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc, type);
         task.Raise(new TaskCreated(task.Id, createdById, createdAtUtc));
+
         return task;
     }
 
@@ -185,9 +207,9 @@ internal sealed class TaskItem : AggregateRoot
 
     public static TaskItem CreateOccurrence(string createdById, string title, string? description,
                                         TaskPriority priority, DateOnly dueDate, Guid recurringTaskId,
-                                        DateTime createdAtUtc)
+                                        DateTime createdAtUtc, TaskType type)
     {
-        var task = New(createdById, title, description, priority, dueDate, createdAtUtc);
+        var task = New(createdById, title, description, priority, dueDate, createdAtUtc, type);
         task.RecurringTaskId = recurringTaskId;
         task.Raise(new TaskCreated(task.Id, ActorId: null, createdAtUtc));
         return task;
@@ -234,10 +256,13 @@ internal sealed class TaskItem : AggregateRoot
     private static string? NormalizeDescription(string? description) =>
         string.IsNullOrWhiteSpace(description) ? null : description.Trim();
 
-    private static TaskPriority EnsureDefined(TaskPriority priority) =>
-    Enum.IsDefined(priority)
-        ? priority
-        : throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown task priority.");
+    private static TEnum EnsureDefined<TEnum>(
+        TEnum value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where TEnum : struct, Enum =>
+        Enum.IsDefined(value)
+            ? value
+            : throw new ArgumentOutOfRangeException(paramName, value, $"Unknown {typeof(TEnum).Name} value.");
 
     private static DateTime EnsureUtc(DateTime value)
     {
@@ -250,7 +275,7 @@ internal sealed class TaskItem : AggregateRoot
     }
 
     private static TaskItem New(string createdById, string title, string? description,
-                            TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc)
+                            TaskPriority priority, DateOnly? dueDate, DateTime createdAtUtc, TaskType type)
     {
         EnsureUtc(createdAtUtc);
 
@@ -264,6 +289,7 @@ internal sealed class TaskItem : AggregateRoot
             DueDate = dueDate,
             Status = TaskItemStatus.ToDo,
             CreatedAtUtc = createdAtUtc,
+            Type = type
         };
     }
 }

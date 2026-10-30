@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TodoApp.Common;
 using TodoApp.Domain.Tasks;
@@ -15,7 +14,6 @@ using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
 using TodoApp.Features.Tasks.GetTaskSummary;
 using TodoApp.Features.Tasks.Recurrence;
-using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
@@ -55,6 +53,9 @@ public sealed partial class TaskList : IDisposable
     [SupplyParameterFromQuery(Name = "task")]
     private Guid? TaskIdToOpen { get; set; }
 
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.TypeParam)]
+    private string[]? TypeQuery { get; set; }
+
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
     private PagedResult<TaskSummary>? _result;
@@ -77,6 +78,7 @@ public sealed partial class TaskList : IDisposable
     private TaskFilter? _filter;
 
     private TaskFilter CurrentFilter => _filter ?? TaskFilter.None;
+    private IReadOnlyList<string> _ignoredFilterValues = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,7 +94,10 @@ public sealed partial class TaskList : IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        var filter = TaskFilterUrl.Parse(PriorityQuery, AssigneeQuery, DueQuery, DueFromQuery, DueToQuery);
+        var filter = TaskFilterUrl.Parse(
+            PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery,
+            out _ignoredFilterValues
+            );
 
         if (filter == _filter)
         {
@@ -317,22 +322,6 @@ public sealed partial class TaskList : IDisposable
     private string FormatDate(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy", French);
 
     private string FormatDateTime(DateTime utc) => Clock.ToLocal(utc).ToString("d MMM yyyy 'à' HH:mm", French);
-
-    private static readonly (TaskScope Scope, string Label)[] Scopes =
-    [
-        (TaskScope.All, "Toutes"),
-        (TaskScope.AssignedToMe, "Assignées à moi"),
-        (TaskScope.CreatedByMe, "Créées par moi"),
-    ];
-
-    private Task ChangeScopeAsync(TaskScope scope)
-    {
-        if (scope == _scope) return Task.CompletedTask;
-
-        _scope = scope;
-        _currentPage = 1;
-        return LoadTasksAsync();
-    }
 
     private string? StatusTooltip(TaskSummary task) =>
         task.CompletedAt is { } completedAt ? $"Résolue le {FormatDateTime(completedAt)}" : null;

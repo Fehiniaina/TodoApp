@@ -16,13 +16,16 @@ internal static class TaskActivityMapper
             e.TaskId, e.ActorId, TaskActivityType.Assigned, e.PreviousAssigneeId, e.NewAssigneeId, e.OccurredAtUtc),
 
         TaskStatusChanged e => TaskActivity.Record(
-            e.TaskId, e.ActorId, TaskActivityType.StatusChanged, e.From.ToString(), e.To.ToString(), e.OccurredAtUtc),
+            e.TaskId, e.ActorId, TaskActivityType.StatusChanged, EnumStorage.ToStored(e.From), EnumStorage.ToStored(e.To), e.OccurredAtUtc),
 
         TaskAttachmentAdded e => TaskActivity.Record(
             e.TaskId, e.ActorId, TaskActivityType.AttachmentAdded, oldValue: null, newValue: e.FileName, e.OccurredAtUtc),
 
         TaskAttachmentRemoved e => TaskActivity.Record(
             e.TaskId, e.ActorId, TaskActivityType.AttachmentRemoved, oldValue: e.FileName, newValue: null, e.OccurredAtUtc),
+
+        TaskTypeChanged e => TaskActivity.Record(
+            e.TaskId, e.ActorId, TaskActivityType.TypeChanged, oldValue: EnumStorage.ToStored(e.Previous), newValue: EnumStorage.ToStored(e.Current), e.OccurredAtUtc),
 
         _ => null,
     };

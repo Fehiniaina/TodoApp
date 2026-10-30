@@ -54,6 +54,7 @@ internal sealed class PreviewTaskImportHandler(
             row.AssigneeEmail,
             assigneeId,
             assigneeName,
+            row.Type,
             errors);
     }
 

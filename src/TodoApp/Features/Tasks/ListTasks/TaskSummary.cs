@@ -16,7 +16,8 @@ public sealed record TaskSummary(
     Guid? RecurringTaskId,
     string CreatedById,
     string? AssigneeId,
-    string? AssigneeName)
+    string? AssigneeName,
+    TaskType Type)
 {
     public bool IsCompleted => Status == TaskItemStatus.Resolved;
 }

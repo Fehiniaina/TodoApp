@@ -33,7 +33,8 @@ internal sealed class CreateTaskHandler(
             string.IsNullOrWhiteSpace(command.Description) ? null : command.Description,
             command.Priority,
             command.DueDate,
-            timeProvider.GetUtcNow().UtcDateTime);
+            timeProvider.GetUtcNow().UtcDateTime,
+            command.Type);
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
         db.Tasks.Add(task);

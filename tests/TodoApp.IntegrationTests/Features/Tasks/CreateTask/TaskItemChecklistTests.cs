@@ -6,7 +6,7 @@ namespace TodoApp.IntegrationTests.Features.Tasks.CreateTask;
 public class TaskItemChecklistTests
 {
     private static readonly DateTime CreatedAt = new(2026, 10, 20, 8, 0, 0, DateTimeKind.Utc);
-    private static TaskItem NewTask() => TaskItem.Create("owner", "Task", null, TaskPriority.Medium, null, CreatedAt);
+    private static TaskItem NewTask() => TaskItem.Create("owner", "Task", null, TaskPriority.Medium, null, CreatedAt, TaskType.Task);
 
     [Fact]
     public void RemoveChecklistItem_ReindexesPositions()

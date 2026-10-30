@@ -5,6 +5,7 @@ using TodoApp.Domain.Tasks;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Tasks.Shared;
 using TodoApp.Features.Users;
+using TodoApp.Shared.Specifications;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
@@ -25,7 +26,7 @@ internal sealed class ListTasksHandler(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var tasks = ApplyScope(db.Tasks.VisibleTo(userId), query.Scope, userId)
-            .ApplyFilter(query.Filter, query.Today);
+            .Where(query.Filter.ToSpecifications(query.Today));
 
         var totalCount = await tasks.CountAsync(cancellationToken);
         var items = await TaskSummaryProjection.ToSummaries(Paginate(tasks, page, pageSize), db.Users)

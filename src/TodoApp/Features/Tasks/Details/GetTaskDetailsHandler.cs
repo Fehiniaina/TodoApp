@@ -43,7 +43,8 @@ internal sealed class GetTaskDetailsHandler(
                     ? null
                     : UserSummary.ToDisplayName(x.Assignee.FirstName, x.Assignee.LastName, x.Assignee.Email),
                 x.Task.Checklist.Count(i => i.IsDone),
-                x.Task.Checklist.Count))
+                x.Task.Checklist.Count,
+                x.Task.Type))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (details is null)

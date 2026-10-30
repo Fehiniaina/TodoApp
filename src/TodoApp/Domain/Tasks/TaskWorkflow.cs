@@ -21,4 +21,7 @@ internal static class TaskWorkflow
         Allowed.TryGetValue(from, out var next) ? next : FrozenSet<TaskItemStatus>.Empty;
 
     private static FrozenSet<TaskItemStatus> Next(params TaskItemStatus[] statuses) => statuses.ToFrozenSet();
+
+    /// <summary>Statuts considérés comme terminés : ni en retard, ni à traiter.</summary>
+    public static readonly TaskItemStatus[] ClosedStatuses = [TaskItemStatus.Resolved, TaskItemStatus.Done];
 }

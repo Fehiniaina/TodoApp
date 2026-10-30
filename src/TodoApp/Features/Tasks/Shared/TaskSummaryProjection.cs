@@ -30,6 +30,7 @@ internal static class TaskSummaryProjection
                 x.Task.AssigneeId,
                 x.Assignee == null
                     ? null
-                    : UserSummary.ToDisplayName(x.Assignee.FirstName, x.Assignee.LastName, x.Assignee.Email)));
+                    : UserSummary.ToDisplayName(x.Assignee.FirstName, x.Assignee.LastName, x.Assignee.Email),
+                x.Task.Type));
 
 }

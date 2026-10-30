@@ -7,4 +7,5 @@ internal enum Column
     Priority,
     DueDate,
     Assignee,
+    Type,
 }

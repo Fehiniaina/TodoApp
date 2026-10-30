@@ -11,4 +11,5 @@ internal static class TaskErrors
     public static Error DescriptionTooLong => Error.Validation("Task.DescriptionTooLong", "The description must be 2000 characters or fewer.");
 
     public static Error InvalidPriority => Error.Validation("Task.InvalidPriority", "The priority is invalid.");
+    public static Error InvalidTaskType => Error.Validation("Task.InvalidTaskType", "Value of task type is invalid.");
 }

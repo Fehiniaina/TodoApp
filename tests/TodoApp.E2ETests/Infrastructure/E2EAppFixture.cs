@@ -137,7 +137,7 @@ public sealed class E2EAppFixture : IAsyncLifetime
         await using var db = await factory.CreateDbContextAsync();
 
         ArgumentNullException.ThrowIfNull(owner);
-        var task = TaskItem.Create(owner.Id, title, description, TaskPriority.Medium, null, DateTime.UtcNow);
+        var task = TaskItem.Create(owner.Id, title, description, TaskPriority.Medium, null, DateTime.UtcNow, TaskType.Task);
         db.Tasks.Add(task);
         await db.SaveChangesAsync();
 

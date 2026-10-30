@@ -14,6 +14,7 @@ internal sealed record TaskFilter
 {
     private readonly FrozenSet<TaskPriority> _priorities = FrozenSet<TaskPriority>.Empty;
     private readonly FrozenSet<string> _assigneeIds = FrozenSet<string>.Empty;
+    private readonly FrozenSet<TaskType> _types = FrozenSet<TaskType>.Empty;
 
     public static TaskFilter None { get; } = new();
 
@@ -21,6 +22,12 @@ internal sealed record TaskFilter
     {
         get => _priorities;
         init => _priorities = (value ?? throw new ArgumentNullException(nameof(value))).ToFrozenSet();
+    }
+
+    public IReadOnlySet<TaskType> Types
+    {
+        get => _types;
+        init => _types = (value ?? throw new ArgumentNullException(nameof(value))).ToFrozenSet();
     }
 
     public IReadOnlySet<string> AssigneeIds
@@ -43,6 +50,8 @@ internal sealed record TaskFilter
 
     public bool FiltersAssignee => _assigneeIds.Count > 0 || IncludeUnassigned;
 
+    public bool FiltersType => _types.Count > 0;
+
     /// <summary>Faux pour <see cref="DueDateFilter.Any"/> et pour une plage invalide.</summary>
     public bool HasDueDateFilter => DueDate switch
     {
@@ -55,7 +64,8 @@ internal sealed record TaskFilter
     public int ActiveCount =>
         (FiltersPriority ? 1 : 0)
         + (FiltersAssignee ? 1 : 0)
-        + (HasDueDateFilter ? 1 : 0);
+        + (HasDueDateFilter ? 1 : 0)
+        + (FiltersType ? 1 : 0);
 
     public bool IsEmpty => ActiveCount == 0;
 
@@ -75,6 +85,11 @@ internal sealed record TaskFilter
         {
             yield return new DueDateSpecification(DueDate, today, DueFrom, DueTo);
         }
+
+        if (FiltersType)
+        {
+            yield return new TypeInSpecification(_types);
+        }
     }
 
     public bool Equals(TaskFilter? other) =>
@@ -84,7 +99,8 @@ internal sealed record TaskFilter
         && DueFrom == other.DueFrom
         && DueTo == other.DueTo
         && _priorities.SetEquals(other._priorities)
-        && _assigneeIds.SetEquals(other._assigneeIds);
+        && _assigneeIds.SetEquals(other._assigneeIds)
+        && _types.SetEquals(other._types);
 
     public override int GetHashCode()
     {
@@ -95,6 +111,8 @@ internal sealed record TaskFilter
         hash.Add(DueTo);
         hash.Add(UnorderedHash(_priorities));
         hash.Add(UnorderedHash(_assigneeIds));
+        hash.Add(UnorderedHash(_types));
+
         return hash.ToHashCode();
     }
 

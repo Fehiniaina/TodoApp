@@ -46,7 +46,7 @@ internal sealed partial class ImportTasksHandler(
             // la première ligne du fichier apparaît en tête de liste, dans l'ordre du CSV.
             var createdAtUtc = nowUtc.AddMilliseconds(-i);
 
-            var task = TaskItem.Create(userId, row.Title, row.Description, row.Priority, row.DueDate, createdAtUtc);
+            var task = TaskItem.Create(userId, row.Title, row.Description, row.Priority, row.DueDate, createdAtUtc, row.TaskType);
 
             if (row.AssigneeId is not null)
             {

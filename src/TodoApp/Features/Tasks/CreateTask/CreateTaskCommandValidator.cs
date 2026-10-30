@@ -17,13 +17,18 @@ internal sealed class CreateTaskCommandValidator : AbstractValidator<CreateTaskC
 
         RuleFor(c => c.Description)
             .MaximumLength(2000)
-                .WithErrorCode(TaskErrors.DescriptionTooLong.Code)
-                .WithMessage(TaskErrors.DescriptionTooLong.Message)
+            .WithErrorCode(TaskErrors.DescriptionTooLong.Code)
+            .WithMessage(TaskErrors.DescriptionTooLong.Message)
             .When(c => c.Description is not null);
 
         RuleFor(c => c.Priority)
             .IsInEnum()
-                .WithErrorCode(TaskErrors.InvalidPriority.Code)
-                .WithMessage(TaskErrors.InvalidPriority.Message);
+            .WithErrorCode(TaskErrors.InvalidPriority.Code)
+            .WithMessage(TaskErrors.InvalidPriority.Message);
+
+        RuleFor(c => c.Type)
+            .IsInEnum()
+            .WithErrorCode(TaskErrors.InvalidTaskType.Code)
+            .WithMessage(TaskErrors.InvalidTaskType.Message);
     }
 }

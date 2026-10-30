@@ -1,0 +1,52 @@
+.type-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    color: #fff;
+    vertical-align: middle;
+}
+
+.type-icon svg {
+    fill: currentColor;
+}
+
+.type-icon svg .stroke,
+.type-icon svg .stroke * {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.type-icon--bug {
+    background: #e5493a;
+}
+
+.type-icon--story {
+    background: #63ba3c;
+}
+
+.type-icon--task {
+    background: #4bade8;
+}
+
+.type-icon--extraction {
+    background: #904ee2;
+}
+
+.type-icon--analysis {
+    background: #ff991f;
+}
+
+.type-icon--unknown {
+    background: #8590a2;
+}
+
+.issue-table .col-type {
+    width: 40px;
+}

@@ -9,4 +9,5 @@ internal sealed record ParsedTaskRow(
     TaskPriority Priority,
     DateOnly? DueDate,
     string? AssigneeEmail,
+    TaskType Type,
     IReadOnlyList<string> Errors);

@@ -5,6 +5,7 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tasks.Shared;
 
 namespace TodoApp.Features.Tasks.Import;
 
@@ -20,19 +21,17 @@ internal static class TaskCsvParser
 
     private static readonly ImportedTaskFieldsValidator FieldsValidator = new();
 
+    private static readonly (string Key, TaskPriority Value)[] PrioritySynonyms =
+    [
+        ("NORMALE", TaskPriority.Medium),
+    ];
+
     private static readonly FrozenDictionary<string, TaskPriority> Priorities =
-        new Dictionary<string, TaskPriority>(StringComparer.Ordinal)
-        {
-            ["BASSE"] = TaskPriority.Low,
-            ["LOW"] = TaskPriority.Low,
-            ["MOYENNE"] = TaskPriority.Medium,
-            ["NORMALE"] = TaskPriority.Medium,
-            ["MEDIUM"] = TaskPriority.Medium,
-            ["HAUTE"] = TaskPriority.High,
-            ["HIGH"] = TaskPriority.High,
-            ["URGENTE"] = TaskPriority.Urgent,
-            ["URGENT"] = TaskPriority.Urgent,
-        }.ToFrozenDictionary(StringComparer.Ordinal);
+    Enum.GetValues<TaskPriority>()
+        .SelectMany(p => new[] { (Key: Normalize(p.ToString()), Value: p), (Key: Normalize(p.ToLabel()), Value: p) })
+        .Concat(PrioritySynonyms)
+        .DistinctBy(x => x.Key, StringComparer.Ordinal)
+        .ToFrozenDictionary(x => x.Key, x => x.Value, StringComparer.Ordinal);
 
     private static readonly FrozenDictionary<string, Column> HeaderAliases =
         new Dictionary<string, Column>(StringComparer.Ordinal)
@@ -51,6 +50,11 @@ internal static class TaskCsvParser
             ["EMAIL ASSIGNE"] = Column.Assignee,
         }.ToFrozenDictionary(StringComparer.Ordinal);
 
+    private static readonly FrozenDictionary<string, TaskType> Types =
+        Enum.GetValues<TaskType>()
+        .SelectMany(t => new[] { (Key: Normalize(t.ToString()), Type: t), (Key: Normalize(t.ToLabel()), Type: t) })
+        .DistinctBy(x => x.Key, StringComparer.Ordinal)
+        .ToFrozenDictionary(x => x.Key, x => x.Type, StringComparer.Ordinal);
 
     public static async Task<TaskCsvParseResult> ParseAsync(Stream stream, CancellationToken cancellationToken)
     {
@@ -135,6 +139,14 @@ internal static class TaskCsvParser
             errors.Add($"Priorité « {priorityText} » inconnue (attendu : Basse, Moyenne, Haute ou Urgente).");
         }
 
+        var type = TaskType.Task;
+        if (Field(Column.Type) is  { } typeText
+            && !Types.TryGetValue(Normalize(typeText), out type))
+        {
+            errors.Add($"Type de tache « {typeText} » inconnue (attendu : Bug, Extraction, Analyse, Task ou Story).");
+        }
+
+
         DateOnly? dueDate = null;
         if (Field(Column.DueDate) is { } dueText)
         {
@@ -154,7 +166,7 @@ internal static class TaskCsvParser
             errors.Add($"Adresse « {assigneeEmail} » invalide.");
         }
 
-        return new ParsedTaskRow(csv.Parser.RawRow, title, description, priority, dueDate, assigneeEmail, errors);
+        return new ParsedTaskRow(csv.Parser.RawRow, title, description, priority, dueDate, assigneeEmail, type, errors);
     }
 
     private static Dictionary<Column, int> MapHeader(string[] header)

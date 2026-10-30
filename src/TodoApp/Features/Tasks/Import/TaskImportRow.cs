@@ -11,6 +11,7 @@ internal sealed record TaskImportRow(
     string? AssigneeEmail,
     string? AssigneeId,
     string? AssigneeName,
+    TaskType TaskType,
     IReadOnlyList<string> Errors)
 {
     public bool IsValid => Errors.Count == 0;

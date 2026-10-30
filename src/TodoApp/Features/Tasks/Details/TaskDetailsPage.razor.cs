@@ -1,6 +1,8 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using TodoApp.Domain.Notifications;
+using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Time;
 using TodoApp.Features.Tasks.UpdateTask;
 
@@ -22,6 +24,7 @@ public sealed partial class TaskDetailsPage
     [Inject] private GetTaskDetailsHandler Handler { get; set; } = null!;
     [Inject] private UpdateTaskHandler UpdateHandler { get; set; } = null!;
     [Inject] private IUserClock Clock { get; set; } = null!;
+    [Inject] private TaskChangeNotifier notifier { get; set; } = null!;
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -87,10 +90,10 @@ public sealed partial class TaskDetailsPage
     }
 
     private async Task<string?> SaveTitleAsync(string? title) =>
-        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, title!, t.Description, t.Priority, t.DueDate));
+        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, title!, t.Description, t.Priority, t.Type, t.DueDate));
 
     private async Task<string?> SaveDescriptionAsync(string? description) =>
-        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, t.Title, description, t.Priority, t.DueDate));
+        await SaveContentAsync(t => new UpdateTaskCommand(t.Id, t.Title, description, t.Priority, t.Type, t.DueDate));
 
     /// <summary>Édition sur place (titre, description) : l'erreur est affichée sous le champ.</summary>
     private async Task<string?> SaveContentAsync(Func<TaskDetails, UpdateTaskCommand> change)
@@ -108,6 +111,9 @@ public sealed partial class TaskDetailsPage
     private async Task<string?> UpdateTaskAsync(Func<TaskDetails, UpdateTaskCommand> change)
     {
         var result = await UpdateHandler.HandleAsync(change(_task!));
+
+        notifier.NotifyChanged();
+
         return result.IsFailure ? result.Error.Message : null;
     }
 

@@ -8,19 +8,14 @@
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
-        <div class="issue-filters" role="group" aria-label="Filtrer les tâches">
-            @foreach (var (scope, label) in Scopes)
-            {
-                <button type="button"
-                        class="filter-chip @(_scope == scope ? "is-active" : null)"
-                        aria-pressed="@(_scope == scope)"
-                        @onclick="() => ChangeScopeAsync(scope)">
-                    @label
-                </button>
-            }
-        </div>
-
         <div class="flt-bar" role="group" aria-label="Filtres">
+            @if (_ignoredFilterValues.Count > 0)
+            {
+                <div class="alert alert-warning" role="status">
+                    Certains filtres de ce lien ne sont plus reconnus et ont été ignorés :
+                    @string.Join(", ", _ignoredFilterValues.Take(5).Select(v => v.Length > 40 ? v[..40] + "…" : v))
+                </div>
+            }
             <span class="flt-separator" aria-hidden="true"></span>
 
             <AssigneeAvatarFilter Users="_userOptions"
@@ -29,6 +24,21 @@
                                     CurrentUserId="_createdById"
                                     OnToggle="ToggleAssignee"
                                     OnToggleUnassigned="ToggleUnassigned" />
+
+            <FilterDropdown Label="Type"
+                            ActiveCount="CurrentFilter.Types.Count"
+                            OnClear="ClearTypes">
+                @foreach (var type in TypeOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                                checked="@CurrentFilter.Types.Contains(type)"
+                                @onchange="() => ToogleType(type)" />
+                        <TaskTypeIcon Type="type" Decorative="true" />
+                        <span>@type.ToLabel()</span>
+                    </label>
+                }
+            </FilterDropdown>
 
             <FilterDropdown Label="Priorité"
                             ActiveCount="CurrentFilter.Priorities.Count"
@@ -137,6 +147,7 @@ else
                              AriaLabel="Pagination des tâches">
             <ChildContentHeader>
                 <tr>
+                    <th scope="col" class="col-type">Type</th>
                     <th scope="col" class="col-summary">Résumé</th>
                     <th scope="col" class="col-priority">Priorité</th>
                     <th scope="col" class="col-status">Statut</th>
@@ -149,7 +160,7 @@ else
 
             <ChildContentRow Context="task">
                 <tr @key="task.Id" class="issue-row @(task.IsCompleted ? "is-done" : null)">
-
+                    <td class="col-type"><TaskTypeIcon Type="task.Type" /></td>
                     <td class="col-summary">
                         <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">

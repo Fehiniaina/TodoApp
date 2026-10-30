@@ -434,6 +434,13 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("old_value");
 
+                    b.Property<long>("Sequence")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("sequence");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Sequence"));
+
                     b.Property<Guid>("TaskId")
                         .HasColumnType("uuid")
                         .HasColumnName("task_id");
@@ -447,8 +454,8 @@ namespace TodoApp.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_task_activities");
 
-                    b.HasIndex("TaskId", "OccurredAtUtc")
-                        .HasDatabaseName("ix_task_activities_task_id_occurred_at_utc");
+                    b.HasIndex("TaskId", "OccurredAtUtc", "Sequence")
+                        .HasDatabaseName("ix_task_activities_task_id_occurred_at_utc_sequence");
 
                     b.ToTable("task_activities", (string)null);
                 });
@@ -561,6 +568,10 @@ namespace TodoApp.Data.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("title");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Rule", "TodoApp.Domain.Tasks.Recurrence.RecurringTask.Rule#RecurrenceRule", b1 =>
                         {
                             b1.IsRequired();
@@ -653,6 +664,12 @@ namespace TodoApp.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3)
+                        .HasColumnName("type");
 
                     b.HasKey("Id")
                         .HasName("pk_tasks");

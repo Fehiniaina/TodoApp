@@ -36,7 +36,8 @@ internal sealed class CreateRecurringTaskHandler(
             command.Title, command.Description, command.Priority,
             rule, command.StartDate, command.EndDate,
             userTimeZone.TimeZone.Id,
-            timeProvider.GetUtcNow().UtcDateTime);
+            timeProvider.GetUtcNow().UtcDateTime,
+            command.Type);
 
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
         db.RecurringTasks.Add(series);

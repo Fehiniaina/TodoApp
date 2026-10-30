@@ -26,6 +26,8 @@ public sealed partial class TaskList
 
     private IReadOnlyList<UserSummary> _userOptions = [];
 
+    private static readonly IReadOnlyCollection<TaskType> TypeOptions = TaskTypeExtensions.InDisplayOrder;
+
     /// <summary>
     /// « Plage » choisie mais aucune borne saisie : on affiche les champs sans naviguer
     /// (une plage vide serait normalisée en « Toutes » par TaskFilterUrl).
@@ -79,6 +81,12 @@ public sealed partial class TaskList
             ? ShowRangeInputs
             : !_editingRange && CurrentFilter.DueDate == value;
 
+    private void ClearTypes() =>
+        ApplyFilter(CurrentFilter with { Types = new HashSet<TaskType>() });
+
+    private void ToogleType(TaskType type) =>
+        ApplyFilter(CurrentFilter with { Types = Toggle(CurrentFilter.Types, type)});
+
     private void SetDueDate(DueDateFilter mode)
     {
         if (mode == DueDateFilter.Range)
@@ -112,6 +120,7 @@ public sealed partial class TaskList
         {
             copy.Add(value);
         }
+
         return copy;
     }
 
