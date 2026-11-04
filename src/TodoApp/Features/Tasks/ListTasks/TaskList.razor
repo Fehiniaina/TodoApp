@@ -6,6 +6,7 @@
 @using TodoApp.Features.Tasks.Shared
 @using TodoApp.Features.Users
 @using TodoApp.Features.Tasks.Tags
+@using TodoApp.Features.Tags.Shared;
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
@@ -74,6 +75,20 @@
                         <label>Du <input type="date" value="@FormatDateInput(RangeFrom)" @onchange="SetDueFrom" /></label>
                         <label>Au <input type="date" value="@FormatDateInput(RangeTo)" @onchange="SetDueTo" /></label>
                     </div>
+                }
+            </FilterDropdown>
+
+            <FilterDropdown Label="Tags"
+                ActiveCount="CurrentFilter.TagIds.Count"
+                OnClear="ClearTags">
+                @foreach (var tag in _tagOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                               checked="@CurrentFilter.TagIds.Contains(tag.Id)"
+                               @onchange="() => ToggleTag(tag.Id)" />
+                        <TagChip Tag="tag" />
+                    </label>
                 }
             </FilterDropdown>
 

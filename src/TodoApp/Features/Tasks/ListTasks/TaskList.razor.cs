@@ -9,6 +9,7 @@ using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Logging;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tags.SearchTags;
 using TodoApp.Features.Tasks.ChangeTaskStatus;
 using TodoApp.Features.Tasks.CreateTask;
 using TodoApp.Features.Tasks.DeleteTasks;
@@ -27,6 +28,7 @@ public sealed partial class TaskList : IDisposable
     [Inject] private StopRecurringTaskHandler StopRecurringHandler { get; set; } = null!;
     [Inject] private TaskChangeNotifier Notifier { get; set; } = null!;
     [Inject] private NotificationService Notification { get; set; } = null!;
+    [Inject] private SearchTagsHandler SearchTagHandler { get; set; } = null!;
     [Inject] private IUserClock Clock { get; set; } = null!;
     [Inject] private UserTimeZone UserTimeZone { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
@@ -55,6 +57,9 @@ public sealed partial class TaskList : IDisposable
 
     [SupplyParameterFromQuery(Name = TaskFilterUrl.TypeParam)]
     private string[]? TypeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = TaskFilterUrl.TagParam)]
+    private string[]? TagQuery { get; set; }
 
     [CascadingParameter] private Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -95,7 +100,7 @@ public sealed partial class TaskList : IDisposable
     protected override async Task OnParametersSetAsync()
     {
         var filter = TaskFilterUrl.Parse(
-            PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery,
+            PriorityQuery, AssigneeQuery, TypeQuery, DueQuery, DueFromQuery, DueToQuery, TagQuery,
             out _ignoredFilterValues
             );
 

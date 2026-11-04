@@ -1,4 +1,5 @@
 using TodoApp.Common;
+using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks;
 using TodoApp.Features.Tasks.ListTasks;
 using TodoApp.IntegrationTests.Infrastructure;
@@ -319,6 +320,44 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
         Assert.Equal(OwnerB, summary.AssigneeId);
     }
 
+    [Fact]
+    public async Task Task_carrying_several_selected_tags_appears_once()
+    {
+        var frontend = await SeedTagAsync("Frontend");
+        var backend = await SeedTagAsync("Backend");
+
+        await SeedAsync("Les deux tags", tags: [frontend, backend]);
+        await SeedAsync("Frontend seul", tags: [frontend]);
+        await SeedAsync("Sans tag");
+
+        var result = await QueryAsync(new TaskFilter { TagIds = new HashSet<Guid> { frontend.Id, backend.Id } });
+
+        // Le piège de la jointure aurait donné 3 lignes et un total de 3.
+        Assert.Equal(["Frontend seul", "Les deux tags"], result.Items.Select(t => t.Title).Order(StringComparer.Ordinal));
+        Assert.Equal(2, result.TotalCount);
+    }
+
+    [Fact]
+    public async Task Pagination_with_tag_filter_counts_each_task_once()
+    {
+        var frontend = await SeedTagAsync("Frontend");
+        var backend = await SeedTagAsync("Backend");
+
+        for (var i = 1; i <= 3; i++)
+        {
+            await SeedAsync($"Tâche {i}", tags: [frontend, backend]);
+        }
+
+        var filter = new TaskFilter { TagIds = new HashSet<Guid> { frontend.Id, backend.Id } };
+        var page1 = await QueryAsync(filter, page: 1, pageSize: 2);
+        var page2 = await QueryAsync(filter, page: 2, pageSize: 2);
+
+        Assert.Equal(3, page1.TotalCount);
+        Assert.Equal(
+            ["Tâche 1", "Tâche 2", "Tâche 3"],
+            page1.Items.Concat(page2.Items).Select(t => t.Title).Order(StringComparer.Ordinal));
+    }
+
     private async Task<TaskItem> SeedAsync(
         string title,
         string owner = OwnerA,
@@ -326,6 +365,7 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
         TaskType type = TaskType.Task,
         DateOnly? dueDate = null,
         string? assigneeId = null,
+        Tag[]? tags = null,
         TaskItemStatus status = TaskItemStatus.ToDo)
     {
         var createdAtUtc = BaseCreatedAtUtc.AddMinutes(++_seeded);
@@ -339,6 +379,11 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
         foreach (var step in PathTo(status))
         {
             task.ChangeStatus(step, owner, createdAtUtc);
+        }
+
+        foreach (var tag in tags ?? [])
+        {
+            task.AddTag(tag, owner, createdAtUtc);
         }
 
         await using var db = fixture.CreateDbContext();
@@ -423,5 +468,15 @@ public sealed class ListTasksHandlerTests(PostgresFixture fixture) : IAsyncLifet
         }
 
         return path;
+    }
+
+    private async Task<Tag> SeedTagAsync(string name)
+    {
+        var tag = Tag.Create(name, TagColor.Blue, OwnerA, BaseCreatedAtUtc);
+
+        await using var db = fixture.CreateDbContext();
+        db.Tags.Add(tag);
+        await db.SaveChangesAsync();
+        return tag;
     }
 }

@@ -8,8 +8,10 @@ public sealed class TaskFilterUrlTests
     [Fact]
     public void Parses_all_criteria()
     {
+        var tagId = Guid.CreateVersion7();
+
         var filter = TaskFilterUrl.Parse(
-            ["High", "urgent"], ["user-1", "none"], ["Bug", "analyse", "Task"], "range", "2026-11-01", "2026-11-30");
+            ["High", "urgent"], ["user-1", "none"], ["Bug", "analyse", "Task"], "range", "2026-11-01", "2026-11-30", [tagId.ToString("D")]);
 
         Assert.True(filter.Priorities.SetEquals([TaskPriority.High, TaskPriority.Urgent]));
         Assert.True(filter.AssigneeIds.SetEquals(["user-1"]));
@@ -24,13 +26,16 @@ public sealed class TaskFilterUrlTests
         Assert.True(filter.FiltersAssignee);
         Assert.True(filter.FiltersType);
         Assert.True(filter.HasDueDateFilter);
-        Assert.Equal(4, filter.ActiveCount);
+
+        Assert.True(filter.TagIds.SetEquals([tagId]));
+        Assert.True(filter.FiltersTag);
+        Assert.Equal(5, filter.ActiveCount);
     }
 
     [Fact]
     public void Unknown_values_are_ignored()
     {
-        var filter = TaskFilterUrl.Parse(["Haute", "999"], [""], ["Epic", ""], "demain", "pas-une-date", null);
+        var filter = TaskFilterUrl.Parse(["Haute", "999"], [""], ["Epic", ""], "demain", "pas-une-date", null, null);
 
         Assert.True(filter.IsEmpty);
     }
@@ -42,7 +47,7 @@ public sealed class TaskFilterUrlTests
     [InlineData("Tâche")] // libellé affiché : pas un nom de membre
     public void Unknown_or_numeric_types_are_ignored(string value)
     {
-        var filter = TaskFilterUrl.Parse(null, null, [value], null, null, null);
+        var filter = TaskFilterUrl.Parse(null, null, [value], null, null, null, null);
 
         Assert.False(filter.FiltersType);
     }
@@ -50,7 +55,7 @@ public sealed class TaskFilterUrlTests
     [Fact]
     public void Range_dates_are_ignored_without_range_mode()
     {
-        var filter = TaskFilterUrl.Parse(null, null, null, "overdue", "2026-11-01", null);
+        var filter = TaskFilterUrl.Parse(null, null, null, "overdue", "2026-11-01", null, null);
 
         Assert.Equal(DueDateFilter.Overdue, filter.DueDate);
         Assert.Null(filter.DueFrom);
@@ -66,6 +71,7 @@ public sealed class TaskFilterUrlTests
             Types = new HashSet<TaskType> { TaskType.UserStory },
             IncludeUnassigned = true,
             DueDate = DueDateFilter.Next7Days,
+            TagIds = new HashSet<Guid> { Guid.CreateVersion7() },
         };
 
         Assert.Equal(original, RoundTrip(original)); // égalité par valeur du record
@@ -119,7 +125,7 @@ public sealed class TaskFilterUrlTests
     [InlineData("STORY")]
     public void Legacy_type_link_still_works(string value)
     {
-        var filter = TaskFilterUrl.Parse(null, null, [value], null, null, null);
+        var filter = TaskFilterUrl.Parse(null, null, [value], null, null, null, null);
 
         Assert.True(filter.Types.SetEquals([TaskType.UserStory]));
     }
@@ -137,7 +143,7 @@ public sealed class TaskFilterUrlTests
     [Fact]
     public void Ignored_values_are_reported()
     {
-        _ = TaskFilterUrl.Parse(["high", "Haute"], null, ["bug", "Epic"], "demain", null, null, out var ignored);
+        _ = TaskFilterUrl.Parse(["high", "Haute"], null, ["bug", "Epic"], "demain", null, null, null, out var ignored);
 
         Assert.Equal(["Haute", "Epic", "demain"], ignored);
     }
@@ -145,9 +151,33 @@ public sealed class TaskFilterUrlTests
     [Fact]
     public void Valid_link_reports_nothing()
     {
-        _ = TaskFilterUrl.Parse(["high"], ["none"], ["story"], "overdue", null, null, out var ignored);
+        _ = TaskFilterUrl.Parse(["high"], ["none"], ["story"], "overdue", null, null, null, out var ignored);
 
         Assert.Empty(ignored);
+    }
+
+    [Fact]
+    public void Tag_round_trip_keeps_ids()
+    {
+        var a = Guid.CreateVersion7();
+        var b = Guid.CreateVersion7();
+        var original = new TaskFilter { TagIds = new HashSet<Guid> { b, a } };
+
+        var parsed = RoundTrip(original);
+
+        Assert.True(parsed.TagIds.SetEquals([a, b]));
+        Assert.Equal(original, parsed);
+    }
+
+    [Theory]
+    [InlineData("pas-un-guid")]
+    [InlineData("0193a8f2c4b17d3e9a1b2c3d4e5f6a7b")] // format « N » : un seul format accepté
+    public void Invalid_tag_ids_are_reported(string value)
+    {
+        var filter = TaskFilterUrl.Parse(null, null, null, null, null, null, [value], out var ignored);
+
+        Assert.False(filter.FiltersTag);
+        Assert.Equal([value], ignored);
     }
 
     private static TaskFilter RoundTrip(TaskFilter filter)
@@ -160,6 +190,7 @@ public sealed class TaskFilterUrlTests
             (string[]?)p[TaskFilterUrl.TypeParam],
             (string?)p[TaskFilterUrl.DueParam],
             (string?)p[TaskFilterUrl.DueFromParam],
-            (string?)p[TaskFilterUrl.DueToParam]);
+            (string?)p[TaskFilterUrl.DueToParam],
+            (string[]?)p[TaskFilterUrl.TagParam]);
     }
 }

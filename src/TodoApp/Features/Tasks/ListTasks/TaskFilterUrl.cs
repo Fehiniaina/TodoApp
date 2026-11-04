@@ -17,6 +17,7 @@ internal static class TaskFilterUrl
     public const string DueParam = "due";
     public const string DueFromParam = "from";
     public const string DueToParam = "to";
+    public const string TagParam = "tag";
 
     /// <summary>Valeur spéciale de <c>assignee</c> pour « non assignée » (les ids Identity sont des GUID).</summary>
     public const string UnassignedValue = "none";
@@ -65,9 +66,13 @@ internal static class TaskFilterUrl
         IEnumerable<string>? types,
         string? due,
         string? dueFrom,
-        string? dueTo) =>
-        Parse(priorities, assignees, types, due, dueFrom, dueTo, out _);
+        string? dueTo,
+        IEnumerable<string>? tags) =>
+        Parse(priorities, assignees, types, due, dueFrom, dueTo, tags, out _);
 
+    /// <summary>
+    /// Parse les URI
+    /// </summary>
     /// <param name="ignored">Valeurs présentes dans l'URL mais non reconnues (lien ancien ou bricolé).</param>
     public static TaskFilter Parse(
         IEnumerable<string>? priorities,
@@ -76,6 +81,7 @@ internal static class TaskFilterUrl
         string? due,
         string? dueFrom,
         string? dueTo,
+        IEnumerable<string>? tags,
         out IReadOnlyList<string> ignored)
     {
         var rejected = new List<string>();
@@ -84,6 +90,7 @@ internal static class TaskFilterUrl
         var (assigneeIds, includeUnassigned) = ParseAssignees(assignees, rejected);
         var parsedTypes = ParseSlugs(types, TypeSlugs, rejected);
         var (mode, from, to) = ParseDueDate(due, dueFrom, dueTo, rejected);
+        var parsedTagIds = ParseTagIds(tags, rejected);
 
         ignored = rejected;
 
@@ -96,6 +103,7 @@ internal static class TaskFilterUrl
             DueDate = mode,
             DueFrom = from,
             DueTo = to,
+            TagIds = parsedTagIds,
         };
     }
 
@@ -118,6 +126,7 @@ internal static class TaskFilterUrl
             [DueParam] = hasDue ? DueSlugs.ToSlug(filter.DueDate) : null,
             [DueFromParam] = isRange ? FormatDate(filter.DueFrom) : null,
             [DueToParam] = isRange ? FormatDate(filter.DueTo) : null,
+            [TagParam] = ToTagValues(filter),
         };
     }
 
@@ -240,4 +249,28 @@ internal static class TaskFilterUrl
 
     private static string? FormatDate(DateOnly? date) =>
         date?.ToString(DateFormat, CultureInfo.InvariantCulture);
+
+    private static string[]? ToTagValues(TaskFilter filter) =>
+        filter.FiltersTag
+            ? [.. filter.TagIds.Order().Select(id => id.ToString("D", CultureInfo.InvariantCulture))]
+            : null;
+
+    private static HashSet<Guid> ParseTagIds(IEnumerable<string>? values, List<string> rejected)
+    {
+        var ids = new HashSet<Guid>();
+
+        foreach (var value in Bounded(values))
+        {
+            if (Guid.TryParseExact(value, "D", out var id))
+            {
+                ids.Add(id);
+            }
+            else
+            {
+                rejected.Add(value);
+            }
+        }
+
+        return ids;
+    }
 }
