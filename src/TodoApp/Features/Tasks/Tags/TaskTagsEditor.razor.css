@@ -1,0 +1,101 @@
+.tags-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tags-editor-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.tags-editor-combobox {
+    position: relative;
+}
+
+.tags-editor-input {
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #dcdfe4;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 14px;
+}
+
+    .tags-editor-input:focus {
+        outline: 2px solid #0c66e4;
+        outline-offset: -1px;
+    }
+
+.tags-editor-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 4px 0;
+    list-style: none;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 8px 12px rgba(9, 30, 66, .15), 0 0 1px rgba(9, 30, 66, .31);
+}
+
+.tags-editor-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+    .tags-editor-option:hover,
+    .tags-editor-option.is-active {
+        background: #f1f2f4;
+    }
+
+.tags-editor-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tags-editor-hint {
+    margin: 0;
+    font-size: 12px;
+    color: #626f86;
+}
+
+.tags-editor-dot.tag-color--gray {
+    background: #42526e;
+}
+
+.tags-editor-dot.tag-color--blue {
+    background: #0747a6;
+}
+
+.tags-editor-dot.tag-color--green {
+    background: #006644;
+}
+
+.tags-editor-dot.tag-color--yellow {
+    background: #b38600;
+}
+
+.tags-editor-dot.tag-color--orange {
+    background: #c25100;
+}
+
+.tags-editor-dot.tag-color--red {
+    background: #bf2600;
+}
+
+.tags-editor-dot.tag-color--purple {
+    background: #403294;
+}

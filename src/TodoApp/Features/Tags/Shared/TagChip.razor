@@ -1,0 +1,11 @@
+<span class="tag-chip @TagColorVisuals.CssFor(Tag.Color)" role="listitem">
+    <span class="tag-chip-name">@Tag.Name</span>
+    @if (OnRemove.HasDelegate)
+    {
+        <button type="button" class="tag-chip-remove"
+                aria-label="@($"Retirer le tag {Tag.Name}")" title="Retirer"
+                @onclick="OnRemove">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 2l6 6M8 2L2 8" /></svg>
+        </button>
+    }
+</span>

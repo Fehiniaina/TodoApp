@@ -29,7 +29,7 @@ internal sealed class ListTasksHandler(
             .Where(query.Filter.ToSpecifications(query.Today));
 
         var totalCount = await tasks.CountAsync(cancellationToken);
-        var items = await TaskSummaryProjection.ToSummaries(Paginate(tasks, page, pageSize), db.Users)
+        var items = await TaskSummaryProjection.ToSummaries(Paginate(tasks, page, pageSize), db.Users, db.Tags)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<TaskSummary>(items, totalCount, pageSize);

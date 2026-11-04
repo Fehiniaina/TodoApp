@@ -5,6 +5,7 @@
 @using TodoApp.Features.Tasks.Checklist
 @using TodoApp.Features.Tasks.Shared
 @using TodoApp.Features.Users
+@using TodoApp.Features.Tasks.Tags
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
@@ -164,6 +165,7 @@ else
                     <td class="col-summary">
                         <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">
+                            <TaskRowTags Tags="task.Tags" />
                             @if (task.RecurringTaskId is not null)
                             {
                                 <span class="recurring-badge" title="Tâche récurrente" aria-label="Tâche récurrente">

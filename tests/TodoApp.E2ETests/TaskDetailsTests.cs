@@ -120,6 +120,34 @@ public sealed class TaskDetailsTests(E2EAppFixture app) : E2ETest(app)
         await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "M'assigner" })).ToHaveCountAsync(0);
     }
 
+    [Fact]
+    public async Task User_can_add_and_remove_tags()
+    {
+        var user = await App.CreateUserAsync("Alice", "Martin");
+        var taskId = await App.CreateTaskAsync(user, "Tâche à étiqueter");
+
+        await SignInAsync(user);
+        await Page.GotoAsync($"tasks/{taskId}");
+        await WaitForInteractivityAsync();
+
+        var input = Page.GetByRole(AriaRole.Combobox, new() { Name = "Ajouter un tag" });
+        var tags = Page.GetByRole(AriaRole.List, new() { Name = "Tags de la tâche" });
+
+        // Ajout par saisie + Entrée : le tag est créé.
+        await input.FillAsync("Frontend");
+        await input.PressAsync("Enter");
+        await Expect(tags.GetByRole(AriaRole.Listitem)).ToHaveTextAsync(["Frontend"]);
+
+        // Le focus reste dans le champ : on enchaîne un second tag au clavier.
+        await input.FillAsync("Client");
+        await input.PressAsync("Enter");
+        await Expect(tags.GetByRole(AriaRole.Listitem)).ToHaveCountAsync(2);
+
+        // Retrait.
+        await tags.GetByRole(AriaRole.Button, new() { Name = "Retirer le tag Frontend" }).ClickAsync();
+        await Expect(tags.GetByRole(AriaRole.Listitem)).ToHaveTextAsync(["Client"]);
+    }
+
     /// <summary>Fait une modification dans le panneau, puis attend que le serveur l'ait enregistrée et rechargée.</summary>
     private async Task SaveFieldAsync(Func<Task> change)
     {
