@@ -30,7 +30,7 @@ internal sealed class UpdateTaskHandler(
 
         // Filtre sur le propriétaire : la tâche d'un autre utilisateur est traitée comme inexistante.
         var task = await db.Tasks
-            .AsTracking()
+            .ForUpdate()
             .VisibleTo(createdById)
             .SingleOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 

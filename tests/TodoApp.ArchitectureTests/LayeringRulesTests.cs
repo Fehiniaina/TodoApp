@@ -84,6 +84,22 @@ public sealed class LayeringRulesTests
         AssertSuccessful(result);
     }
 
+    [Fact]
+    public void Tasks_are_loaded_for_update_through_ForUpdate()
+    {
+        // Leçon de l'explosion cartésienne : la checklist et les tags sont des collections possédées.
+        // Un chargement suivi « à la main » les joint en une seule requête et multiplie les lignes.
+        var pattern = new Regex(@"\.Tasks\s*\.AsTracking\(\)", RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+        var featuresDirectory = Path.Combine(SolutionRoot(), "src", "TodoApp", "Features");
+
+        var offenders = Directory.EnumerateFiles(featuresDirectory, "*.cs", SearchOption.AllDirectories)
+            .Where(path => pattern.IsMatch(File.ReadAllText(path)))
+            .Select(Path.GetFileName)
+            .ToList();
+
+        Assert.Empty(offenders);
+    }
+
     private static void AssertSuccessful(TestResult result) =>
         Assert.True(
             result.IsSuccessful,
