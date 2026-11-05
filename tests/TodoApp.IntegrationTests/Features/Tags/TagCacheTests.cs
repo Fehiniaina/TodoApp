@@ -114,6 +114,22 @@ public sealed class TagCacheTests(PostgresFixture fixture) : IAsyncLifetime, IDi
         Assert.True(_cache.TryGetValue(TagCache.AllTagsKey, out _));
     }
 
+    [Fact]
+    public async Task Diagnostic_concurrent_requests_on_an_empty_cache()
+    {
+        await SeedTagsAsync("Backend", "Frontend");
+
+        var counter = new CommandCounter();
+        var handler = new GetAllTagsHandler(new InterceptedDbContextFactory(fixture, counter), _cache);
+
+        // 50 utilisateurs ouvrent la liste au même instant, alors que le cache est vide.
+        var results = await Task.WhenAll(
+            Enumerable.Range(0, 50).Select(_ => Task.Run(() => handler.HandleAsync())));
+
+        Assert.Equal(1, counter.Count);
+        Assert.All(results, r => Assert.Equal(["Backend", "Frontend"], r.Select(t => t.Name)));
+    }
+
     private async Task<IReadOnlyList<string>> AllTagNamesAsync()
     {
         var handler = new GetAllTagsHandler(new TestDbContextFactory(fixture), _cache);
