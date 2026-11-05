@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tags.GetAllTags;
 using TodoApp.Features.Tags.SearchTags;
 using TodoApp.Features.Tags.Shared;
 using TodoApp.Features.Tasks.Shared;
@@ -25,6 +26,7 @@ public sealed partial class TaskList
     ];
 
     [Inject] private GetAssignableUsersHandler AssignableUsersHandler { get; set; } = null!;
+    [Inject] private GetAllTagsHandler GetAllTagsHandler { get; set; } = null!;
 
     private IReadOnlyList<UserSummary> _userOptions = [];
     private IReadOnlyList<TagDto> _tagOptions = [];
@@ -56,7 +58,7 @@ public sealed partial class TaskList
                 .ThenBy(u => u.DisplayName, StringComparer.CurrentCultureIgnoreCase),
         ];
 
-        _tagOptions = await SearchTagHandler.HandleAsync(new SearchTagsQuery(Term: null, Limit: 20));
+        _tagOptions = await GetAllTagsHandler.HandleAsync();
     }
 
     /// <summary>Passe par l'URL : OnParametersSetAsync détecte le changement et recharge.</summary>

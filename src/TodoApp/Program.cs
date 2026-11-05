@@ -61,7 +61,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, options) => {
         ))
     .AddInterceptors(
         sp.GetRequiredService<NotificationPublishingInterceptor>(),
-        sp.GetRequiredService<EmailDeliveryWakeUpInterceptor>());
+        sp.GetRequiredService<EmailDeliveryWakeUpInterceptor>(),
+        sp.GetRequiredService<TagCacheInvalidationInterceptor>());
 
     if (builder.Environment.IsDevelopment())
     {
@@ -133,6 +134,9 @@ builder.Services.AddNotificationFeatures(builder.Configuration);
 builder.Services.AddAccountEmails();
 builder.Services.AddAttachmentFeatures(builder.Configuration);
 builder.Services.AddOrphanFileCleanerOptions(builder.Configuration);
+
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<TagCacheInvalidationInterceptor>();
 
 var app = builder.Build();
 

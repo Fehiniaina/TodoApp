@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
 using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks;
@@ -18,6 +19,7 @@ internal static class TaskSummaryProjection
         IQueryable<ApplicationUser> users,
         IQueryable<Tag> tags) =>
         tasks
+            .TagWith("GetTasksToSummaries")
             .LeftJoin(users, t => t.AssigneeId, u => u.Id, (t, u) => new { Task = t, Assignee = u })
             .Select(x => new TaskSummary(
                 x.Task.Id,
