@@ -14,6 +14,7 @@ using TodoApp.Features.Notifications;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tags.Shared;
 using TodoApp.Features.Tasks.Attachments;
 using TodoApp.Features.Tasks.Attachments.Cleanup;
 using TodoApp.Features.Tasks.Attachments.Download;
@@ -137,6 +138,7 @@ builder.Services.AddOrphanFileCleanerOptions(builder.Configuration);
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<TagCacheInvalidationInterceptor>();
+builder.Services.AddSingleton<TagCache>();
 
 var app = builder.Build();
 

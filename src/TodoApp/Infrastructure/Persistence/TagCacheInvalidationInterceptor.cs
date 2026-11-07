@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Caching.Memory;
 using TodoApp.Domain.Tags;
 using TodoApp.Features.Tags.Shared;
 
@@ -17,7 +16,7 @@ namespace TodoApp.Infrastructure.Persistence;
 /// Limite : ExecuteUpdate/ExecuteDelete et le SQL brut contournent le suivi des entités ;
 /// l'expiration de <see cref="TagCache"/> sert de filet de sécurité.
 /// </summary>
-internal sealed class TagCacheInvalidationInterceptor(IMemoryCache cache) : SaveChangesInterceptor
+internal sealed class TagCacheInvalidationInterceptor(TagCache cache) : SaveChangesInterceptor
 {
     private static readonly object Marker = new();
 
@@ -85,7 +84,7 @@ internal sealed class TagCacheInvalidationInterceptor(IMemoryCache cache) : Save
     {
         if (context is not null && _pending.Remove(context))
         {
-            cache.Remove(TagCache.AllTagsKey);
+            cache.Invalidate();
         }
     }
 
