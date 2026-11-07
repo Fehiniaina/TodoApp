@@ -1,11 +1,8 @@
-﻿@using System.Globalization
-@using TodoApp.Domain.Tasks
-
 @if (DueDate is { } due)
 {
     var status = TaskDueDate.Evaluate(due, IsCompleted, Today);
 
-    <span class="due due-@status.ToString().ToLowerInvariant()"
+    <span class="due @CssFor(status)"
           title="Échéance : @due.ToString("dddd d MMMM yyyy", French)">
         <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
             <rect x="2.5" y="3.5" width="11" height="10" rx="1.5" />
@@ -17,20 +14,4 @@
 else
 {
     <span class="due-empty" aria-label="Pas d'échéance">—</span>
-}
-
-@code {
-    private static readonly CultureInfo French = CultureInfo.GetCultureInfo("fr-FR");
-
-    [Parameter] public DateOnly? DueDate { get; set; }
-    [Parameter] public bool IsCompleted { get; set; }
-    [Parameter, EditorRequired] public DateOnly Today { get; set; }
-
-    private string Label(DateOnly due, DueStatus status) => status switch
-    {
-        DueStatus.Overdue => $"En retard · {due.ToString("d MMM", French)}",
-        DueStatus.DueToday => "Aujourd'hui",
-        _ when due == Today.AddDays(1) => "Demain",
-        _ => due.ToString(due.Year == Today.Year ? "d MMM" : "d MMM yyyy", French),
-    };
 }

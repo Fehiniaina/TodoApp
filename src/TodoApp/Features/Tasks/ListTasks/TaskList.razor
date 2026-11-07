@@ -5,6 +5,8 @@
 @using TodoApp.Features.Tasks.Checklist
 @using TodoApp.Features.Tasks.Shared
 @using TodoApp.Features.Users
+@using TodoApp.Features.Tasks.Tags
+@using TodoApp.Features.Tags.Shared;
 
 <div class="issue-toolbar">
     <div class="issue-toolbar-left">
@@ -73,6 +75,20 @@
                         <label>Du <input type="date" value="@FormatDateInput(RangeFrom)" @onchange="SetDueFrom" /></label>
                         <label>Au <input type="date" value="@FormatDateInput(RangeTo)" @onchange="SetDueTo" /></label>
                     </div>
+                }
+            </FilterDropdown>
+
+            <FilterDropdown Label="Tags"
+                ActiveCount="CurrentFilter.TagIds.Count"
+                OnClear="ClearTags">
+                @foreach (var tag in _tagOptions)
+                {
+                    <label class="flt-option">
+                        <input type="checkbox"
+                               checked="@CurrentFilter.TagIds.Contains(tag.Id)"
+                               @onchange="() => ToggleTag(tag.Id)" />
+                        <TagChip Tag="tag" />
+                    </label>
                 }
             </FilterDropdown>
 
@@ -164,6 +180,7 @@ else
                     <td class="col-summary">
                         <a href="@($"tasks/{task.Id}")" class="issue-title-link">@task.Title</a>
                         <div class="issue-meta">
+                            <TaskRowTags Tags="task.Tags" />
                             @if (task.RecurringTaskId is not null)
                             {
                                 <span class="recurring-badge" title="Tâche récurrente" aria-label="Tâche récurrente">

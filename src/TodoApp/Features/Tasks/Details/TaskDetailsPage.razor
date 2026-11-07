@@ -7,6 +7,7 @@
 @using TodoApp.Features.Users
 @using Microsoft.AspNetCore.Authorization
 @using TodoApp.Features.Tasks.Attachments
+@using TodoApp.Features.Tasks.Tags
 
 <PageTitle>@(_task?.Title ?? "Tâche") · TodoApp</PageTitle>
 
@@ -140,6 +141,11 @@
 
                     <div class="td-panel">
                         <h2 class="td-panel-title">Détails</h2>
+
+                        <section class="td-tags" aria-labelledby="td-tags-title">
+                            <h2 id="td-tags-title" class="td-section-title">Tags</h2>
+                            <TaskTagsEditor TaskId="_task.Id" Tags="_task.Tags" OnChanged="ReloadAsync" />
+                        </section>
 
                         <dl class="td-fields" @key="_fieldsVersion">
                             <dt><label for="field-assignee">Assigné</label></dt>

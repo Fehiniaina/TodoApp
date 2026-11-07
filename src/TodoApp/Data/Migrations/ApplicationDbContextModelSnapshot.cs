@@ -409,6 +409,51 @@ namespace TodoApp.Data.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
+            modelBuilder.Entity("TodoApp.Domain.Tags.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Color")
+                        .HasColumnType("integer")
+                        .HasColumnName("color");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tags");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tags_normalized_name");
+
+                    b.ToTable("tags", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_tags_color", "color BETWEEN 0 AND 6");
+                        });
+                });
+
             modelBuilder.Entity("TodoApp.Domain.Tasks.Activity.TaskActivity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -922,7 +967,39 @@ namespace TodoApp.Data.Migrations
                                 .HasConstraintName("fk_checklist_items_tasks_task_id");
                         });
 
+                    b.OwnsMany("TodoApp.Domain.Tasks.TaskTag", "Tags", b1 =>
+                        {
+                            b1.Property<Guid>("TaskId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("task_id");
+
+                            b1.Property<Guid>("TagId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("tag_id");
+
+                            b1.HasKey("TaskId", "TagId")
+                                .HasName("pk_task_tags");
+
+                            b1.HasIndex("TagId")
+                                .HasDatabaseName("ix_task_tags_tag_id");
+
+                            b1.ToTable("task_tags", (string)null);
+
+                            b1.HasOne("TodoApp.Domain.Tags.Tag", null)
+                                .WithMany()
+                                .HasForeignKey("TagId")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired()
+                                .HasConstraintName("fk_task_tags_tags_tag_id");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TaskId")
+                                .HasConstraintName("fk_task_tags_tasks_task_id");
+                        });
+
                     b.Navigation("Checklist");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("TodoApp.Domain.Notifications.Notification", b =>

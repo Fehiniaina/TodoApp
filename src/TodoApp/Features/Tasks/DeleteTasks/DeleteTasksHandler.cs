@@ -18,7 +18,7 @@ internal sealed class DeleteTasksHandler(
         var createdById = await currentUser.GetIdAsync();
 
         var task = await context.Tasks
-            .AsTracking()
+            .ForUpdate()
             .CreatedBy(createdById)
             .SingleOrDefaultAsync(t => t.Id == command.Id, cancellationToken);
 

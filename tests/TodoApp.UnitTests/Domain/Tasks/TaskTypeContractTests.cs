@@ -31,6 +31,8 @@ public sealed class TaskTypeContractTests
         "AttachmentAdded",
         "AttachmentRemoved",
         "TypeChanged",
+        "TagAdded",
+        "TagRemoved",
     ];
 
     [Fact]

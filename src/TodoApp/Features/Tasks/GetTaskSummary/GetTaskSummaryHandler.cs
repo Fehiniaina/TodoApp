@@ -20,7 +20,7 @@ internal sealed class GetTaskSummaryHandler(
             .VisibleTo(userId)
             .Where(t => t.Id == taskId);
 
-        return await TaskSummaryProjection.ToSummaries(tasks, db.Users)
+        return await TaskSummaryProjection.ToSummaries(tasks, db.Users, db.Tags)
             .SingleOrDefaultAsync(cancellationToken);
     }
 }

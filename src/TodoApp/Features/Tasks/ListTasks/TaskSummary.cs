@@ -1,4 +1,5 @@
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tags.Shared;
 
 namespace TodoApp.Features.Tasks.ListTasks;
 
@@ -17,7 +18,8 @@ public sealed record TaskSummary(
     string CreatedById,
     string? AssigneeId,
     string? AssigneeName,
-    TaskType Type)
+    TaskType Type,
+    IReadOnlyList<TagDto> Tags)
 {
     public bool IsCompleted => Status == TaskItemStatus.Resolved;
 }

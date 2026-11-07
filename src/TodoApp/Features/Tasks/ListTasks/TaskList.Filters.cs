@@ -1,6 +1,9 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tags.GetAllTags;
+using TodoApp.Features.Tags.SearchTags;
+using TodoApp.Features.Tags.Shared;
 using TodoApp.Features.Tasks.Shared;
 using TodoApp.Features.Users;
 
@@ -23,8 +26,10 @@ public sealed partial class TaskList
     ];
 
     [Inject] private GetAssignableUsersHandler AssignableUsersHandler { get; set; } = null!;
+    [Inject] private GetAllTagsHandler GetAllTagsHandler { get; set; } = null!;
 
     private IReadOnlyList<UserSummary> _userOptions = [];
+    private IReadOnlyList<TagDto> _tagOptions = [];
 
     private static readonly IReadOnlyCollection<TaskType> TypeOptions = TaskTypeExtensions.InDisplayOrder;
 
@@ -52,6 +57,8 @@ public sealed partial class TaskList
                 .OrderByDescending(u => string.Equals(u.Id,_createdById, StringComparison.Ordinal))
                 .ThenBy(u => u.DisplayName, StringComparer.CurrentCultureIgnoreCase),
         ];
+
+        _tagOptions = await GetAllTagsHandler.HandleAsync();
     }
 
     /// <summary>Passe par l'URL : OnParametersSetAsync détecte le changement et recharge.</summary>
@@ -86,6 +93,12 @@ public sealed partial class TaskList
 
     private void ToogleType(TaskType type) =>
         ApplyFilter(CurrentFilter with { Types = Toggle(CurrentFilter.Types, type)});
+
+    private void ClearTags() =>
+        ApplyFilter(CurrentFilter with { TagIds = new HashSet<Guid>() });
+
+    private void ToggleTag(Guid guid) =>
+        ApplyFilter(CurrentFilter with { TagIds = Toggle(CurrentFilter.TagIds, guid) });
 
     private void SetDueDate(DueDateFilter mode)
     {

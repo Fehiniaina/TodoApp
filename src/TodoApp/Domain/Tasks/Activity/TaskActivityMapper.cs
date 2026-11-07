@@ -27,6 +27,12 @@ internal static class TaskActivityMapper
         TaskTypeChanged e => TaskActivity.Record(
             e.TaskId, e.ActorId, TaskActivityType.TypeChanged, oldValue: EnumStorage.ToStored(e.Previous), newValue: EnumStorage.ToStored(e.Current), e.OccurredAtUtc),
 
+        TaskTagAdded e => TaskActivity.Record(
+            e.TaskId, e.ActorId, TaskActivityType.TagAdded, oldValue: null, newValue: e.TagName, e.OccurredAtUtc),
+
+        TaskTagRemoved e => TaskActivity.Record(
+            e.TaskId, e.ActorId, TaskActivityType.TagRemoved, oldValue: e.TagName, newValue: null, e.OccurredAtUtc),
+
         _ => null,
     };
 }

@@ -14,16 +14,18 @@ using TodoApp.Features.Notifications;
 using TodoApp.Features.Shared;
 using TodoApp.Features.Shared.Notifications;
 using TodoApp.Features.Shared.Time;
+using TodoApp.Features.Tags.Shared;
+using TodoApp.Features.Tasks.Attachments;
+using TodoApp.Features.Tasks.Attachments.Cleanup;
+using TodoApp.Features.Tasks.Attachments.Download;
 using TodoApp.Features.Tasks.Import;
 using TodoApp.Infrastructure;
 using TodoApp.Infrastructure.BackgroundJobs;
 using TodoApp.Infrastructure.Configurations;
 using TodoApp.Infrastructure.Email.Templating;
+using TodoApp.Infrastructure.Identity;
 using TodoApp.Infrastructure.Persistence;
 using TodoApp.Infrastructure.Seed;
-using TodoApp.Features.Tasks.Attachments;
-using TodoApp.Features.Tasks.Attachments.Download;
-using TodoApp.Features.Tasks.Attachments.Cleanup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,7 +62,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>((sp, options) => {
         ))
     .AddInterceptors(
         sp.GetRequiredService<NotificationPublishingInterceptor>(),
-        sp.GetRequiredService<EmailDeliveryWakeUpInterceptor>());
+        sp.GetRequiredService<EmailDeliveryWakeUpInterceptor>(),
+        sp.GetRequiredService<TagCacheInvalidationInterceptor>());
 
     if (builder.Environment.IsDevelopment())
     {
@@ -77,9 +80,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = true;
-        options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
         options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment();
+        IdentityStoreConfiguration.Configure(options.Stores);
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
@@ -133,6 +135,10 @@ builder.Services.AddNotificationFeatures(builder.Configuration);
 builder.Services.AddAccountEmails();
 builder.Services.AddAttachmentFeatures(builder.Configuration);
 builder.Services.AddOrphanFileCleanerOptions(builder.Configuration);
+
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<TagCacheInvalidationInterceptor>();
+builder.Services.AddSingleton<TagCache>();
 
 var app = builder.Build();
 

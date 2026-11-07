@@ -26,7 +26,7 @@ internal sealed class ChangeTaskStatusHandler(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var task = await db.Tasks
-            .AsTracking()
+            .ForUpdate()
             .VisibleTo(actorId)
             .SingleOrDefaultAsync(t => t.Id == command.TaskId, cancellationToken);
 

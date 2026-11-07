@@ -1,0 +1,67 @@
+@using TodoApp.Domain.Tags
+@using TodoApp.Domain.Tasks
+@using TodoApp.Features.Tags.Shared
+
+<div class="tags-editor">
+    @if (Tags.Count > 0)
+    {
+        <div class="tags-editor-chips" role="list" aria-label="Tags de la tâche">
+            @foreach (var tag in Tags)
+            {
+                <TagChip @key="tag.Id" Tag="tag" OnRemove="() => RemoveAsync(tag)" />
+            }
+        </div>
+    }
+
+    @if (CanAddMore)
+    {
+        <div class="tags-editor-combobox">
+            <input id="@_inputId" type="text" class="tags-editor-input"
+                   role="combobox"
+                   aria-label="Ajouter un tag"
+                   aria-autocomplete="list"
+                   aria-controls="@ListId"
+                   aria-expanded="@(IsListVisible ? "true" : "false")"
+                   aria-activedescendant="@ActiveOptionId"
+                   placeholder="Ajouter un tag…"
+                   maxlength="@Tag.MaxNameLength"
+                   autocomplete="off"
+                   value="@_input"
+                   @oninput="OnInputAsync"
+                   @onkeydown="OnKeyDownAsync"
+                   @onfocus="OnFocusAsync"
+                   @onblur="Close" />
+
+            @if (IsListVisible)
+            {
+                <ul id="@ListId" class="tags-editor-list" role="listbox" aria-label="Suggestions de tags">
+                    @for (var i = 0; i < _options.Count; i++)
+                    {
+                        var index = i;
+                        var option = _options[i];
+                        <li id="@OptionId(index)"
+                            role="option"
+                            aria-selected="@(index == _activeIndex ? "true" : "false")"
+                            class="tags-editor-option @(index == _activeIndex ? "is-active" : null)"
+                            @onmousedown="() => SelectAsync(option)"
+                            @onmousedown:preventDefault="true">
+                            @if (option.Existing is { } existing)
+                            {
+                                <span class="tags-editor-dot @TagColorVisuals.CssFor(existing.Color)" aria-hidden="true"></span>
+                                <span>@existing.Name</span>
+                            }
+                            else
+                            {
+                                <span>Créer « <strong>@option.Name</strong> »</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="tags-editor-hint">Maximum de @TaskItem.MaxTags tags atteint.</p>
+    }
+</div>

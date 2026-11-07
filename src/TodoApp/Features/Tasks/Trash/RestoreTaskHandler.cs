@@ -18,7 +18,7 @@ internal sealed class RestoreTaskHandler(
 
         var task = await db.Tasks
             .IgnoreQueryFilters([QueryFilters.SoftDelete])
-            .AsTracking()
+            .ForUpdate()
             .CreatedBy(createdById)
             .SingleOrDefaultAsync(t => t.Id == command.Id && t.IsDeleted, cancellationToken);
 

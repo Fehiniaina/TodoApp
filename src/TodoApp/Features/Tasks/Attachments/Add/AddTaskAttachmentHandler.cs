@@ -28,7 +28,7 @@ internal sealed partial class AddTaskAttachmentHandler(
 
         // 1. Accès et limite, AVANT de lire le moindre octet.
         var task = await db.Tasks
-            .AsTracking()
+            .ForUpdate()
             .VisibleTo(userId)
             .Include(t => t.Attachments)
             .SingleOrDefaultAsync(t => t.Id == command.TaskId, cancellationToken);

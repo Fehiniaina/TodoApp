@@ -1,0 +1,11 @@
+@using TodoApp.Features.Tags.Shared
+
+@if (Tags.Count > 0)
+{
+    <span class="row-tags" role="list" aria-label="Tags">
+        @foreach (var tag in Tags)
+        {
+            <TagChip @key="tag.Id" Tag="tag" />
+        }
+    </span>
+}

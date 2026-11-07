@@ -1,7 +1,8 @@
 using FluentValidation;
+using TodoApp.Domain.Tasks.Recurrence;
 using TodoApp.Features.Shared;
 
-namespace TodoApp.Domain.Tasks.Recurrence;
+namespace TodoApp.Features.Tasks.Recurrence;
 
 internal sealed class CreateRecurringTaskCommandValidator : AbstractValidator<CreateRecurringTaskCommand>
 {

@@ -74,7 +74,7 @@ internal sealed class ChecklistHandler(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var task = await db.Tasks
-            .AsTracking()
+            .ForUpdate()
             .SingleOrDefaultAsync(t => t.Id == taskId && t.CreatedById == createdBy, cancellationToken);
 
         if (task is null) return TaskNotFound;

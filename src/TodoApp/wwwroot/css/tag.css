@@ -1,0 +1,82 @@
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 22px;
+    max-width: 100%;
+    padding: 0 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.tag-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tag-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: -4px;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    opacity: .7;
+}
+
+    .tag-chip-remove:hover,
+    .tag-chip-remove:focus-visible {
+        opacity: 1;
+        background: rgba(9, 30, 66, .12);
+    }
+
+    .tag-chip-remove svg {
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+    }
+
+/* Fond clair + texte foncé : contraste suffisant (WCAG AA) pour chaque couleur. */
+.tag-color--gray {
+    background: #dfe1e6;
+    color: #42526e;
+}
+
+.tag-color--blue {
+    background: #deebff;
+    color: #0747a6;
+}
+
+.tag-color--green {
+    background: #e3fcef;
+    color: #006644;
+}
+
+.tag-color--yellow {
+    background: #fff0b3;
+    color: #7a5d00;
+}
+
+.tag-color--orange {
+    background: #ffe2bd;
+    color: #8a4600;
+}
+
+.tag-color--red {
+    background: #ffebe6;
+    color: #bf2600;
+}
+
+.tag-color--purple {
+    background: #eae6ff;
+    color: #403294;
+}

@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
+using TodoApp.Domain.Tags;
 using TodoApp.Domain.Tasks;
+using TodoApp.Features.Tags.Shared;
 using TodoApp.Features.Tasks.ListTasks;
 using TodoApp.Features.Users;
 
@@ -11,8 +14,12 @@ internal static class TaskSummaryProjection
     /// Projection finale : tout est traduit en SQL, sauf ToDisplayName qu'EF évalue
     /// en mémoire sur chaque ligne (autorisé dans le dernier Select uniquement).
     /// </summary>
-    public static IQueryable<TaskSummary> ToSummaries(IQueryable<TaskItem> tasks, IQueryable<ApplicationUser> users) =>
+    public static IQueryable<TaskSummary> ToSummaries(
+        IQueryable<TaskItem> tasks,
+        IQueryable<ApplicationUser> users,
+        IQueryable<Tag> tags) =>
         tasks
+            .TagWith("GetTasksToSummaries")
             .LeftJoin(users, t => t.AssigneeId, u => u.Id, (t, u) => new { Task = t, Assignee = u })
             .Select(x => new TaskSummary(
                 x.Task.Id,
@@ -31,6 +38,11 @@ internal static class TaskSummaryProjection
                 x.Assignee == null
                     ? null
                     : UserSummary.ToDisplayName(x.Assignee.FirstName, x.Assignee.LastName, x.Assignee.Email),
-                x.Task.Type));
+                x.Task.Type,
+                tags
+                    .Where(tag => x.Task.Tags.Any(tt => tt.TagId == tag.Id))
+                    .OrderBy(tag => tag.Name)
+                    .Select(tag => new TagDto(tag.Id, tag.Name, tag.Color))
+                    .ToList()));
 
 }

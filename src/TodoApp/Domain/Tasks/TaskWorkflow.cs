@@ -23,5 +23,5 @@ internal static class TaskWorkflow
     private static FrozenSet<TaskItemStatus> Next(params TaskItemStatus[] statuses) => statuses.ToFrozenSet();
 
     /// <summary>Statuts considérés comme terminés : ni en retard, ni à traiter.</summary>
-    public static readonly TaskItemStatus[] ClosedStatuses = [TaskItemStatus.Resolved, TaskItemStatus.Done];
+    public static readonly TaskItemStatus[] ClosedStatuses = [TaskItemStatus.Resolved];
 }

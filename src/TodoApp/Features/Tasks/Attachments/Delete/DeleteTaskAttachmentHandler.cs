@@ -20,7 +20,7 @@ internal sealed partial class DeleteTaskAttachmentHandler(
         await using var db = await factory.CreateDbContextAsync(cancellationToken);
 
         var task = await db.Tasks
-            .AsTracking()
+            .ForUpdate()
             .VisibleTo(userId)
             .Include(t => t.Attachments)
             .SingleOrDefaultAsync(t => t.Id == command.TaskId, cancellationToken);
